@@ -1,4 +1,4 @@
-from panda.eval import main
+from panda.entrypoint import main
 
 
 if __name__ == "__main__":
