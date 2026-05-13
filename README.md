@@ -1,8 +1,8 @@
 # PAnDa
 
-PAnDa is a public research repository for **Parallel-block Adaptive Contrast DoLa** and related decoding baselines. It packages the current evaluator, benchmark runners, saved development artifacts, and paper notes into a cleaner layout extracted from a larger internal workspace.
+PAnDa is a public research repository for **Parallel-block Adaptive Contrast DoLa** and related decoding baselines. It packages the current evaluator, benchmark runners, saved development artifacts, and paper notes into a compact public layout.
 
-The repo is built for **re-running decoder comparisons and inspecting the imported artifacts**, not as a polished benchmark suite with publication-final claims.
+The repo is built for **re-running decoder comparisons and inspecting saved development artifacts**, not as a polished benchmark suite with publication-final claims.
 
 ## What PAnDa does
 
@@ -25,9 +25,9 @@ TBASCo is the fixed-alpha low/high rerank baseline included for comparison.
 
 ## Repository status
 
-- This repository is a cleaned public release of the imported research artifact, not a full mirror of the original `KeelNetV2` workspace.
+- This repository is a cleaned public research release, not a full historical workspace mirror.
 - The strongest checked-in PAnDa evidence is still a **development TruthfulQA sanity artifact**, not a publication-final benchmark package.
-- Historical `stage*` names remain in some saved metadata and directories for provenance compatibility, even though the public-facing preset names are now `panda` and `tbasco`.
+- Historical `stage*` names remain in some saved metadata and directories for provenance compatibility, even though the active public preset names are `panda` and `tbasco`.
 
 ## Install
 
@@ -82,7 +82,7 @@ If the executable bit is missing on your machine, enable it once:
 chmod +x scripts/run_panda_truthfulqa.py scripts/run_tbasco_truthfulqa.py
 ```
 
-If you do not override `--model-name`, both presets switch from the generic CLI default to the imported comparison model:
+If you do not override `--model-name`, both presets switch from the generic CLI default to the saved comparison model:
 
 ```text
 HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration
@@ -136,7 +136,7 @@ Fresh runs written by the CLI use a decoder-specific artifact prefix. For exampl
 - `panda_full_eval_pairwise_summary.csv`
 - `panda_full_eval_metadata.json`
 
-The checked-in imported artifacts under `results/dev/stage*/` use the older unprefixed naming:
+The checked-in historical artifacts under `results/dev/stage*/` use the older unprefixed naming:
 
 - `raw_predictions.csv`
 - `summary.csv`
@@ -154,13 +154,13 @@ Plot an overview from a freshly generated PAnDa summary:
   --title "PAnDa TruthfulQA sanity run"
 ```
 
-Plot the checked-in imported artifact instead:
+Plot the checked-in historical artifact instead:
 
 ```bash
 ./.venv/bin/python scripts/plot_results.py \
   results/dev/stage12_panda_truthfulqa_sanity10/summary.csv \
   --output results/dev/stage12_panda_truthfulqa_sanity10/overview.png \
-  --title "Imported Stage 12 PAnDa artifact"
+  --title "Historical Stage 12 PAnDa artifact"
 ```
 
 ## Repository layout
@@ -185,7 +185,7 @@ Key implementation files:
 
 - The evaluator reads `HF_TOKEN` or `HUGGINGFACE_HUB_TOKEN` for remote Hugging Face access.
 - `--mode sanity` uses small seeded subsets; `--mode subset` uses larger seeded subsets; `--mode full` removes the default limit.
-- The repo tracks compact artifacts and provenance metadata, not the original cache tree or every exploratory run from the source workspace.
+- The repo tracks compact artifacts and provenance metadata, not every exploratory run or cache file from earlier internal work.
 - Exact reproduction can still depend on model availability, Hugging Face authentication, local dataset copies, and hardware comparable to the original environment.
 
 ## Paper

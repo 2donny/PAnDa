@@ -7,7 +7,7 @@ from .utils import normalize_comparison_preset
 
 def parse_args():
     """Parse command-line arguments."""
-    parser = argparse.ArgumentParser(description="PAnDa evaluation driver imported from KeelNetV2.")
+    parser = argparse.ArgumentParser(description="PAnDa evaluation driver.")
 
     # Model and evaluation setup
     parser.add_argument("--model-name", default="Qwen/Qwen2.5-3B-Instruct")

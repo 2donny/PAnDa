@@ -73,15 +73,3 @@ def build_pairwise_preference_prompt(prompt, candidate_a, candidate_b):
         "A = Candidate A is more likely correct\n"
         "B = Candidate B is more likely correct\n"
     )
-
-
-def build_confidence_query_prompt(prompt, candidate_text):
-    return (
-        "Estimate how likely the candidate answer is to be correct for the question.\n"
-        "Do not think aloud.\n\n"
-        f"Question:\n{prompt}\n\n"
-        f"Candidate answer:\n{candidate_text}\n\n"
-        "Reply with exactly one decimal number between 0 and 1 on the first line.\n"
-        "Examples:\n0.12\n0.73\n0.98\n"
-        "Do not output any words, labels, explanation, or punctuation other than the decimal number.\n"
-    )

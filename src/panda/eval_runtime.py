@@ -42,7 +42,6 @@ from .evaluator import (
     merge_runtime_summaries,
 )
 from .prompts import (
-    build_confidence_query_prompt,
     build_gsm8k_prompt,
     build_gsm8k_sequence_prompt,
     build_halueval_prompt,
@@ -56,7 +55,6 @@ __all__ = [
     "aggregate_results",
     "apply_final_norm",
     "assert_eval_sources",
-    "build_confidence_query_prompt",
     "build_gsm8k_prompt",
     "build_gsm8k_sequence_prompt",
     "build_halueval_prompt",

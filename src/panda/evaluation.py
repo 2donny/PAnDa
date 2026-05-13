@@ -177,13 +177,13 @@ def choose_pairwise_rerank_branch(
     candidate_a_norm = normalize_text(candidate_a_prediction)
     candidate_b_norm = normalize_text(candidate_b_prediction)
     same_prediction = candidate_a_norm == candidate_b_norm
-    confidence_base = None
-    confidence_fixed = None
-    confidence_base_raw = None
-    confidence_fixed_raw = None
-    confidence_base_valid = None
-    confidence_fixed_valid = None
-    confidence_runtime = None
+    pairwise_prob_a = None
+    pairwise_prob_b = None
+    pairwise_prob_a_raw = None
+    pairwise_prob_b_raw = None
+    pairwise_prob_a_valid = None
+    pairwise_prob_b_valid = None
+    pairwise_runtime = None
     pairwise_choice = None
     pairwise_choice_scores = None
     pairwise_choice_probs = None
@@ -197,13 +197,13 @@ def choose_pairwise_rerank_branch(
             candidate_a_prediction,
             candidate_b_prediction,
         )
-        confidence_base = float(preference_query["prob_a"])
-        confidence_fixed = float(preference_query["prob_b"])
-        confidence_base_raw = f"{confidence_base:.6f}"
-        confidence_fixed_raw = f"{confidence_fixed:.6f}"
-        confidence_base_valid = 1.0
-        confidence_fixed_valid = 1.0
-        confidence_runtime = preference_query["runtime_summary"]
+        pairwise_prob_a = float(preference_query["prob_a"])
+        pairwise_prob_b = float(preference_query["prob_b"])
+        pairwise_prob_a_raw = f"{pairwise_prob_a:.6f}"
+        pairwise_prob_b_raw = f"{pairwise_prob_b:.6f}"
+        pairwise_prob_a_valid = 1.0
+        pairwise_prob_b_valid = 1.0
+        pairwise_runtime = preference_query["runtime_summary"]
         pairwise_choice = preference_query["selected_choice"]
         pairwise_choice_scores = json.dumps(preference_query["choice_scores"], ensure_ascii=True)
         pairwise_choice_probs = json.dumps(preference_query["choice_probs"], ensure_ascii=True)
@@ -217,13 +217,13 @@ def choose_pairwise_rerank_branch(
         "selected_decoder": selected_decoder,
         "selected_base": float(selected_decoder == candidate_a_decoder),
         "same_prediction": float(same_prediction),
-        "confidence_base": confidence_base,
-        "confidence_fixed_alpha": confidence_fixed,
-        "confidence_base_raw": confidence_base_raw,
-        "confidence_fixed_alpha_raw": confidence_fixed_raw,
-        "confidence_base_valid": confidence_base_valid,
-        "confidence_fixed_alpha_valid": confidence_fixed_valid,
-        "confidence_runtime": confidence_runtime,
+        "pairwise_prob_a": pairwise_prob_a,
+        "pairwise_prob_b": pairwise_prob_b,
+        "pairwise_prob_a_raw": pairwise_prob_a_raw,
+        "pairwise_prob_b_raw": pairwise_prob_b_raw,
+        "pairwise_prob_a_valid": pairwise_prob_a_valid,
+        "pairwise_prob_b_valid": pairwise_prob_b_valid,
+        "pairwise_runtime": pairwise_runtime,
         "pairwise_choice": pairwise_choice,
         "pairwise_choice_scores": pairwise_choice_scores,
         "pairwise_choice_probs": pairwise_choice_probs,
@@ -271,12 +271,12 @@ def generate_with_tbasco_decoder(evaluator, prompt, max_new_tokens=96, stop_on_e
         "tbasco_selected_decoder": branch["selected_decoder"],
         "tbasco_selected_low": branch["selected_base"],
         "tbasco_same_prediction": branch["same_prediction"],
-        "tbasco_confidence_low": branch["confidence_base"],
-        "tbasco_confidence_high": branch["confidence_fixed_alpha"],
-        "tbasco_confidence_low_valid": branch["confidence_base_valid"],
-        "tbasco_confidence_high_valid": branch["confidence_fixed_alpha_valid"],
-        "tbasco_confidence_low_raw": branch["confidence_base_raw"],
-        "tbasco_confidence_high_raw": branch["confidence_fixed_alpha_raw"],
+        "tbasco_pairwise_prob_low": branch["pairwise_prob_a"],
+        "tbasco_pairwise_prob_high": branch["pairwise_prob_b"],
+        "tbasco_pairwise_prob_low_valid": branch["pairwise_prob_a_valid"],
+        "tbasco_pairwise_prob_high_valid": branch["pairwise_prob_b_valid"],
+        "tbasco_pairwise_prob_low_raw": branch["pairwise_prob_a_raw"],
+        "tbasco_pairwise_prob_high_raw": branch["pairwise_prob_b_raw"],
         "tbasco_pairwise_choice": branch["pairwise_choice"],
         "tbasco_pairwise_choice_scores": branch["pairwise_choice_scores"],
         "tbasco_pairwise_choice_probs": branch["pairwise_choice_probs"],
@@ -284,7 +284,7 @@ def generate_with_tbasco_decoder(evaluator, prompt, max_new_tokens=96, stop_on_e
     }
     extra.update(
         merge_runtime_summaries(
-            (low_runtime, high_runtime, branch["confidence_runtime"])
+            (low_runtime, high_runtime, branch["pairwise_runtime"])
         )
     )
     return prediction, trace, extra
@@ -311,7 +311,7 @@ def predict_choice(evaluator, question, choices, decoder_name, prompt_builder):
         chosen_rows = low_sorted_rows if use_low else high_sorted_rows
         best_trace = low_trace if use_low else high_trace
         runtime_summary = merge_runtime_summaries(
-            (low_runtime, high_runtime, branch["confidence_runtime"])
+            (low_runtime, high_runtime, branch["pairwise_runtime"])
         )
         prediction = chosen_rows[0]["choice"]
         choice_scores = {row["choice"]: row["sequence_logprob"] for row in chosen_rows}
@@ -321,12 +321,12 @@ def predict_choice(evaluator, question, choices, decoder_name, prompt_builder):
             "tbasco_selected_decoder": branch["selected_decoder"],
             "tbasco_selected_low": branch["selected_base"],
             "tbasco_same_prediction": branch["same_prediction"],
-            "tbasco_confidence_low": branch["confidence_base"],
-            "tbasco_confidence_high": branch["confidence_fixed_alpha"],
-            "tbasco_confidence_low_valid": branch["confidence_base_valid"],
-            "tbasco_confidence_high_valid": branch["confidence_fixed_alpha_valid"],
-            "tbasco_confidence_low_raw": branch["confidence_base_raw"],
-            "tbasco_confidence_high_raw": branch["confidence_fixed_alpha_raw"],
+            "tbasco_pairwise_prob_low": branch["pairwise_prob_a"],
+            "tbasco_pairwise_prob_high": branch["pairwise_prob_b"],
+            "tbasco_pairwise_prob_low_valid": branch["pairwise_prob_a_valid"],
+            "tbasco_pairwise_prob_high_valid": branch["pairwise_prob_b_valid"],
+            "tbasco_pairwise_prob_low_raw": branch["pairwise_prob_a_raw"],
+            "tbasco_pairwise_prob_high_raw": branch["pairwise_prob_b_raw"],
             "tbasco_pairwise_choice": branch["pairwise_choice"],
             "tbasco_pairwise_choice_scores": branch["pairwise_choice_scores"],
             "tbasco_pairwise_choice_probs": branch["pairwise_choice_probs"],
@@ -402,13 +402,13 @@ def predict_truthfulqa_mc(evaluator, question, mc1_choices, mc1_labels, mc2_choi
                 "selected_decoder": "tbasco_high",
                 "selected_base": 0.0,
                 "same_prediction": 1.0,
-                "confidence_base": None,
-                "confidence_fixed_alpha": None,
-                "confidence_base_raw": None,
-                "confidence_fixed_alpha_raw": None,
-                "confidence_base_valid": None,
-                "confidence_fixed_alpha_valid": None,
-                "confidence_runtime": None,
+                "pairwise_prob_a": None,
+                "pairwise_prob_b": None,
+                "pairwise_prob_a_raw": None,
+                "pairwise_prob_b_raw": None,
+                "pairwise_prob_a_valid": None,
+                "pairwise_prob_b_valid": None,
+                "pairwise_runtime": None,
                 "pairwise_choice": None,
                 "pairwise_choice_scores": None,
                 "pairwise_choice_probs": None,
@@ -430,12 +430,12 @@ def predict_truthfulqa_mc(evaluator, question, mc1_choices, mc1_labels, mc2_choi
             "tbasco_selected_decoder": branch["selected_decoder"],
             "tbasco_selected_low": branch["selected_base"],
             "tbasco_same_prediction": branch["same_prediction"],
-            "tbasco_confidence_low": branch["confidence_base"],
-            "tbasco_confidence_high": branch["confidence_fixed_alpha"],
-            "tbasco_confidence_low_valid": branch["confidence_base_valid"],
-            "tbasco_confidence_high_valid": branch["confidence_fixed_alpha_valid"],
-            "tbasco_confidence_low_raw": branch["confidence_base_raw"],
-            "tbasco_confidence_high_raw": branch["confidence_fixed_alpha_raw"],
+            "tbasco_pairwise_prob_low": branch["pairwise_prob_a"],
+            "tbasco_pairwise_prob_high": branch["pairwise_prob_b"],
+            "tbasco_pairwise_prob_low_valid": branch["pairwise_prob_a_valid"],
+            "tbasco_pairwise_prob_high_valid": branch["pairwise_prob_b_valid"],
+            "tbasco_pairwise_prob_low_raw": branch["pairwise_prob_a_raw"],
+            "tbasco_pairwise_prob_high_raw": branch["pairwise_prob_b_raw"],
             "tbasco_pairwise_choice": branch["pairwise_choice"],
             "tbasco_pairwise_choice_scores": branch["pairwise_choice_scores"],
             "tbasco_pairwise_choice_probs": branch["pairwise_choice_probs"],
@@ -448,7 +448,7 @@ def predict_truthfulqa_mc(evaluator, question, mc1_choices, mc1_labels, mc2_choi
                     mc2_runtime_low,
                     mc1_runtime_high,
                     mc2_runtime_high,
-                    branch["confidence_runtime"],
+                    branch["pairwise_runtime"],
                 )
             )
         )
@@ -634,12 +634,12 @@ def evaluate_truthfulqa(evaluator, rows, progress_every=1, decoder_names=None):
                     "tbasco_selected_decoder": extra.get("tbasco_selected_decoder"),
                     "tbasco_selected_low": extra.get("tbasco_selected_low"),
                     "tbasco_same_prediction": extra.get("tbasco_same_prediction"),
-                    "tbasco_confidence_low": extra.get("tbasco_confidence_low"),
-                    "tbasco_confidence_high": extra.get("tbasco_confidence_high"),
-                    "tbasco_confidence_low_valid": extra.get("tbasco_confidence_low_valid"),
-                    "tbasco_confidence_high_valid": extra.get("tbasco_confidence_high_valid"),
-                    "tbasco_confidence_low_raw": extra.get("tbasco_confidence_low_raw"),
-                    "tbasco_confidence_high_raw": extra.get("tbasco_confidence_high_raw"),
+                    "tbasco_pairwise_prob_low": extra.get("tbasco_pairwise_prob_low"),
+                    "tbasco_pairwise_prob_high": extra.get("tbasco_pairwise_prob_high"),
+                    "tbasco_pairwise_prob_low_valid": extra.get("tbasco_pairwise_prob_low_valid"),
+                    "tbasco_pairwise_prob_high_valid": extra.get("tbasco_pairwise_prob_high_valid"),
+                    "tbasco_pairwise_prob_low_raw": extra.get("tbasco_pairwise_prob_low_raw"),
+                    "tbasco_pairwise_prob_high_raw": extra.get("tbasco_pairwise_prob_high_raw"),
                     "tbasco_pairwise_choice": extra.get("tbasco_pairwise_choice"),
                     "tbasco_pairwise_choice_scores": extra.get("tbasco_pairwise_choice_scores"),
                     "tbasco_pairwise_choice_probs": extra.get("tbasco_pairwise_choice_probs"),
@@ -690,12 +690,12 @@ def evaluate_strategyqa(evaluator, rows, progress_every=1, decoder_names=None):
                 "tbasco_selected_decoder": extra.get("tbasco_selected_decoder"),
                 "tbasco_selected_low": extra.get("tbasco_selected_low"),
                 "tbasco_same_prediction": extra.get("tbasco_same_prediction"),
-                "tbasco_confidence_low": extra.get("tbasco_confidence_low"),
-                "tbasco_confidence_high": extra.get("tbasco_confidence_high"),
-                "tbasco_confidence_low_valid": extra.get("tbasco_confidence_low_valid"),
-                "tbasco_confidence_high_valid": extra.get("tbasco_confidence_high_valid"),
-                "tbasco_confidence_low_raw": extra.get("tbasco_confidence_low_raw"),
-                "tbasco_confidence_high_raw": extra.get("tbasco_confidence_high_raw"),
+                "tbasco_pairwise_prob_low": extra.get("tbasco_pairwise_prob_low"),
+                "tbasco_pairwise_prob_high": extra.get("tbasco_pairwise_prob_high"),
+                "tbasco_pairwise_prob_low_valid": extra.get("tbasco_pairwise_prob_low_valid"),
+                "tbasco_pairwise_prob_high_valid": extra.get("tbasco_pairwise_prob_high_valid"),
+                "tbasco_pairwise_prob_low_raw": extra.get("tbasco_pairwise_prob_low_raw"),
+                "tbasco_pairwise_prob_high_raw": extra.get("tbasco_pairwise_prob_high_raw"),
                 "tbasco_pairwise_choice": extra.get("tbasco_pairwise_choice"),
                 "tbasco_pairwise_choice_scores": extra.get("tbasco_pairwise_choice_scores"),
                 "tbasco_pairwise_choice_probs": extra.get("tbasco_pairwise_choice_probs"),
@@ -753,12 +753,12 @@ def evaluate_halueval(evaluator, rows, progress_every=1, decoder_names=None):
                 "tbasco_selected_decoder": extra.get("tbasco_selected_decoder"),
                 "tbasco_selected_low": extra.get("tbasco_selected_low"),
                 "tbasco_same_prediction": extra.get("tbasco_same_prediction"),
-                "tbasco_confidence_low": extra.get("tbasco_confidence_low"),
-                "tbasco_confidence_high": extra.get("tbasco_confidence_high"),
-                "tbasco_confidence_low_valid": extra.get("tbasco_confidence_low_valid"),
-                "tbasco_confidence_high_valid": extra.get("tbasco_confidence_high_valid"),
-                "tbasco_confidence_low_raw": extra.get("tbasco_confidence_low_raw"),
-                "tbasco_confidence_high_raw": extra.get("tbasco_confidence_high_raw"),
+                "tbasco_pairwise_prob_low": extra.get("tbasco_pairwise_prob_low"),
+                "tbasco_pairwise_prob_high": extra.get("tbasco_pairwise_prob_high"),
+                "tbasco_pairwise_prob_low_valid": extra.get("tbasco_pairwise_prob_low_valid"),
+                "tbasco_pairwise_prob_high_valid": extra.get("tbasco_pairwise_prob_high_valid"),
+                "tbasco_pairwise_prob_low_raw": extra.get("tbasco_pairwise_prob_low_raw"),
+                "tbasco_pairwise_prob_high_raw": extra.get("tbasco_pairwise_prob_high_raw"),
                 "tbasco_pairwise_choice": extra.get("tbasco_pairwise_choice"),
                 "tbasco_pairwise_choice_scores": extra.get("tbasco_pairwise_choice_scores"),
                 "tbasco_pairwise_choice_probs": extra.get("tbasco_pairwise_choice_probs"),
@@ -809,12 +809,12 @@ def evaluate_gsm8k(evaluator, rows, progress_every=1, decoder_names=None):
                 "tbasco_selected_decoder": extra.get("tbasco_selected_decoder"),
                 "tbasco_selected_low": extra.get("tbasco_selected_low"),
                 "tbasco_same_prediction": extra.get("tbasco_same_prediction"),
-                "tbasco_confidence_low": extra.get("tbasco_confidence_low"),
-                "tbasco_confidence_high": extra.get("tbasco_confidence_high"),
-                "tbasco_confidence_low_valid": extra.get("tbasco_confidence_low_valid"),
-                "tbasco_confidence_high_valid": extra.get("tbasco_confidence_high_valid"),
-                "tbasco_confidence_low_raw": extra.get("tbasco_confidence_low_raw"),
-                "tbasco_confidence_high_raw": extra.get("tbasco_confidence_high_raw"),
+                "tbasco_pairwise_prob_low": extra.get("tbasco_pairwise_prob_low"),
+                "tbasco_pairwise_prob_high": extra.get("tbasco_pairwise_prob_high"),
+                "tbasco_pairwise_prob_low_valid": extra.get("tbasco_pairwise_prob_low_valid"),
+                "tbasco_pairwise_prob_high_valid": extra.get("tbasco_pairwise_prob_high_valid"),
+                "tbasco_pairwise_prob_low_raw": extra.get("tbasco_pairwise_prob_low_raw"),
+                "tbasco_pairwise_prob_high_raw": extra.get("tbasco_pairwise_prob_high_raw"),
                 "tbasco_pairwise_choice": extra.get("tbasco_pairwise_choice"),
                 "tbasco_pairwise_choice_scores": extra.get("tbasco_pairwise_choice_scores"),
                 "tbasco_pairwise_choice_probs": extra.get("tbasco_pairwise_choice_probs"),
@@ -870,12 +870,12 @@ def evaluate_gsm8k_sequence(evaluator, rows, progress_every=1, decoder_names=Non
                 "tbasco_selected_decoder": extra.get("tbasco_selected_decoder"),
                 "tbasco_selected_low": extra.get("tbasco_selected_low"),
                 "tbasco_same_prediction": extra.get("tbasco_same_prediction"),
-                "tbasco_confidence_low": extra.get("tbasco_confidence_low"),
-                "tbasco_confidence_high": extra.get("tbasco_confidence_high"),
-                "tbasco_confidence_low_valid": extra.get("tbasco_confidence_low_valid"),
-                "tbasco_confidence_high_valid": extra.get("tbasco_confidence_high_valid"),
-                "tbasco_confidence_low_raw": extra.get("tbasco_confidence_low_raw"),
-                "tbasco_confidence_high_raw": extra.get("tbasco_confidence_high_raw"),
+                "tbasco_pairwise_prob_low": extra.get("tbasco_pairwise_prob_low"),
+                "tbasco_pairwise_prob_high": extra.get("tbasco_pairwise_prob_high"),
+                "tbasco_pairwise_prob_low_valid": extra.get("tbasco_pairwise_prob_low_valid"),
+                "tbasco_pairwise_prob_high_valid": extra.get("tbasco_pairwise_prob_high_valid"),
+                "tbasco_pairwise_prob_low_raw": extra.get("tbasco_pairwise_prob_low_raw"),
+                "tbasco_pairwise_prob_high_raw": extra.get("tbasco_pairwise_prob_high_raw"),
                 "tbasco_pairwise_choice": extra.get("tbasco_pairwise_choice"),
                 "tbasco_pairwise_choice_scores": extra.get("tbasco_pairwise_choice_scores"),
                 "tbasco_pairwise_choice_probs": extra.get("tbasco_pairwise_choice_probs"),
