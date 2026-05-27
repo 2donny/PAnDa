@@ -1,9 +1,9 @@
 """Utility functions for text normalization and parsing."""
 
-import re
 import math
+import re
 
-from .config import CANONICAL_COMPARISON_PRESETS, DECODER_LABELS
+from .config import CANONICAL_COMPARISON_PRESETS, DECODER_LABELS, DEFAULT_DECODER_NAMES
 
 
 def normalize_text(text):
@@ -199,4 +199,4 @@ def get_decoder_label(decoder_name):
 def get_decoder_names(args=None):
     """Get list of decoders to evaluate."""
     del args
-    return ("greedy", "dola", "fixed_alpha_dola", "tbasco", "panda")
+    return DEFAULT_DECODER_NAMES

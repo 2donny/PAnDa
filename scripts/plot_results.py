@@ -6,11 +6,9 @@ import pandas as pd
 
 
 QUALITY_ORDER = [
+    ("truthfulqa", "mc1", "TruthfulQA MC1"),
     ("truthfulqa", "mc2", "TruthfulQA MC2"),
     ("truthfulqa", "mc3", "TruthfulQA MC3"),
-    ("strategyqa", "accuracy", "StrategyQA"),
-    ("gsm8k_sequence", "accuracy", "GSM8K Seq"),
-    ("gsm8k", "accuracy", "GSM8K"),
 ]
 
 
@@ -61,10 +59,9 @@ def plot_overview(summary_df, output_path, title):
         "Greedy": "#355070",
         "dola": "#6d597a",
         "DoLa": "#6d597a",
-        "fixed alpha dola": "#b56576",
-        "DoLa-FixedAlpha": "#b56576",
-        "tbasco": "#e56b6f",
-        "TBASCo": "#e56b6f",
+        "fixed alpha dola (0.1)": "#d08c60",
+        "fixed alpha dola (0.5)": "#b56576",
+        "fixed alpha dola (0.95)": "#82435d",
         "panda": "#5f0f40",
         "PAnDa": "#5f0f40",
     }

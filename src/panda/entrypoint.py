@@ -12,22 +12,11 @@ except ImportError:
     pd = None
 
 from .args import apply_comparison_preset, parse_args
-from .benchmarks import (
-    load_alpacaeval_rows,
-    load_gsm8k_rows,
-    load_halueval_rows,
-    load_strategyqa_rows,
-    load_truthfulqa_rows,
-)
+from .benchmarks import load_truthfulqa_rows
 from .evaluation import (
     assert_eval_sources,
     build_pairwise_summary,
-    evaluate_gsm8k,
-    evaluate_gsm8k_sequence,
-    evaluate_halueval,
-    evaluate_strategyqa,
     evaluate_truthfulqa,
-    export_alpacaeval_outputs,
 )
 from .evaluator import Stage4Evaluator
 from .utils import make_sampling_rng, resolve_limit
@@ -36,8 +25,6 @@ from .utils import make_sampling_rng, resolve_limit
 def infer_artifact_prefix(args):
     if args.comparison_preset == "panda":
         return "panda_full_eval"
-    if args.comparison_preset == "tbasco":
-        return "tbasco_full_eval"
     return "comparison_full_eval"
 
 
@@ -78,83 +65,28 @@ def main():
     artifact_prefix = infer_artifact_prefix(args)
 
     truthfulqa_limit = resolve_limit(args.truthfulqa_limit, args.mode, 5)
-    strategyqa_limit = resolve_limit(args.strategyqa_limit, args.mode, 5)
-    gsm8k_limit = resolve_limit(args.gsm8k_limit, args.mode, 5)
-    halueval_limit = resolve_limit(args.halueval_limit, args.mode, 5)
-    alpacaeval_limit = resolve_limit(args.alpacaeval_limit, args.mode, 5)
 
     print(
         {
             "truthfulqa_limit": truthfulqa_limit,
-            "strategyqa_limit": strategyqa_limit,
-            "gsm8k_limit": gsm8k_limit,
-            "halueval_limit": halueval_limit,
-            "alpacaeval_limit": alpacaeval_limit,
-            "include_gsm8k_sequence": args.include_gsm8k_sequence,
-            "include_halueval": args.include_halueval,
-            "include_alpacaeval": args.include_alpacaeval,
             "save_results": args.save_results,
         }
     )
 
     evaluator = Stage4Evaluator(args)
 
-    truthfulqa_rows, truthfulqa_source, truthfulqa_manifest = ([], "disabled", {"sampling_mode": "disabled"})
-    strategyqa_rows, strategyqa_source, strategyqa_manifest = ([], "disabled", {"sampling_mode": "disabled"})
-    gsm8k_rows, gsm8k_source, gsm8k_manifest = ([], "disabled", {"sampling_mode": "disabled"})
-    halueval_rows, halueval_source, halueval_manifest = ([], "disabled", {"sampling_mode": "disabled"})
-    alpacaeval_rows, alpacaeval_source, alpacaeval_manifest = ([], "disabled", {"sampling_mode": "disabled"})
+    truthfulqa_rows, truthfulqa_source, truthfulqa_manifest = load_truthfulqa_rows(
+        truthfulqa_limit,
+        make_sampling_rng(args.seed, "truthfulqa"),
+    )
 
-    if not args.skip_truthfulqa:
-        truthfulqa_rows, truthfulqa_source, truthfulqa_manifest = load_truthfulqa_rows(
-            truthfulqa_limit,
-            make_sampling_rng(args.seed, "truthfulqa"),
-        )
-    if not args.skip_strategyqa:
-        strategyqa_rows, strategyqa_source, strategyqa_manifest = load_strategyqa_rows(
-            strategyqa_limit,
-            make_sampling_rng(args.seed, "strategyqa"),
-            dataset=args.strategyqa_dataset,
-            config=args.strategyqa_config,
-            split=args.strategyqa_split,
-        )
-    if not args.skip_gsm8k:
-        gsm8k_rows, gsm8k_source, gsm8k_manifest = load_gsm8k_rows(
-            gsm8k_limit,
-            make_sampling_rng(args.seed, "gsm8k"),
-        )
-    if args.include_halueval:
-        halueval_rows, halueval_source, halueval_manifest = load_halueval_rows(
-            halueval_limit,
-            make_sampling_rng(args.seed, "halueval"),
-            args.halueval_root,
-            tuple(part.strip() for part in str(args.halueval_tasks).split(",") if part.strip()),
-        )
-    if args.include_alpacaeval:
-        alpacaeval_rows, alpacaeval_source, alpacaeval_manifest = load_alpacaeval_rows(
-            alpacaeval_limit,
-            make_sampling_rng(args.seed, "alpacaeval"),
-        )
-
-    assert_eval_sources(args, truthfulqa_source, strategyqa_source, gsm8k_source, alpacaeval_source)
+    assert_eval_sources(args, truthfulqa_source)
 
     print(
         {
             "truthfulqa_source": truthfulqa_source,
             "truthfulqa_sampling": truthfulqa_manifest,
-            "strategyqa_source": strategyqa_source,
-            "strategyqa_sampling": strategyqa_manifest,
-            "gsm8k_source": gsm8k_source,
-            "gsm8k_sampling": gsm8k_manifest,
-            "halueval_source": halueval_source,
-            "halueval_sampling": halueval_manifest,
-            "alpacaeval_source": alpacaeval_source,
-            "alpacaeval_sampling": alpacaeval_manifest,
             "truthfulqa_examples": len(truthfulqa_rows),
-            "strategyqa_examples": len(strategyqa_rows),
-            "gsm8k_examples": len(gsm8k_rows),
-            "halueval_examples": len(halueval_rows),
-            "alpacaeval_examples": len(alpacaeval_rows),
         }
     )
 
@@ -162,34 +94,8 @@ def main():
     start_time = time.perf_counter()
     if truthfulqa_rows:
         all_results.extend(evaluate_truthfulqa(evaluator, truthfulqa_rows, args.progress_every))
-    if strategyqa_rows:
-        all_results.extend(evaluate_strategyqa(evaluator, strategyqa_rows, args.progress_every))
-    if gsm8k_rows:
-        all_results.extend(evaluate_gsm8k(evaluator, gsm8k_rows, args.progress_every))
-        if args.include_gsm8k_sequence:
-            all_results.extend(
-                evaluate_gsm8k_sequence(
-                    evaluator,
-                    gsm8k_rows,
-                    args.progress_every,
-                    max_new_tokens=args.sequence_max_new_tokens,
-                )
-            )
-    if halueval_rows:
-        all_results.extend(evaluate_halueval(evaluator, halueval_rows, args.progress_every))
     elapsed = time.perf_counter() - start_time
     print({"evaluation_seconds": elapsed, "rows": len(all_results)})
-
-    alpacaeval_export_metadata = None
-    if args.include_alpacaeval and alpacaeval_rows:
-        alpacaeval_export_metadata = export_alpacaeval_outputs(
-            evaluator,
-            alpacaeval_rows,
-            evaluator.decoder_names,
-            Path(args.results_dir),
-            artifact_prefix,
-        )
-        print({"alpacaeval_export": alpacaeval_export_metadata})
 
     if pd is not None:
         results_df = pd.DataFrame(all_results)
@@ -223,13 +129,6 @@ def main():
                 avg_selection_score=("avg_selection_score", "mean"),
                 fallback_rate=("fallback_rate", "mean"),
                 avg_baseline_margin=("avg_baseline_margin", "mean"),
-                tbasco_selected_low_rate=("tbasco_selected_low", "mean"),
-                tbasco_same_prediction_rate=("tbasco_same_prediction", "mean"),
-                tbasco_pairwise_prob_low_mean=("tbasco_pairwise_prob_low", "mean"),
-                tbasco_pairwise_prob_high_mean=("tbasco_pairwise_prob_high", "mean"),
-                tbasco_pairwise_prob_low_valid_rate=("tbasco_pairwise_prob_low_valid", "mean"),
-                tbasco_pairwise_prob_high_valid_rate=("tbasco_pairwise_prob_high_valid", "mean"),
-                tbasco_pairwise_tie_prob_mean=("tbasco_pairwise_tie_prob", "mean"),
                 avg_jacobi_passes=("avg_jacobi_passes", "mean"),
                 avg_jacobi_window_size=("avg_jacobi_window_size", "mean"),
                 avg_jacobi_stable_prefix=("avg_jacobi_stable_prefix", "mean"),
@@ -275,13 +174,6 @@ def main():
             "avg_selection_score",
             "fallback_rate",
             "avg_baseline_margin",
-            "tbasco_selected_low_rate",
-            "tbasco_same_prediction_rate",
-            "tbasco_pairwise_prob_low_mean",
-            "tbasco_pairwise_prob_high_mean",
-            "tbasco_pairwise_prob_low_valid_rate",
-            "tbasco_pairwise_prob_high_valid_rate",
-            "tbasco_pairwise_tie_prob_mean",
             "avg_jacobi_passes",
             "avg_jacobi_window_size",
             "avg_jacobi_stable_prefix",
@@ -332,14 +224,9 @@ def main():
             "decoders": list(evaluator.decoder_names),
             "decoder_labels": evaluator.decoder_labels,
             "default_shallow_bucket": evaluator.default_bucket,
-            "fixed_alpha_value": args.fixed_alpha_value,
-            "include_gsm8k_sequence": args.include_gsm8k_sequence,
-            "sequence_max_new_tokens": args.sequence_max_new_tokens,
-            "tbasco_low": evaluator.tbasco_low,
-            "tbasco_high": evaluator.tbasco_high,
-            "tbasco_note": (
-                "TBASCo reranks low-alpha and high-alpha fixed-alpha DoLa candidates with a pairwise preference query."
-            ),
+            "fixed_alpha_decoders": evaluator.fixed_alpha_decoders,
+            "panda_low_alpha": evaluator.panda_low_alpha,
+            "panda_high_alpha": evaluator.panda_high_alpha,
             "jacobi_window_size": evaluator.jacobi_window_size,
             "jacobi_max_iters": evaluator.jacobi_max_iters,
             "jacobi_init_strategy": "repeat_last",
@@ -350,26 +237,11 @@ def main():
                 "jacobi_block_decoding_with_shared_low_high_fixed_alpha_views_and_local_truth_biased_arbitration"
             ),
             "panda_early_agreement_shortcut": evaluator.panda_early_agreement_shortcut,
+            "evaluation_benchmark": "truthfulqa",
+            "truthfulqa_metrics": ["mc1", "mc2", "mc3"],
             "truthfulqa_source": truthfulqa_source,
-            "strategyqa_source": strategyqa_source,
-            "gsm8k_source": gsm8k_source,
-            "halueval_source": halueval_source,
-            "alpacaeval_source": alpacaeval_source,
             "truthfulqa_sampling": truthfulqa_manifest,
-            "strategyqa_sampling": strategyqa_manifest,
-            "gsm8k_sampling": gsm8k_manifest,
-            "halueval_sampling": halueval_manifest,
-            "alpacaeval_sampling": alpacaeval_manifest,
             "truthfulqa_limit": truthfulqa_limit,
-            "strategyqa_limit": strategyqa_limit,
-            "gsm8k_limit": gsm8k_limit,
-            "halueval_limit": halueval_limit,
-            "alpacaeval_limit": alpacaeval_limit,
-            "include_halueval": args.include_halueval,
-            "halueval_root": args.halueval_root,
-            "halueval_tasks": tuple(part.strip() for part in str(args.halueval_tasks).split(",") if part.strip()),
-            "include_alpacaeval": args.include_alpacaeval,
-            "alpacaeval_export": alpacaeval_export_metadata,
         }
         save_outputs(results_df, summary_df, pairwise_df, metadata, Path(args.results_dir), artifact_prefix)
 

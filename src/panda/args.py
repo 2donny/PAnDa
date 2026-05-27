@@ -21,59 +21,16 @@ def parse_args():
 
     # Dataset limits
     parser.add_argument("--truthfulqa-limit", type=str, default=None)
-    parser.add_argument("--strategyqa-limit", type=str, default=None)
-    parser.add_argument("--gsm8k-limit", type=str, default=None)
-    parser.add_argument("--halueval-limit", type=str, default=None)
-    parser.add_argument("--alpacaeval-limit", type=str, default=None)
 
     # Comparison preset
     parser.add_argument(
         "--comparison-preset",
         default=None,
-        metavar="{panda,tbasco}",
-        help="Apply one of the public comparison presets.",
+        metavar="{panda}",
+        help="Apply the public PAnDa comparison preset.",
     )
-
-    # Dataset configuration
-    parser.add_argument("--skip-truthfulqa", action="store_true")
-    parser.add_argument("--skip-strategyqa", action="store_true")
-    parser.add_argument("--skip-gsm8k", action="store_true")
-    parser.add_argument("--include-halueval", action="store_true")
-    parser.add_argument("--include-alpacaeval", action="store_true")
-    parser.add_argument("--include-gsm8k-sequence", action="store_true")
-
-    # Benchmark-specific settings
-    parser.add_argument("--dola-relative-top", type=float, default=0.1)
-    parser.add_argument("--dola-relative-top-value", type=float, default=-1000.0)
-    parser.add_argument("--alpacaeval-max-new-tokens", type=int, default=256)
-    parser.add_argument("--sequence-max-new-tokens", type=int, default=160)
-    parser.add_argument("--halueval-root", type=str, default=None)
-    parser.add_argument(
-        "--halueval-tasks",
-        type=str,
-        default="qa,dialogue,summarization",
-        help="Comma-separated HaluEval task files to use from the official release root.",
-    )
-    parser.add_argument("--strategyqa-dataset", type=str, default=None)
-    parser.add_argument("--strategyqa-config", type=str, default=None)
-    parser.add_argument("--strategyqa-split", type=str, default=None)
 
     # Decoder configuration
-    parser.add_argument("--fixed-alpha-value", type=float, default=0.5)
-    parser.add_argument(
-        "--tbasco-low",
-        type=float,
-        dest="tbasco_low",
-        default=0.2,
-        help="Low fixed-alpha candidate used by the TBASCo reranker.",
-    )
-    parser.add_argument(
-        "--tbasco-high",
-        type=float,
-        dest="tbasco_high",
-        default=0.8,
-        help="High fixed-alpha candidate used by the TBASCo reranker.",
-    )
     parser.add_argument(
         "--shallow-bucket",
         type=str,
@@ -109,6 +66,18 @@ def parse_args():
         action="store_true",
         help="Commit the leading PAnDa block prefix when low/high regimes do not produce a genuine conflict.",
     )
+    parser.add_argument(
+        "--dola-relative-top",
+        type=float,
+        default=0.1,
+        help="Relative-top filtering value used by the official DoLa baseline.",
+    )
+    parser.add_argument(
+        "--dola-relative-top-value",
+        type=float,
+        default=-1000.0,
+        help="Replacement log-score assigned to tokens masked by DoLa relative-top filtering.",
+    )
 
     # Miscellaneous
     parser.add_argument("--seed", type=int, default=42)
@@ -119,26 +88,10 @@ def parse_args():
 def apply_comparison_preset(args):
     """Apply preset configuration to args."""
     args.comparison_preset = normalize_comparison_preset(args.comparison_preset)
-    
-    if args.comparison_preset == "tbasco":
-        if float(args.tbasco_low) == 0.2:
-            args.tbasco_low = 0.1
-        if float(args.tbasco_high) == 0.8:
-            args.tbasco_high = 0.95
+
+    if args.comparison_preset == "panda":
         if args.model_name == "Qwen/Qwen2.5-3B-Instruct":
             args.model_name = "HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration"
         args.strict_eval = True
-        args.skip_strategyqa = True
-        args.skip_gsm8k = True
-    elif args.comparison_preset == "panda":
-        if float(args.tbasco_low) == 0.2:
-            args.tbasco_low = 0.1
-        if float(args.tbasco_high) == 0.8:
-            args.tbasco_high = 0.95
-        if args.model_name == "Qwen/Qwen2.5-3B-Instruct":
-            args.model_name = "HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration"
-        args.strict_eval = True
-        args.skip_strategyqa = True
-        args.skip_gsm8k = True
-    
+
     return args

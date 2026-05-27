@@ -1,4 +1,4 @@
-"""Public package metadata for the PAnDa and TBASCo research repository."""
+"""Public package metadata for the PAnDa research repository."""
 
 __all__ = ["__version__"]
 

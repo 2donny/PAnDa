@@ -17,17 +17,16 @@ The current evaluator also includes these comparison decoders:
 
 - `greedy`
 - `dola`
+- `fixed_alpha_dola_low`
 - `fixed_alpha_dola`
-- `tbasco`
+- `fixed_alpha_dola_high`
 - `panda`
-
-TBASCo is the fixed-alpha low/high rerank baseline included for comparison.
 
 ## Repository status
 
 - This repository is a cleaned public research release, not a full historical workspace mirror.
 - The strongest checked-in PAnDa evidence is still a **development TruthfulQA sanity artifact**, not a publication-final benchmark package.
-- Historical `stage*` names remain in some saved metadata and directories for provenance compatibility, even though the active public preset names are `panda` and `tbasco`.
+- Historical `stage*` names remain in some saved metadata and directories for provenance compatibility, even though the active public preset name is `panda`.
 
 ## Install
 
@@ -55,15 +54,9 @@ Re-run the checked-in PAnDa preset:
 ./scripts/run_panda_truthfulqa.py
 ```
 
-Re-run the checked-in TBASCo preset:
+That wrapper:
 
-```bash
-./scripts/run_tbasco_truthfulqa.py
-```
-
-Those wrappers:
-
-- apply `--comparison-preset panda` or `--comparison-preset tbasco`
+- apply `--comparison-preset panda`
 - run in `--mode sanity`
 - save outputs under `results/dev/...`
 - work from any current directory because they resolve the repo root themselves
@@ -73,16 +66,15 @@ If the target Python environment is missing dependencies, bootstrap once from th
 
 ```bash
 ./scripts/run_panda_truthfulqa.py --bootstrap
-./scripts/run_tbasco_truthfulqa.py --bootstrap
 ```
 
 If the executable bit is missing on your machine, enable it once:
 
 ```bash
-chmod +x scripts/run_panda_truthfulqa.py scripts/run_tbasco_truthfulqa.py
+chmod +x scripts/run_panda_truthfulqa.py
 ```
 
-If you do not override `--model-name`, both presets switch from the generic CLI default to the saved comparison model:
+If you do not override `--model-name`, the public PAnDa preset switches from the generic CLI default to the saved comparison model:
 
 ```text
 HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration
@@ -100,34 +92,31 @@ After installing the package, you can run the evaluator directly:
   --results-dir results/dev/panda_truthfulqa_sanity10
 ```
 
-Example: run the broader default benchmark mix on a seeded subset:
+Example: run a larger TruthfulQA subset:
 
 ```bash
 ./.venv/bin/python -m panda \
   --mode subset \
   --save-results \
-  --results-dir results/dev/subset_run
+  --results-dir results/dev/truthfulqa_subset_run
 ```
 
 Useful flags:
 
-- `--comparison-preset {panda,tbasco}` to apply the public comparison presets
+- `--comparison-preset panda` to apply the public PAnDa preset
 - `--model-name ...` to choose a different Hugging Face causal LM
 - `--local-files-only` to avoid network fetches
-- `--include-halueval --halueval-root /path/to/halueval` to add local HaluEval data
-- `--include-alpacaeval` to export AlpacaEval-formatted generations
-- `--include-gsm8k-sequence` to run the longer GSM8K sequence path
-- `--skip-truthfulqa`, `--skip-strategyqa`, `--skip-gsm8k` to trim the benchmark set
+- `--truthfulqa-limit 50` to override the seeded sample size
+
+The fixed-alpha DoLa comparison set is hardcoded to `0.1`, `0.5`, and `0.95`. PAnDa uses the `0.1` and `0.95` regimes internally.
 
 ## Benchmarks and outputs
 
-The current code can evaluate or export:
+The current public CLI evaluates `TruthfulQA` multiple choice and reports:
 
-- `TruthfulQA` multiple choice
-- `StrategyQA`
-- `GSM8K`
-- `HaluEval` from a local dataset root
-- `AlpacaEval` exports
+- `mc1`
+- `mc2`
+- `mc3`
 
 Fresh runs written by the CLI use a decoder-specific artifact prefix. For example, the PAnDa preset writes:
 
