@@ -14,8 +14,7 @@ Run example:
 
 ```bash
 python3 results/experiments/exp2_horizon_arbitration/run_experiment.py \
-  --model-name HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration \
+  --model-name Qwen/Qwen2.5-3B-Instruct \
   --mode subset \
   --truthfulqa-limit 50
 ```
-

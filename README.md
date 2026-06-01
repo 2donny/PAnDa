@@ -54,6 +54,13 @@ Re-run the checked-in PAnDa preset:
 ./scripts/run_panda_truthfulqa.py
 ```
 
+Run the same preset on the shared 3B backbone used by the isolated experiments:
+
+```bash
+./scripts/run_panda_truthfulqa.py \
+  --model-name Qwen/Qwen2.5-3B-Instruct
+```
+
 That wrapper:
 
 - apply `--comparison-preset panda`
@@ -96,6 +103,7 @@ Example: run a larger TruthfulQA subset:
 
 ```bash
 ./.venv/bin/python -m panda \
+  --model-name Qwen/Qwen2.5-3B-Instruct \
   --mode subset \
   --save-results \
   --results-dir results/dev/truthfulqa_subset_run
