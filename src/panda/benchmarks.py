@@ -1,12 +1,27 @@
 """Benchmark loaders kept in sync with the public TruthfulQA evaluator."""
 
-from datasets import load_dataset
+from pathlib import Path
+
+from datasets import Dataset, load_dataset
 
 from .utils import sample_candidate_rows
 
 
+def _load_truthfulqa_validation_dataset():
+    try:
+        return load_dataset("truthful_qa", "multiple_choice", split="validation")
+    except Exception:
+        cache_root = Path.home() / ".cache" / "huggingface" / "datasets" / "truthful_qa" / "multiple_choice" / "0.0.0"
+        if not cache_root.exists():
+            raise
+        arrow_candidates = sorted(cache_root.glob("*/truthful_qa-validation.arrow"))
+        if not arrow_candidates:
+            raise
+        return Dataset.from_file(str(arrow_candidates[-1]))
+
+
 def load_truthfulqa_rows(limit, rng):
-    dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
+    dataset = _load_truthfulqa_validation_dataset()
     candidates = []
     for source_idx, row in enumerate(dataset):
         mc1_targets = row.get("mc1_targets") or {}

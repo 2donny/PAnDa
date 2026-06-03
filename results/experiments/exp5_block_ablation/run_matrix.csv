@@ -1,0 +1,2 @@
+run_id,notes
+run_02_update4_default,Compare always_contrast vs panda_switch vs panda_switch_update4 vs panda_always_contrasts under the default block settings with jacobi_window_size=2.

@@ -118,9 +118,9 @@ These are the relevant current repo settings:
 
 | Setting | Value |
 | --- | --- |
-| Fixed-alpha presets | `0.1`, `0.5`, `0.95` |
-| `alpha_min` | `0.1` |
-| `alpha_max` | `0.95` |
+| Fixed-alpha presets | `0.0`, `0.5`, `1.0` |
+| `alpha_min` | `0.0` |
+| `alpha_max` | `1.0` |
 | `tau` | `0.5` |
 | `update_every` | `4` |
 | Default shallow bucket | `range(0, max(1, num_layers // 4), 2)` |

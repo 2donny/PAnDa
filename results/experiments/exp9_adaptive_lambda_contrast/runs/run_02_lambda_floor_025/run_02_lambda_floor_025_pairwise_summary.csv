@@ -1,0 +1,7 @@
+sweep_id,benchmark,metric_name,left_decoder_label,right_decoder_label,num_examples,mean_score_delta,median_score_delta,win_rate,tie_rate,loss_rate
+,truthfulqa,mc1,adaptive_lambda_contrast,always_contrast,50,-0.04,0.0,0.02,0.92,0.06
+,truthfulqa,mc1,always_contrast,adaptive_lambda_contrast,50,0.04,0.0,0.06,0.92,0.02
+,truthfulqa,mc2,adaptive_lambda_contrast,always_contrast,50,-0.014899895944589864,5.128764634880858e-10,0.64,0.0,0.36
+,truthfulqa,mc2,always_contrast,adaptive_lambda_contrast,50,0.014899895944589864,-5.128764634880858e-10,0.36,0.0,0.64
+,truthfulqa,mc3,adaptive_lambda_contrast,always_contrast,50,-0.025666666666666667,0.0,0.08,0.78,0.14
+,truthfulqa,mc3,always_contrast,adaptive_lambda_contrast,50,0.025666666666666667,0.0,0.14,0.78,0.08

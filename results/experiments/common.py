@@ -27,6 +27,19 @@ from panda.utils import make_sampling_rng, resolve_limit
 SUMMARY_GROUP_COLUMNS = ["benchmark", "metric_name", "decoder", "decoder_label"]
 
 
+def _write_progress_snapshot(path, payload):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+
+
+def _append_progress_event(path, payload):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
+
+
 def read_run_matrix(path):
     with Path(path).open("r", encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
@@ -71,6 +84,63 @@ def build_evaluator_args(cli_args, run_spec, results_dir):
         dola_relative_top=float(run_spec.get("dola_relative_top") or cli_args.dola_relative_top),
         dola_relative_top_value=float(
             run_spec.get("dola_relative_top_value") or cli_args.dola_relative_top_value
+        ),
+        cd_amateur_model_name=(
+            run_spec.get("cd_amateur_model_name")
+            or getattr(cli_args, "cd_amateur_model_name", None)
+            or "Qwen/Qwen2.5-0.5B-Instruct"
+        ),
+        cd_plausibility_alpha=float(
+            run_spec.get("cd_plausibility_alpha")
+            or getattr(cli_args, "cd_plausibility_alpha", 0.1)
+        ),
+        cd_amateur_temperature=float(
+            run_spec.get("cd_amateur_temperature")
+            or getattr(cli_args, "cd_amateur_temperature", 0.5)
+        ),
+        top_k_value=int(run_spec.get("top_k_value") or getattr(cli_args, "top_k_value", 50)),
+        top_p_value=float(run_spec.get("top_p_value") or getattr(cli_args, "top_p_value", 0.9)),
+        exp6_guarded_top_k=int(
+            run_spec.get("exp6_guarded_top_k") or getattr(cli_args, "exp6_guarded_top_k", 2)
+        ),
+        exp6_sticky_hold_steps=int(
+            run_spec.get("exp6_sticky_hold_steps") or getattr(cli_args, "exp6_sticky_hold_steps", 1)
+        ),
+        exp6_margin_threshold=float(
+            run_spec.get("exp6_margin_threshold") or getattr(cli_args, "exp6_margin_threshold", 0.5)
+        ),
+        exp9_lambda_min=float(
+            run_spec.get("exp9_lambda_min") or getattr(cli_args, "exp9_lambda_min", 0.5)
+        ),
+        exp9_lambda_max=float(
+            run_spec.get("exp9_lambda_max") or getattr(cli_args, "exp9_lambda_max", 1.0)
+        ),
+        exp9_uncertainty_weight=float(
+            run_spec.get("exp9_uncertainty_weight")
+            or getattr(cli_args, "exp9_uncertainty_weight", 1.0)
+        ),
+        exp9_confidence_gap_weight=float(
+            run_spec.get("exp9_confidence_gap_weight")
+            or getattr(cli_args, "exp9_confidence_gap_weight", 2.0)
+        ),
+        exp10_risk_beta=float(
+            run_spec.get("exp10_risk_beta") or getattr(cli_args, "exp10_risk_beta", 0.8)
+        ),
+        exp10_entropy_weight=float(
+            run_spec.get("exp10_entropy_weight") or getattr(cli_args, "exp10_entropy_weight", 1.0)
+        ),
+        exp10_margin_weight=float(
+            run_spec.get("exp10_margin_weight") or getattr(cli_args, "exp10_margin_weight", 1.0)
+        ),
+        exp10_layer_jsd_weight=float(
+            run_spec.get("exp10_layer_jsd_weight") or getattr(cli_args, "exp10_layer_jsd_weight", 1.0)
+        ),
+        exp10_risk_threshold=float(
+            run_spec.get("exp10_risk_threshold") or getattr(cli_args, "exp10_risk_threshold", 0.55)
+        ),
+        exp10_sticky_hold_steps=int(
+            run_spec.get("exp10_sticky_hold_steps")
+            or getattr(cli_args, "exp10_sticky_hold_steps", 0)
         ),
         seed=int(run_spec.get("seed") or cli_args.seed),
     )
@@ -169,6 +239,10 @@ def save_experiment_outputs(results_df, summary_df, pairwise_df, metadata, resul
 def run_truthfulqa_suite(evaluator, decoder_names, cli_args, artifact_prefix, results_dir, metadata):
     from panda.benchmarks import load_truthfulqa_rows
 
+    results_dir = Path(results_dir)
+    results_dir.mkdir(parents=True, exist_ok=True)
+    progress_json_path = results_dir / "progress.json"
+    progress_events_path = results_dir / "progress.ndjson"
     truthfulqa_limit = resolve_limit(cli_args.truthfulqa_limit, cli_args.mode, 5)
     truthfulqa_rows, truthfulqa_source, truthfulqa_manifest = load_truthfulqa_rows(
         truthfulqa_limit,
@@ -185,15 +259,108 @@ def run_truthfulqa_suite(evaluator, decoder_names, cli_args, artifact_prefix, re
         }
     )
 
+    total_examples = len(truthfulqa_rows)
+    total_decoder_evals = total_examples * len(decoder_names)
+    progress_state = {
+        "status": "running",
+        "experiment": metadata.get("experiment_name"),
+        "run_id": metadata.get("run_id"),
+        "results_dir": str(results_dir),
+        "benchmark": "truthfulqa",
+        "total_examples": total_examples,
+        "total_decoders": len(decoder_names),
+        "total_decoder_evals": total_decoder_evals,
+        "completed_examples": 0,
+        "completed_decoder_evals": 0,
+        "current_example_idx": None,
+        "current_decoder_name": None,
+        "current_decoder_idx": None,
+        "latest_metrics": None,
+        "started_at_epoch": time.time(),
+        "updated_at_epoch": time.time(),
+    }
+
+    def progress_callback(event):
+        progress_state["updated_at_epoch"] = time.time()
+        event_type = event["event"]
+        progress_state["last_event"] = event_type
+        if event_type == "example_started":
+            progress_state["current_example_idx"] = int(event["example_idx"])
+            progress_state["current_question"] = event.get("question")
+        elif event_type == "decoder_finished":
+            progress_state["current_example_idx"] = int(event["example_idx"])
+            progress_state["current_decoder_idx"] = int(event["decoder_idx"])
+            progress_state["current_decoder_name"] = event["decoder_name"]
+            progress_state["completed_decoder_evals"] = int(
+                (int(event["example_idx"]) - 1) * len(decoder_names) + int(event["decoder_idx"])
+            )
+            progress_state["latest_metrics"] = {
+                "decoder_name": event["decoder_name"],
+                "mc1": event["mc1"],
+                "mc2": event["mc2"],
+                "mc3": event["mc3"],
+                "latency_seconds": event["latency_seconds"],
+            }
+            print(
+                {
+                    "progress": f"{progress_state['completed_decoder_evals']}/{total_decoder_evals}",
+                    "example": f"{event['example_idx']}/{total_examples}",
+                    "decoder": event["decoder_name"],
+                    "mc1": event["mc1"],
+                    "mc2": event["mc2"],
+                    "mc3": event["mc3"],
+                    "latency_seconds": event["latency_seconds"],
+                },
+                flush=True,
+            )
+        elif event_type == "example_finished":
+            progress_state["completed_examples"] = int(event["example_idx"])
+        elif event_type == "evaluation_finished":
+            progress_state["status"] = "completed"
+            progress_state["completed_examples"] = total_examples
+            progress_state["completed_decoder_evals"] = total_decoder_evals
+            progress_state["result_rows"] = int(event["result_rows"])
+        snapshot = dict(progress_state)
+        snapshot["percent_complete"] = (
+            100.0 * snapshot["completed_decoder_evals"] / total_decoder_evals if total_decoder_evals else 100.0
+        )
+        _write_progress_snapshot(progress_json_path, snapshot)
+        event_record = {"timestamp_epoch": time.time(), **event}
+        _append_progress_event(progress_events_path, event_record)
+
+    _write_progress_snapshot(progress_json_path, dict(progress_state, percent_complete=0.0))
+
     start_time = time.perf_counter()
-    all_results = evaluate_truthfulqa(
-        evaluator,
-        truthfulqa_rows,
-        progress_every=cli_args.progress_every,
-        decoder_names=decoder_names,
-    )
+    try:
+        all_results = evaluate_truthfulqa(
+            evaluator,
+            truthfulqa_rows,
+            progress_every=cli_args.progress_every,
+            decoder_names=decoder_names,
+            progress_callback=progress_callback,
+        )
+    except Exception as exc:
+        progress_state["status"] = "failed"
+        progress_state["updated_at_epoch"] = time.time()
+        progress_state["error"] = repr(exc)
+        _write_progress_snapshot(
+            progress_json_path,
+            dict(
+                progress_state,
+                percent_complete=(
+                    100.0 * progress_state["completed_decoder_evals"] / total_decoder_evals
+                    if total_decoder_evals
+                    else 0.0
+                ),
+            ),
+        )
+        _append_progress_event(
+            progress_events_path,
+            {"timestamp_epoch": time.time(), "event": "evaluation_failed", "error": repr(exc)},
+        )
+        raise
     elapsed = time.perf_counter() - start_time
-    print({"evaluation_seconds": elapsed, "rows": len(all_results)})
+    print({"evaluation_seconds": elapsed, "rows": len(all_results)}, flush=True)
 
     results_df, summary_df, pairwise_df = build_summary_frames(all_results)
     metadata = dict(metadata)

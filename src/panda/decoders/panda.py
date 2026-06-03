@@ -51,8 +51,6 @@ class PandaDecoderMixin:
 
     def run_panda_block(self, generated, window_size):
         window_size = int(window_size)
-        low_alpha = self.clamp_fixed_alpha("fixed_alpha_dola_low")
-        high_alpha = self.clamp_fixed_alpha("fixed_alpha_dola_high")
         # Start each speculative block from a cheap placeholder, then refine all positions in parallel.
         buffer = self.repeat_last_token_buffer(generated, window_size)
         previous_buffer = buffer.clone()
@@ -77,23 +75,22 @@ class PandaDecoderMixin:
                     shallow_logits,
                     p_final,
                 )
-                low_scores = final_logits_pos - low_alpha * shallow_logits
-                high_scores = final_logits_pos - high_alpha * shallow_logits
-                low_token = torch.argmax(low_scores, dim=-1)
-                high_token = torch.argmax(high_scores, dim=-1)
-                safe_confidence = self.top1_confidence(low_scores)
-                truth_confidence = self.top1_confidence(high_scores)
-                token_mismatch = int(int(low_token.item()) != int(high_token.item()))
+                greedy_scores, contrast_scores = self.build_binary_views(final_logits_pos, shallow_logits)
+                greedy_token = torch.argmax(greedy_scores, dim=-1)
+                contrast_token = torch.argmax(contrast_scores, dim=-1)
+                greedy_confidence = self.top1_confidence(greedy_scores)
+                contrast_confidence = self.top1_confidence(contrast_scores)
+                token_mismatch = int(int(greedy_token.item()) != int(contrast_token.item()))
                 if self.panda_early_agreement_shortcut and not token_mismatch:
                     regime_jsd = 0.0
                     disagreement = 0
                 else:
-                    low_probs = F.softmax(low_scores / self.cfg.tau, dim=-1)
-                    high_probs = F.softmax(high_scores / self.cfg.tau, dim=-1)
-                    regime_jsd = self.js_divergence(low_probs, high_probs)
+                    greedy_probs = F.softmax(greedy_scores / self.cfg.tau, dim=-1)
+                    contrast_probs = F.softmax(contrast_scores / self.cfg.tau, dim=-1)
+                    regime_jsd = self.js_divergence(greedy_probs, contrast_probs)
                     disagreement = int(token_mismatch and regime_jsd >= float(self.panda_divergence_threshold))
                 if disagreement and first_divergence_idx is None:
-                    # Arbitration only starts from the first meaningful low/high split onward.
+                    # Arbitration only starts from the first meaningful greedy/contrast split onward.
                     first_divergence_idx = int(position_idx)
                 candidate_rows.append(
                     {
@@ -103,14 +100,21 @@ class PandaDecoderMixin:
                         "margin": float(margin),
                         "instability": float(instability),
                         "jsd_current": float(jsd_score),
-                        "low_scores": low_scores,
-                        "high_scores": high_scores,
-                        "low_token": low_token,
-                        "high_token": high_token,
+                        "greedy_scores": greedy_scores,
+                        "contrast_scores": contrast_scores,
+                        "greedy_token": greedy_token,
+                        "contrast_token": contrast_token,
+                        # Preserve the historical low/high keys so existing summaries keep working.
+                        "low_scores": greedy_scores,
+                        "high_scores": contrast_scores,
+                        "low_token": greedy_token,
+                        "high_token": contrast_token,
                         "panda_token_mismatch": float(token_mismatch),
                         "panda_divergence": float(regime_jsd),
-                        "panda_safe_confidence": float(safe_confidence),
-                        "panda_truth_confidence": float(truth_confidence),
+                        "panda_greedy_confidence": float(greedy_confidence),
+                        "panda_contrast_confidence": float(contrast_confidence),
+                        "panda_safe_confidence": float(greedy_confidence),
+                        "panda_truth_confidence": float(contrast_confidence),
                         "panda_disagreement": float(disagreement),
                     }
                 )
@@ -127,13 +131,14 @@ class PandaDecoderMixin:
             for row in candidate_rows:
                 position_idx = int(row["position_idx"])
                 arbitration_active = first_divergence_idx is not None and position_idx >= first_divergence_idx
-                # Prefer the high-alpha view only when disagreement is active and the truth view is not weaker.
-                use_truth = arbitration_active and (
-                    float(row["panda_truth_confidence"])
-                    > float(row["panda_safe_confidence"]) - float(self.panda_truth_bias)
+                # Prefer the contrast-subtracted view only when disagreement is active
+                # and it is not weaker than the greedy view by the truth-bias rule.
+                use_contrast = arbitration_active and (
+                    float(row["panda_contrast_confidence"])
+                    > float(row["panda_greedy_confidence"]) - float(self.panda_truth_bias)
                 )
-                selected_scores = row["high_scores"] if use_truth else row["low_scores"]
-                selected_token = row["high_token"] if use_truth else row["low_token"]
+                selected_scores = row["contrast_scores"] if use_contrast else row["greedy_scores"]
+                selected_token = row["contrast_token"] if use_contrast else row["greedy_token"]
                 if position_idx == 0:
                     current_first_scores = selected_scores
                 next_tokens.append(selected_token)
@@ -144,28 +149,33 @@ class PandaDecoderMixin:
                         "divergence": float(row["divergence"]),
                         "margin": float(row["margin"]),
                         "instability": float(row["instability"]),
-                        "alpha": float(high_alpha if use_truth else low_alpha),
+                        # Keep alpha-like trace values for backward compatibility:
+                        # 0.0 = greedy view, 1.0 = contrast-subtracted view.
+                        "alpha": float(1.0 if use_contrast else 0.0),
                         "ablation_mode": "panda",
                         "risk_triggered": float(row["panda_disagreement"]),
                         "risk_score": float(row["panda_divergence"]),
                         "jsd_current": float(row["jsd_current"]),
                         "selection_margin": float(
-                            float(row["panda_truth_confidence"]) - float(row["panda_safe_confidence"])
+                            float(row["panda_contrast_confidence"]) - float(row["panda_greedy_confidence"])
                         ),
                         "selection_score": float(
-                            row["panda_truth_confidence"] if use_truth else row["panda_safe_confidence"]
+                            row["panda_contrast_confidence"] if use_contrast else row["panda_greedy_confidence"]
                         ),
-                        "fallback_used": float(not use_truth),
+                        "fallback_used": float(not use_contrast),
                         "baseline_margin": float(row["margin"]),
                         "jacobi_position": int(position_idx),
                         "jacobi_window_size": int(window_size),
                         "jacobi_pass_index": int(iteration_idx),
                         "panda_divergence": float(row["panda_divergence"]),
+                        "panda_greedy_confidence": float(row["panda_greedy_confidence"]),
+                        "panda_contrast_confidence": float(row["panda_contrast_confidence"]),
                         "panda_safe_confidence": float(row["panda_safe_confidence"]),
                         "panda_truth_confidence": float(row["panda_truth_confidence"]),
                         "panda_token_mismatch": float(row["panda_token_mismatch"]),
                         "panda_disagreement": float(row["panda_disagreement"]),
-                        "panda_selected_truth": float(use_truth),
+                        "panda_selected_contrast": float(use_contrast),
+                        "panda_selected_truth": float(use_contrast),
                         "panda_arbitration_active": float(arbitration_active),
                         "panda_first_divergence_position": (
                             int(first_divergence_idx) if first_divergence_idx is not None else None

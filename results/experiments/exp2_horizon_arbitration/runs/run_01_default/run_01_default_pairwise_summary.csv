@@ -1,0 +1,7 @@
+sweep_id,benchmark,metric_name,left_decoder_label,right_decoder_label,num_examples,mean_score_delta,median_score_delta,win_rate,tie_rate,loss_rate
+,truthfulqa,mc1,simple_panda_h1,simple_panda_h2,50,0.02,0.0,0.04,0.94,0.02
+,truthfulqa,mc1,simple_panda_h2,simple_panda_h1,50,-0.02,0.0,0.02,0.94,0.04
+,truthfulqa,mc2,simple_panda_h1,simple_panda_h2,50,0.03622471160562966,0.0,0.48,0.14,0.38
+,truthfulqa,mc2,simple_panda_h2,simple_panda_h1,50,-0.03622471160562966,0.0,0.38,0.14,0.48
+,truthfulqa,mc3,simple_panda_h1,simple_panda_h2,50,0.01833333333333333,0.0,0.08,0.9,0.02
+,truthfulqa,mc3,simple_panda_h2,simple_panda_h1,50,-0.01833333333333333,0.0,0.02,0.9,0.08

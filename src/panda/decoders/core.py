@@ -21,6 +21,19 @@ class BaseDecoderMixin:
         probs = F.softmax(logits, dim=-1)
         return float(torch.max(probs, dim=-1).values.item())
 
+    @staticmethod
+    def greedy_view_scores(final_logits):
+        return final_logits
+
+    @staticmethod
+    def contrast_subtracted_view_scores(final_logits, shallow_logits):
+        return final_logits - shallow_logits
+
+    def build_binary_views(self, final_logits, shallow_logits):
+        greedy_scores = self.greedy_view_scores(final_logits)
+        contrast_scores = self.contrast_subtracted_view_scores(final_logits, shallow_logits)
+        return greedy_scores, contrast_scores
+
     def select_dynamic_layer(self, step, selected_layer, layer_logits, p_final):
         if step % self.cfg.update_every != 0:
             return selected_layer

@@ -6,7 +6,7 @@
 
 It keeps one evolving trajectory and works inside a speculative block:
 
-1. build low-alpha and high-alpha views for the same block
+1. build a greedy view and a contrast-subtracted view for the same block
 2. detect the first meaningful local disagreement
 3. arbitrate locally from that point onward
 4. refine the block with Jacobi-style updates
@@ -43,10 +43,6 @@ return decoded continuation
 ## `run_panda_block()` Pseudocode
 
 ```text
-# The low/high regimes reuse the repo-wide alpha settings.
-low_alpha_regime = low_alpha
-high_alpha_regime = high_alpha
-
 # Initialize the speculative block by repeating the last generated token.
 buffer = repeat last generated token across the whole block
 previous_buffer = buffer
@@ -63,32 +59,32 @@ for iteration in 0 .. jacobi_max_iters - 1:
         # Read the shallow view chosen for this position.
         shallow_logits = layer_logits[selected_layer][position]
 
-        # Build the two local contrast regimes for the same position.
-        low_scores = final_logits[position] - low_alpha * shallow_logits
-        high_scores = final_logits[position] - high_alpha * shallow_logits
+        # Build the two local views for the same position.
+        greedy_scores = final_logits[position]
+        contrast_scores = final_logits[position] - shallow_logits
 
         # Each regime proposes its own top token.
-        low_token = argmax(low_scores)
-        high_token = argmax(high_scores)
+        greedy_token = argmax(greedy_scores)
+        contrast_token = argmax(contrast_scores)
 
         # Only mark a real disagreement if the top tokens differ
         # and the two regime distributions are far enough apart.
-        if low_token != high_token and JSD(low_scores, high_scores) >= panda_divergence_threshold:
+        if greedy_token != contrast_token and JSD(greedy_scores, contrast_scores) >= panda_divergence_threshold:
             mark this position as a disagreement
 
     # Arbitration starts only from the earliest meaningful disagreement.
     first_divergence = earliest marked disagreement position
 
     for each position in the block:
-        # Prefix positions before the first divergence just keep the low view.
+        # Prefix positions before the first divergence just keep the greedy view.
         arbitration_active = position >= first_divergence
 
-        # After arbitration activates, switch to the high view only if
-        # its top-1 confidence beats the low view by the truth-bias rule.
-        if arbitration_active and top1_confidence(high_scores) > top1_confidence(low_scores) - panda_truth_bias:
-            choose high_scores / high_token
+        # After arbitration activates, switch to the contrast-subtracted view only if
+        # its top-1 confidence beats the greedy view by the truth-bias rule.
+        if arbitration_active and top1_confidence(contrast_scores) > top1_confidence(greedy_scores) - panda_truth_bias:
+            choose contrast_scores / contrast_token
         else:
-            choose low_scores / low_token
+            choose greedy_scores / greedy_token
 
     # These chosen tokens become the next block proposal.
     new_buffer = chosen block tokens
@@ -145,14 +141,14 @@ return total_logprob
 | `panda_truth_bias` | `0.02` |
 | `panda_early_agreement_shortcut` | `False` |
 
-### Low/High Regimes Used Inside PAnDa
+### Binary Views Used Inside PAnDa
 
-PAnDa uses the fixed `0.1` and `0.95` regimes directly:
+PAnDa uses a fixed binary rule rather than a tuned alpha sweep:
 
 | Setting | Value |
 | --- | --- |
-| Low-alpha regime | `0.1` |
-| High-alpha regime | `0.95` |
+| Greedy view | `final_logits` |
+| Contrast-subtracted view | `final_logits - shallow_logits` |
 
 ### Shared Layer-Selection Settings
 
@@ -168,5 +164,5 @@ PAnDa uses the fixed `0.1` and `0.95` regimes directly:
 PAnDa is best described as:
 
 ```text
-shared low/high block views + local disagreement detection + truth-biased arbitration + stable-prefix commit
+shared greedy/contrast block views + local disagreement detection + truth-biased arbitration + stable-prefix commit
 ```

@@ -3,6 +3,11 @@
 import os
 
 import torch
+
+from .import_shims import suppress_problematic_optional_dependency_detection
+
+suppress_problematic_optional_dependency_detection()
+
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .config import (
@@ -91,17 +96,19 @@ class Stage4Evaluator(
                 "panda_config": {
                     "divergence_threshold": self.panda_divergence_threshold,
                     "truth_bias": self.panda_truth_bias,
-                    "low_alpha": self.panda_low_alpha,
-                    "high_alpha": self.panda_high_alpha,
+                    "binary_views": {
+                        "greedy_view": "final_logits",
+                        "contrast_subtracted_view": "final_logits - shallow_logits",
+                    },
                     "local_score": "top1_confidence",
                     "early_agreement_shortcut": self.panda_early_agreement_shortcut,
                 },
                 "strict_eval": self.args.strict_eval,
                 "dola_relative_top": self.dola_relative_top,
                 "dola_relative_top_value": self.dola_relative_top_value,
-                "low_high_regimes": {
-                    "low_alpha": self.panda_low_alpha,
-                    "high_alpha": self.panda_high_alpha,
+                "binary_views": {
+                    "greedy_view": "final_logits",
+                    "contrast_subtracted_view": "final_logits - shallow_logits",
                 },
             }
         )

@@ -185,14 +185,36 @@ def assert_eval_sources(args, truthfulqa_source):
         )
 
 
-def evaluate_truthfulqa(evaluator, rows, progress_every=1, decoder_names=None):
+def evaluate_truthfulqa(evaluator, rows, progress_every=1, decoder_names=None, progress_callback=None):
     results = []
     total = len(rows)
     decoder_names = tuple(decoder_names or evaluator.decoder_names)
+    total_decoders = len(decoder_names)
+    if progress_callback is not None:
+        progress_callback(
+            {
+                "event": "evaluation_started",
+                "total_examples": total,
+                "total_decoders": total_decoders,
+            }
+        )
     for example_idx, row in enumerate(rows, start=1):
         if example_idx == 1 or example_idx % progress_every == 0 or example_idx == total:
-            print(f"[truthfulqa] {example_idx}/{total}")
-        for decoder_name in decoder_names:
+            print(f"[truthfulqa] example {example_idx}/{total}", flush=True)
+        if progress_callback is not None:
+            progress_callback(
+                {
+                    "event": "example_started",
+                    "example_idx": example_idx,
+                    "total_examples": total,
+                    "question": row["question"],
+                }
+            )
+        for decoder_idx, decoder_name in enumerate(decoder_names, start=1):
+            print(
+                f"[truthfulqa] example {example_idx}/{total} decoder {decoder_idx}/{total_decoders} {decoder_name}",
+                flush=True,
+            )
             metrics, trace, extra = predict_truthfulqa_mc(
                 evaluator,
                 row["question"],
@@ -202,6 +224,21 @@ def evaluate_truthfulqa(evaluator, rows, progress_every=1, decoder_names=None):
                 row["mc2_labels"],
                 decoder_name,
             )
+            if progress_callback is not None:
+                progress_callback(
+                    {
+                        "event": "decoder_finished",
+                        "example_idx": example_idx,
+                        "total_examples": total,
+                        "decoder_idx": decoder_idx,
+                        "total_decoders": total_decoders,
+                        "decoder_name": decoder_name,
+                        "mc1": float(metrics["mc1"]),
+                        "mc2": float(metrics["mc2"]),
+                        "mc3": float(metrics["mc3"]),
+                        "latency_seconds": float(extra["latency_seconds"]),
+                    }
+                )
             trace_summary = summarize_trace(trace)
             metric_margins = {
                 "mc1": metrics["mc1_margin"],
@@ -236,6 +273,23 @@ def evaluate_truthfulqa(evaluator, rows, progress_every=1, decoder_names=None):
                 }
                 result.update(trace_summary)
                 results.append(result)
+        if progress_callback is not None:
+            progress_callback(
+                {
+                    "event": "example_finished",
+                    "example_idx": example_idx,
+                    "total_examples": total,
+                }
+            )
+    if progress_callback is not None:
+        progress_callback(
+            {
+                "event": "evaluation_finished",
+                "total_examples": total,
+                "total_decoders": total_decoders,
+                "result_rows": len(results),
+            }
+        )
     return results
 
 

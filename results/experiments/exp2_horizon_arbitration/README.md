@@ -1,6 +1,11 @@
 # Experiment 2: Horizon Arbitration
 
-This experiment isolates the sequential-awareness hypothesis in a simplified no-block PAnDa:
+This experiment isolates the horizon-arbitration question in a simplified no-block PAnDa:
+
+Both variants use the same binary local choice:
+
+- greedy view: `final_logits`
+- contrast-subtracted view: `final_logits - shallow_logits`
 
 - `simple_panda_h1`
   - no block

@@ -227,6 +227,10 @@ def main():
             "fixed_alpha_decoders": evaluator.fixed_alpha_decoders,
             "panda_low_alpha": evaluator.panda_low_alpha,
             "panda_high_alpha": evaluator.panda_high_alpha,
+            "panda_binary_views": {
+                "greedy_view": "final_logits",
+                "contrast_subtracted_view": "final_logits - shallow_logits",
+            },
             "jacobi_window_size": evaluator.jacobi_window_size,
             "jacobi_max_iters": evaluator.jacobi_max_iters,
             "jacobi_init_strategy": "repeat_last",
@@ -234,7 +238,7 @@ def main():
             "panda_divergence_threshold": evaluator.panda_divergence_threshold,
             "panda_truth_bias": evaluator.panda_truth_bias,
             "panda_note": (
-                "jacobi_block_decoding_with_shared_low_high_fixed_alpha_views_and_local_truth_biased_arbitration"
+                "jacobi_block_decoding_with_shared_greedy_and_contrast_subtracted_views_and_local_truth_biased_arbitration"
             ),
             "panda_early_agreement_shortcut": evaluator.panda_early_agreement_shortcut,
             "evaluation_benchmark": "truthfulqa",

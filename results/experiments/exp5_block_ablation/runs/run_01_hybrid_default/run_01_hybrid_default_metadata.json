@@ -1,0 +1,48 @@
+{
+  "experiment_name": "exp5_block_ablation",
+  "run_id": "run_01_hybrid_default",
+  "notes": "Compare always_contrast vs original panda vs block_refined_always_contrast under the default block settings.",
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "mode": "subset",
+  "seed": 42,
+  "strict_eval": false,
+  "decoder_names": [
+    "always_contrast",
+    "panda",
+    "block_refined_always_contrast"
+  ],
+  "hypothesis": "if_block_refinement_is_still_useful_after_the_oracle_diagnosis_then_a_forced_contrast_block_should_outperform_plain_always_contrast_without_needing_greedy_arbitration",
+  "experiment_note": "always_contrast_vs_original_panda_vs_block_refined_always_contrast_hybrid",
+  "binary_rule": "final_logits_vs_final_logits_minus_shallow_logits",
+  "hybrid_rule": "jacobi_block_refinement_with_per_position_dynamic_layer_selection_and_forced_contrast_view_at_every_position",
+  "panda_divergence_threshold": 0.05,
+  "panda_truth_bias": 0.02,
+  "jacobi_max_iters": 2,
+  "base_jacobi_window_size": 4,
+  "evaluation_benchmark": "truthfulqa",
+  "truthfulqa_source": "truthful_qa/multiple_choice",
+  "truthfulqa_sampling": {
+    "usable_row_count": 817,
+    "selected_row_count": 10,
+    "sampling_mode": "seeded_random_subset",
+    "selected_source_indices": [
+      51,
+      163,
+      179,
+      248,
+      267,
+      318,
+      323,
+      600,
+      632,
+      727
+    ]
+  },
+  "truthfulqa_limit": 10,
+  "truthfulqa_metrics": [
+    "mc1",
+    "mc2",
+    "mc3"
+  ],
+  "latency_measurement": "wall_clock_seconds_with_cuda_synchronize"
+}

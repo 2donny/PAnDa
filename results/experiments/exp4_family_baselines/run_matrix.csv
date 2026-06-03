@@ -1,0 +1,2 @@
+run_id,notes
+run_01_default,Greedy vs top-k vs top-p vs exact two-model contrastive decoding vs official DoLa vs repo-native fixed-alpha DoLa family.

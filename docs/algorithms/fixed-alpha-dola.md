@@ -85,9 +85,9 @@ return total_logprob
 
 | Setting | Value in this repo | Notes |
 | --- | --- | --- |
-| Fixed-alpha presets | `0.1`, `0.5`, `0.95` | repo-defined decoder set |
-| `alpha_min` | `0.1` | lower clamp |
-| `alpha_max` | `0.95` | upper clamp for the fixed-alpha presets |
+| Fixed-alpha presets | `0.0`, `0.5`, `1.0` | repo-defined decoder set |
+| `alpha_min` | `0.0` | lower clamp |
+| `alpha_max` | `1.0` | upper clamp for the fixed-alpha presets |
 | `tau` | `0.5` | used for layer selection and instability terms |
 | `update_every` | `4` | dynamic shallow layer is refreshed every 4 steps |
 | Shallow bucket | default `range(0, max(1, num_layers // 4), 2)` | early even-numbered layers |

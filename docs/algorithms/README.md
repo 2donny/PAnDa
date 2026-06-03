@@ -39,13 +39,13 @@ These are the current code defaults, not necessarily the settings used by every 
 | Default decoder set | `greedy`, `dola`, `fixed_alpha_dola_low`, `fixed_alpha_dola`, `fixed_alpha_dola_high`, `panda` | `src/panda/utils.py` |
 | Default shallow bucket | `range(0, max(1, num_layers // 4), 2)` | `src/panda/evaluator.py` |
 | `tau` | `0.5` | `src/panda/config.py` |
-| `alpha_min` | `0.1` | `src/panda/config.py` |
-| `alpha_max` | `0.95` | `src/panda/config.py` |
+| `alpha_min` | `0.0` | `src/panda/config.py` |
+| `alpha_max` | `1.0` | `src/panda/config.py` |
 | `update_every` | `4` | `src/panda/config.py` |
 | `dola_relative_top` | `0.1` | `src/panda/args.py` |
 | `dola_relative_top_value` | `-1000.0` | `src/panda/args.py` |
-| Fixed-alpha DoLa presets | `0.1`, `0.5`, `0.95` | `src/panda/config.py` |
-| PAnDa low/high regimes | `0.1`, `0.95` | `src/panda/config.py` |
+| Fixed-alpha DoLa presets | `0.0`, `0.5`, `1.0` | `src/panda/config.py` |
+| PAnDa low/high regimes | `0.0`, `1.0` | `src/panda/config.py` |
 | `jacobi_window_size` | `4` | `src/panda/args.py` |
 | `jacobi_max_iters` | `2` | `src/panda/args.py` |
 | `panda_divergence_threshold` | `0.05` | `src/panda/args.py` |

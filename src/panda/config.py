@@ -9,9 +9,9 @@ CANONICAL_COMPARISON_PRESETS = {
 
 
 FIXED_ALPHA_DECODER_ALPHAS = {
-    "fixed_alpha_dola_low": 0.1,
+    "fixed_alpha_dola_low": 0.0,
     "fixed_alpha_dola": 0.5,
-    "fixed_alpha_dola_high": 0.95,
+    "fixed_alpha_dola_high": 1.0,
 }
 
 DEFAULT_DECODER_NAMES = (
@@ -30,9 +30,9 @@ PANDA_TRUTH_ALPHA = FIXED_ALPHA_DECODER_ALPHAS["fixed_alpha_dola_high"]
 DECODER_LABELS = {
     "greedy": "greedy",
     "dola": "dola",
-    "fixed_alpha_dola_low": "fixed alpha dola (0.1)",
+    "fixed_alpha_dola_low": "fixed alpha dola (0.0)",
     "fixed_alpha_dola": "fixed alpha dola (0.5)",
-    "fixed_alpha_dola_high": "fixed alpha dola (0.95)",
+    "fixed_alpha_dola_high": "fixed alpha dola (1.0)",
     "panda": "panda",
 }
 
@@ -43,8 +43,8 @@ class DynDoLaConfig:
 
     shallow_bucket: list
     tau: float = 0.5
-    alpha_min: float = 0.1
-    alpha_max: float = 0.95
+    alpha_min: float = 0.0
+    alpha_max: float = 1.0
     update_every: int = 4
     jacobi_window_size: int = 4
     jacobi_max_iters: int = 2
