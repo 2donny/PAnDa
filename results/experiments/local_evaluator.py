@@ -70,6 +70,29 @@ EXP7_FIXED_VIEW_DECODERS = {
     "always_contrast": True,
 }
 
+EXP12_STATEFUL_FIXED_VIEW_DECODERS = {
+    "always_contrast_update1": {"use_contrast": True, "update_every": 1},
+    "always_contrast_update2": {"use_contrast": True, "update_every": 2},
+    "always_contrast_update4": {"use_contrast": True, "update_every": 4},
+    # Step 0 still refreshes once, then the layer is held for the rest of the answer.
+    "always_contrast_frozen": {"use_contrast": True, "update_every": 10**9},
+}
+
+EXP13_FACTORIAL_DECODERS = {
+    "exp13_logprob_top": {"score_space": "logprob", "relative_top": True},
+    "exp13_logprob_no_top": {"score_space": "logprob", "relative_top": False},
+    "exp13_logit_top": {"score_space": "logit", "relative_top": True},
+    "exp13_logit_no_top": {"score_space": "logit", "relative_top": False},
+}
+
+EXP14_OPEN_FACTUAL_DECODERS = {
+    "exp14_update1": {"use_contrast": True, "update_every": 1},
+    "exp14_update2": {"use_contrast": True, "update_every": 2},
+    "exp14_update4": {"use_contrast": True, "update_every": 4},
+    "exp14_update8": {"use_contrast": True, "update_every": 8},
+    "exp14_frozen": {"use_contrast": True, "update_every": 10**9},
+}
+
 EXP7_STATEFUL_SWITCH_DECODERS = (
     "pure_argmax_switchv2",
 )
@@ -136,6 +159,19 @@ EXPERIMENT_DECODER_LABELS = {
     "pure_greedy": "pure_greedy",
     "always_greedy": "always_greedy",
     "always_contrast": "always_contrast",
+    "always_contrast_update1": "always_contrast_update1",
+    "always_contrast_update2": "always_contrast_update2",
+    "always_contrast_update4": "always_contrast_update4",
+    "always_contrast_frozen": "always_contrast_frozen",
+    "exp13_logprob_top": "logprob + relative-top (u1)",
+    "exp13_logprob_no_top": "logprob + no-filter (u1)",
+    "exp13_logit_top": "raw-logit + relative-top (u1)",
+    "exp13_logit_no_top": "raw-logit + no-filter (u1)",
+    "exp14_update1": "exp14 update1",
+    "exp14_update2": "exp14 update2",
+    "exp14_update4": "exp14 update4",
+    "exp14_update8": "exp14 update8",
+    "exp14_frozen": "exp14 frozen",
     "pure_argmax_switch": "pure_argmax_switch",
     "pure_argmax_switchv2": "pure_argmax_switchv2",
     "oracle_token_switch": "oracle_token_switch",
@@ -315,6 +351,46 @@ class ExperimentEvaluator(Stage4Evaluator):
                 "uncertainty_weight": self.exp9_uncertainty_weight,
                 "confidence_gap_weight": self.exp9_confidence_gap_weight,
             }
+        if any(name in EXP12_STATEFUL_FIXED_VIEW_DECODERS for name in self._experiment_decoder_names):
+            config["exp12_state_persistence_config"] = {
+                "decoder_variants": {
+                    name: EXP12_STATEFUL_FIXED_VIEW_DECODERS[name]
+                    for name in self._experiment_decoder_names
+                    if name in EXP12_STATEFUL_FIXED_VIEW_DECODERS
+                },
+                "mechanism_question": (
+                    "does_holding_the_same_selected_layer_for_a_short_span_reduce_correction_signal_"
+                    "thrash_without_becoming_too_stale"
+                ),
+                "primary_diagnostics": [
+                    "switch_rate",
+                    "selected_layer_match_rate",
+                    "avg_oracle_jsd_gap",
+                    "avg_selection_margin",
+                    "avg_risk_score",
+                ],
+            }
+        if any(name in EXP13_FACTORIAL_DECODERS for name in self._experiment_decoder_names):
+            config["exp13_factorial_config"] = {
+                "decoder_variants": {
+                    name: EXP13_FACTORIAL_DECODERS[name]
+                    for name in self._experiment_decoder_names
+                    if name in EXP13_FACTORIAL_DECODERS
+                },
+                "layer_selection_rule": "official_dola_step_local_jsd_argmax",
+                "matching_rule": "all_four_cells_refresh_selected_layer_every_token",
+                "binary_question": "does_raw_logit_vs_logprob_and_relative_top_on_vs_off_explain_part_of_the_gain",
+            }
+        if any(name in EXP14_OPEN_FACTUAL_DECODERS for name in self._experiment_decoder_names):
+            config["exp14_openended_factuality_config"] = {
+                "decoder_variants": {
+                    name: EXP14_OPEN_FACTUAL_DECODERS[name]
+                    for name in self._experiment_decoder_names
+                    if name in EXP14_OPEN_FACTUAL_DECODERS
+                },
+                "benchmark_mode": "free_form_generation_on_truthfulqa_mc_questions",
+                "evaluation_mode": "reference_bank_token_overlap_against_true_vs_false_answer_sets",
+            }
         if any(name in EXP10_EMA_RISK_DECODERS for name in self._experiment_decoder_names):
             config["exp10_ema_risk_switch_config"] = {
                 "adaptive_decoders": [
@@ -463,6 +539,27 @@ class ExperimentEvaluator(Stage4Evaluator):
                 decoder_name,
             )
 
+        if decoder_name in EXP12_STATEFUL_FIXED_VIEW_DECODERS:
+            return self._score_candidate_with_custom_step(
+                prompt,
+                choice_text,
+                decoder_name,
+            )
+
+        if decoder_name in EXP13_FACTORIAL_DECODERS:
+            return self._score_candidate_with_custom_step(
+                prompt,
+                choice_text,
+                decoder_name,
+            )
+
+        if decoder_name in EXP14_OPEN_FACTUAL_DECODERS:
+            return self._score_candidate_with_custom_step(
+                prompt,
+                choice_text,
+                decoder_name,
+            )
+
         if decoder_name in EXP7_STATEFUL_SWITCH_DECODERS:
             return self._score_candidate_with_custom_step(
                 prompt,
@@ -499,6 +596,116 @@ class ExperimentEvaluator(Stage4Evaluator):
             )
 
         return super().score_candidate_with_decoder(prompt, decoder_name, choice_text)
+
+    def generate_with_decoder(self, prompt, decoder_name, max_new_tokens=96, stop_on_eos=True):
+        if decoder_name in EXP14_OPEN_FACTUAL_DECODERS:
+            return self._generate_with_custom_step(
+                prompt,
+                decoder_name,
+                max_new_tokens=max_new_tokens,
+                stop_on_eos=stop_on_eos,
+            )
+        return super().generate_with_decoder(
+            prompt,
+            decoder_name,
+            max_new_tokens=max_new_tokens,
+            stop_on_eos=stop_on_eos,
+        )
+
+    def _generate_with_custom_step(self, prompt, decoder_name, max_new_tokens=96, stop_on_eos=True):
+        generated = self.prepare_prompt(prompt)
+        prompt_length = generated.shape[1]
+        eos_token_id = self.tokenizer.eos_token_id
+        trace = []
+        generated_steps = 0
+        forward_passes = 0
+        decoder_state = None
+
+        self.synchronize_cuda()
+        start_time = time.perf_counter()
+        for _ in range(max_new_tokens):
+            scores, scores_are_logprobs, trace_row, step_forward_passes, decoder_state = self._custom_decoder_step_scores(
+                generated,
+                decoder_name,
+                decoder_state,
+            )
+            del scores_are_logprobs
+            forward_passes += int(step_forward_passes)
+            next_token = torch.argmax(scores, dim=-1, keepdim=True)
+            generated_steps += 1
+            row = dict(trace_row)
+            row["step"] = len(trace)
+            row["token_id"] = int(next_token.item())
+            row["token_text"] = self.decode_token(next_token.item())
+            trace.append(row)
+            generated = torch.cat([generated, next_token.to(generated.device)], dim=-1)
+            if stop_on_eos and eos_token_id is not None and next_token.item() == eos_token_id:
+                break
+        self.synchronize_cuda()
+        elapsed = time.perf_counter() - start_time
+
+        return self.decode_continuation(generated, prompt_length), trace, make_runtime_summary(
+            elapsed,
+            generated_steps,
+            forward_passes=forward_passes,
+            generated_tokens=generated_steps,
+        )
+
+    def _select_step_local_dola_layer(self, final_logits, layer_logits):
+        candidate_metrics = []
+        for candidate_idx in self.cfg.shallow_bucket:
+            if candidate_idx >= len(layer_logits) or candidate_idx == self.mature_layer_index:
+                continue
+            candidate_logits = layer_logits[candidate_idx]
+            candidate_score = self.official_dola_js_divergence(final_logits, candidate_logits)
+            candidate_metrics.append(
+                {
+                    "layer": int(candidate_idx),
+                    "jsd_current": float(candidate_score),
+                }
+            )
+        if not candidate_metrics:
+            raise ValueError("No candidate shallow layers were available for the matched exp13 comparison.")
+        return max(candidate_metrics, key=lambda row: row["jsd_current"])
+
+    def build_exp13_factorial_scores(self, final_logits, layer_logits, decoder_name):
+        variant = EXP13_FACTORIAL_DECODERS[decoder_name]
+        best_candidate = self._select_step_local_dola_layer(final_logits, layer_logits)
+        selected_layer = int(best_candidate["layer"])
+        shallow_logits = layer_logits[selected_layer]
+        mature_log_probs = F.log_softmax(final_logits, dim=-1)
+
+        if variant["score_space"] == "logprob":
+            shallow_view = F.log_softmax(shallow_logits, dim=-1)
+            scores = mature_log_probs - shallow_view
+            scores = F.log_softmax(scores, dim=-1)
+            scores_are_logprobs = True
+        else:
+            scores = final_logits - shallow_logits
+            scores_are_logprobs = False
+
+        if variant["relative_top"]:
+            relative_top_mask = self.get_relative_top_filter(mature_log_probs, self.dola_relative_top)
+            scores = torch.where(
+                relative_top_mask,
+                torch.full_like(scores, self.dola_relative_top_value),
+                scores,
+            )
+
+        trace_row = {
+            "step": None,
+            "selected_layer": selected_layer,
+            "divergence": float(best_candidate["jsd_current"]),
+            "margin": None,
+            "instability": None,
+            "alpha": None,
+            "ablation_mode": decoder_name,
+            "jsd_current": float(best_candidate["jsd_current"]),
+            "selection_score": float(best_candidate["jsd_current"]),
+            "exp13_score_space": variant["score_space"],
+            "exp13_relative_top": bool(variant["relative_top"]),
+        }
+        return scores, scores_are_logprobs, trace_row
 
     def _score_candidate_with_custom_step(self, prompt, choice_text, decoder_name):
         generated = self.prepare_prompt(prompt)
@@ -605,6 +812,26 @@ class ExperimentEvaluator(Stage4Evaluator):
             )
             return scores, True, trace_row, 1, None
 
+        if decoder_name in EXP13_FACTORIAL_DECODERS:
+            layer_logits, final_logits = self.forward_with_layer_logits(generated)
+            scores, scores_are_logprobs, trace_row = self.build_exp13_factorial_scores(
+                final_logits,
+                layer_logits,
+                decoder_name,
+            )
+            return scores, scores_are_logprobs, trace_row, 1, None
+
+        if decoder_name in EXP14_OPEN_FACTUAL_DECODERS:
+            variant = EXP14_OPEN_FACTUAL_DECODERS[decoder_name]
+            selected_scores, trace_row, next_state = self.compute_stateful_fixed_binary_view_step(
+                generated,
+                decoder_name,
+                decoder_state=decoder_state,
+                use_contrast=bool(variant["use_contrast"]),
+                update_every_override=int(variant["update_every"]),
+            )
+            return selected_scores, False, trace_row, 1, next_state
+
         if decoder_name in EXP2_DECODER_NAMES:
             step_info = self.build_simple_panda_step(generated)
             selected_scores, trace_row, extra_forward_passes = self.choose_simple_panda_branch(
@@ -640,6 +867,17 @@ class ExperimentEvaluator(Stage4Evaluator):
                 step_info,
                 decoder_name,
                 decoder_state=decoder_state,
+            )
+            return selected_scores, False, trace_row, 1, next_state
+
+        if decoder_name in EXP12_STATEFUL_FIXED_VIEW_DECODERS:
+            variant = EXP12_STATEFUL_FIXED_VIEW_DECODERS[decoder_name]
+            selected_scores, trace_row, next_state = self.compute_stateful_fixed_binary_view_step(
+                generated,
+                decoder_name,
+                decoder_state=decoder_state,
+                use_contrast=bool(variant["use_contrast"]),
+                update_every_override=int(variant["update_every"]),
             )
             return selected_scores, False, trace_row, 1, next_state
 
@@ -1547,7 +1785,41 @@ class ExperimentEvaluator(Stage4Evaluator):
         }
         return selected_scores, trace_row, next_state
 
-    def compute_stateful_fixed_binary_view_step(self, generated, decoder_name, decoder_state, use_contrast):
+    def select_dynamic_layer_with_interval(
+        self,
+        step,
+        selected_layer,
+        layer_logits,
+        p_final,
+        update_every_override=None,
+    ):
+        update_every = int(self.cfg.update_every if update_every_override is None else update_every_override)
+        if update_every < 1:
+            raise ValueError("update_every must be >= 1.")
+        if step % update_every != 0:
+            return int(selected_layer), False, update_every
+
+        best_score = -float("inf")
+        refreshed_layer = int(selected_layer)
+        for candidate_idx in self.cfg.shallow_bucket:
+            if candidate_idx >= len(layer_logits):
+                continue
+            candidate_logits = layer_logits[candidate_idx]
+            candidate_probs = F.softmax(candidate_logits / self.cfg.tau, dim=-1)
+            score = self.js_divergence(p_final, candidate_probs)
+            if score > best_score:
+                best_score = score
+                refreshed_layer = int(candidate_idx)
+        return refreshed_layer, True, update_every
+
+    def compute_stateful_fixed_binary_view_step(
+        self,
+        generated,
+        decoder_name,
+        decoder_state,
+        use_contrast,
+        update_every_override=None,
+    ):
         if decoder_state is None:
             decoder_state = self.init_fixed_alpha_state()
 
@@ -1555,7 +1827,14 @@ class ExperimentEvaluator(Stage4Evaluator):
         selected_layer = int(decoder_state["selected_layer"])
         layer_logits, final_logits = self.forward_with_layer_logits(generated)
         p_final = F.softmax(final_logits / self.cfg.tau, dim=-1)
-        selected_layer = self.select_dynamic_layer(step, selected_layer, layer_logits, p_final)
+        oracle_best_layer, oracle_best_jsd, _ = self.select_best_layer_by_jsd(final_logits, layer_logits)
+        selected_layer, layer_refreshed, layer_update_every = self.select_dynamic_layer_with_interval(
+            step,
+            selected_layer,
+            layer_logits,
+            p_final,
+            update_every_override=update_every_override,
+        )
 
         shallow_logits = layer_logits[selected_layer]
         shallow_probs = F.softmax(shallow_logits / self.cfg.tau, dim=-1)
@@ -1590,6 +1869,12 @@ class ExperimentEvaluator(Stage4Evaluator):
         trace_row = {
             "step": None,
             "selected_layer": int(selected_layer),
+            "oracle_best_layer": int(oracle_best_layer),
+            "selected_layer_matches_oracle": float(int(selected_layer == int(oracle_best_layer))),
+            "oracle_best_layer_jsd": float(oracle_best_jsd),
+            "oracle_jsd_gap": float(oracle_best_jsd - current_layer_jsd),
+            "layer_refreshed": float(layer_refreshed),
+            "layer_update_every": float(layer_update_every),
             "divergence": float(divergence),
             "margin": float(margin),
             "instability": float(instability),

@@ -1,0 +1,150 @@
+{
+  "figure_claim": "Exp14 tests whether longer open-ended generations expose a clearer refresh-schedule tradeoff than the earlier short-answer multiple-choice setup.",
+  "leaders": {
+    "best_oref_margin": "exp14_update2",
+    "best_oref_true_f1": "exp14_update8",
+    "best_oref_win": "exp14_update2",
+    "lowest_switch_rate": "exp14_frozen",
+    "highest_selected_layer_match_rate": "exp14_update1"
+  },
+  "metrics": {
+    "oref_margin": {
+      "exp14_update1": {
+        "score_mean": 0.0016298259632135,
+        "score_sem": 0.0131103530778708,
+        "switch_rate": 0.672181881565137,
+        "selected_layer_match_rate": 1.0,
+        "avg_oracle_jsd_gap": 0.0
+      },
+      "exp14_update2": {
+        "score_mean": 0.0076175678847856,
+        "score_sem": 0.0132072757568128,
+        "switch_rate": 0.3383710584412547,
+        "selected_layer_match_rate": 0.6689052335323465,
+        "avg_oracle_jsd_gap": 0.0012908983314655
+      },
+      "exp14_update4": {
+        "score_mean": -0.0090128358616716,
+        "score_sem": 0.0153454617405412,
+        "switch_rate": 0.1601528469937434,
+        "selected_layer_match_rate": 0.5031422227772379,
+        "avg_oracle_jsd_gap": 0.0011305673032822
+      },
+      "exp14_update8": {
+        "score_mean": -0.0080024920649628,
+        "score_sem": 0.0123768392944269,
+        "switch_rate": 0.0822994188433959,
+        "selected_layer_match_rate": 0.3714148229864031,
+        "avg_oracle_jsd_gap": 0.0016724502058333
+      },
+      "exp14_frozen": {
+        "score_mean": -0.0013367021543158,
+        "score_sem": 0.0173244492024921,
+        "switch_rate": 0.0,
+        "selected_layer_match_rate": 0.142401860263812,
+        "avg_oracle_jsd_gap": 0.0023603384199715
+      }
+    },
+    "oref_true_f1": {
+      "exp14_update1": {
+        "score_mean": 0.1882512024561726,
+        "score_sem": 0.0135819526677582,
+        "switch_rate": 0.672181881565137,
+        "selected_layer_match_rate": 1.0,
+        "avg_oracle_jsd_gap": 0.0
+      },
+      "exp14_update2": {
+        "score_mean": 0.2037317752556499,
+        "score_sem": 0.0156626197045339,
+        "switch_rate": 0.3383710584412547,
+        "selected_layer_match_rate": 0.6689052335323465,
+        "avg_oracle_jsd_gap": 0.0012908983314655
+      },
+      "exp14_update4": {
+        "score_mean": 0.205910339866284,
+        "score_sem": 0.015615223556992,
+        "switch_rate": 0.1601528469937434,
+        "selected_layer_match_rate": 0.5031422227772379,
+        "avg_oracle_jsd_gap": 0.0011305673032822
+      },
+      "exp14_update8": {
+        "score_mean": 0.2105361153272279,
+        "score_sem": 0.0184382720860975,
+        "switch_rate": 0.0822994188433959,
+        "selected_layer_match_rate": 0.3714148229864031,
+        "avg_oracle_jsd_gap": 0.0016724502058333
+      },
+      "exp14_frozen": {
+        "score_mean": 0.2021058870618719,
+        "score_sem": 0.0166595547964175,
+        "switch_rate": 0.0,
+        "selected_layer_match_rate": 0.142401860263812,
+        "avg_oracle_jsd_gap": 0.0023603384199715
+      }
+    },
+    "oref_win": {
+      "exp14_update1": {
+        "score_mean": 0.48,
+        "score_sem": 0.0713714056959817,
+        "switch_rate": 0.672181881565137,
+        "selected_layer_match_rate": 1.0,
+        "avg_oracle_jsd_gap": 0.0
+      },
+      "exp14_update2": {
+        "score_mean": 0.52,
+        "score_sem": 0.0713714056959817,
+        "switch_rate": 0.3383710584412547,
+        "selected_layer_match_rate": 0.6689052335323465,
+        "avg_oracle_jsd_gap": 0.0012908983314655
+      },
+      "exp14_update4": {
+        "score_mean": 0.46,
+        "score_sem": 0.0711996331107263,
+        "switch_rate": 0.1601528469937434,
+        "selected_layer_match_rate": 0.5031422227772379,
+        "avg_oracle_jsd_gap": 0.0011305673032822
+      },
+      "exp14_update8": {
+        "score_mean": 0.36,
+        "score_sem": 0.0685714285714285,
+        "switch_rate": 0.0822994188433959,
+        "selected_layer_match_rate": 0.3714148229864031,
+        "avg_oracle_jsd_gap": 0.0016724502058333
+      },
+      "exp14_frozen": {
+        "score_mean": 0.4,
+        "score_sem": 0.0699854212223765,
+        "switch_rate": 0.0,
+        "selected_layer_match_rate": 0.142401860263812,
+        "avg_oracle_jsd_gap": 0.0023603384199715
+      }
+    }
+  },
+  "mechanism": {
+    "exp14_update1": {
+      "switch_rate": 0.672181881565137,
+      "selected_layer_match_rate": 1.0,
+      "avg_oracle_jsd_gap": 0.0
+    },
+    "exp14_update2": {
+      "switch_rate": 0.3383710584412547,
+      "selected_layer_match_rate": 0.6689052335323465,
+      "avg_oracle_jsd_gap": 0.0012908983314655
+    },
+    "exp14_update4": {
+      "switch_rate": 0.1601528469937434,
+      "selected_layer_match_rate": 0.5031422227772379,
+      "avg_oracle_jsd_gap": 0.0011305673032822
+    },
+    "exp14_update8": {
+      "switch_rate": 0.0822994188433959,
+      "selected_layer_match_rate": 0.3714148229864031,
+      "avg_oracle_jsd_gap": 0.0016724502058333
+    },
+    "exp14_frozen": {
+      "switch_rate": 0.0,
+      "selected_layer_match_rate": 0.142401860263812,
+      "avg_oracle_jsd_gap": 0.0023603384199715
+    }
+  }
+}

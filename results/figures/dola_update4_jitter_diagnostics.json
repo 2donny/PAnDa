@@ -1,0 +1,75 @@
+{
+  "figure_claim": "The saved results support the claim that per-token or per-position layer reselection is much more jittery than the update-every-4 path.",
+  "exp11": {
+    "switch_metrics": {
+      "dola": {
+        "mean_switch_rate": 0.7231899211899211,
+        "median_switch_rate": 0.75,
+        "mean_switch_count_est": 86.1992355977356,
+        "mean_avg_selected_layer": 2.6901374736374737,
+        "mean_avg_instability": null,
+        "num_examples": 50
+      },
+      "always_contrast": {
+        "mean_switch_rate": 0.13527211677211676,
+        "median_switch_rate": 0.1428571428571428,
+        "mean_switch_count_est": 15.29478832278832,
+        "mean_avg_selected_layer": 3.525182373182373,
+        "mean_avg_instability": 12.447005571736414,
+        "num_examples": 50
+      }
+    },
+    "quality": {
+      "dola": {
+        "mc1": 0.28,
+        "mc2": 0.527824148006008,
+        "mc3": 0.273
+      },
+      "always_contrast": {
+        "mc1": 0.4,
+        "mc2": 0.5758458460194236,
+        "mc3": 0.35100000000000003
+      }
+    },
+    "mean_switch_rate_ratio_dola_over_update4": 5.346186179730057,
+    "mean_switch_rate_delta_dola_minus_update4": 0.5879178044178044
+  },
+  "exp5": {
+    "switch_metrics": {
+      "always_contrast": {
+        "mean_switch_rate": 0.14226699226699227,
+        "median_switch_rate": 0.1547619047619047,
+        "mean_switch_count_est": 14.675818070818071,
+        "mean_avg_selected_layer": 3.6698242498242504,
+        "mean_avg_instability": 12.199951788863718,
+        "num_examples": 30
+      },
+      "panda_switch_update4": {
+        "mean_switch_rate": 0.14155881155881156,
+        "median_switch_rate": 0.1547619047619047,
+        "mean_switch_count_est": 14.415213675213671,
+        "mean_avg_selected_layer": 3.506263366263367,
+        "mean_avg_instability": 12.332208300847453,
+        "num_examples": 30
+      },
+      "panda_switch": {
+        "mean_switch_rate": 0.6551577126577127,
+        "median_switch_rate": 0.6833333333333333,
+        "mean_switch_count_est": 76.39640313390312,
+        "mean_avg_selected_layer": 2.364772542272542,
+        "mean_avg_instability": 12.397587245610318,
+        "num_examples": 30
+      },
+      "panda_always_contrasts": {
+        "mean_switch_rate": 0.6576302401302402,
+        "median_switch_rate": 0.6458333333333333,
+        "mean_switch_count_est": 76.48019434269433,
+        "mean_avg_selected_layer": 2.5274180449180452,
+        "mean_avg_instability": 12.46809874988956,
+        "num_examples": 30
+      }
+    },
+    "mean_switch_rate_ratio_panda_switch_over_update4": 4.628166240188609,
+    "mean_switch_rate_ratio_panda_always_contrasts_over_update4": 4.645632673011127
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "manual_csv": "results/experiments/exp14_openended_factuality/runs/run_01_default/run_01_default_manual_eval.csv",
+  "total_rows": 250,
+  "stats": {
+    "exp14_update1": {
+      "count": 50,
+      "mean_manual_score": 0.62,
+      "sem_manual_score": 0.10648368659190985,
+      "score0_count": 27,
+      "score1_count": 15,
+      "score2_count": 8,
+      "score0_rate": 0.54,
+      "score1_rate": 0.3,
+      "score2_rate": 0.16
+    },
+    "exp14_update2": {
+      "count": 50,
+      "mean_manual_score": 0.52,
+      "sem_manual_score": 0.09578888350994405,
+      "score0_count": 29,
+      "score1_count": 16,
+      "score2_count": 5,
+      "score0_rate": 0.58,
+      "score1_rate": 0.32,
+      "score2_rate": 0.1
+    },
+    "exp14_update4": {
+      "count": 50,
+      "mean_manual_score": 0.38,
+      "sem_manual_score": 0.08518886580500329,
+      "score0_count": 34,
+      "score1_count": 13,
+      "score2_count": 3,
+      "score0_rate": 0.68,
+      "score1_rate": 0.26,
+      "score2_rate": 0.06
+    },
+    "exp14_update8": {
+      "count": 50,
+      "mean_manual_score": 0.44,
+      "sem_manual_score": 0.09107072828862416,
+      "score0_count": 32,
+      "score1_count": 14,
+      "score2_count": 4,
+      "score0_rate": 0.64,
+      "score1_rate": 0.28,
+      "score2_rate": 0.08
+    },
+    "exp14_frozen": {
+      "count": 50,
+      "mean_manual_score": 0.56,
+      "sem_manual_score": 0.10751364412701016,
+      "score0_count": 30,
+      "score1_count": 12,
+      "score2_count": 8,
+      "score0_rate": 0.6,
+      "score1_rate": 0.24,
+      "score2_rate": 0.16
+    }
+  },
+  "ranking_by_mean_manual_score": [
+    {
+      "decoder": "exp14_update1",
+      "label": "update1",
+      "mean_manual_score": 0.62
+    },
+    {
+      "decoder": "exp14_frozen",
+      "label": "frozen",
+      "mean_manual_score": 0.56
+    },
+    {
+      "decoder": "exp14_update2",
+      "label": "update2",
+      "mean_manual_score": 0.52
+    },
+    {
+      "decoder": "exp14_update8",
+      "label": "update8",
+      "mean_manual_score": 0.44
+    },
+    {
+      "decoder": "exp14_update4",
+      "label": "update4",
+      "mean_manual_score": 0.38
+    }
+  ]
+}

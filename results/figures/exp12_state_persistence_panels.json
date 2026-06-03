@@ -1,0 +1,16 @@
+{
+  "switch_rate_figure": "results/figures/exp12_state_persistence_switch_rate.svg",
+  "staleness_figure": "results/figures/exp12_state_persistence_staleness.svg",
+  "quality_figure": "results/figures/exp12_state_persistence_quality.svg",
+  "source_summary_csv": "results/experiments/exp12_state_persistence_diagnostics/runs/run_01_default/run_01_default_summary.csv",
+  "key_claims": {
+    "update4_switch_rate_reduction_vs_update1_pct": 80.45109688290133,
+    "update4_switch_rate_reduction_vs_update2_pct": 58.061584609861285,
+    "update4_match_rate_minus_frozen": 0.20283480408480398,
+    "update4_gap_reduction_vs_frozen_pct": 27.02779225628821,
+    "update4_mc2_delta_vs_update1": 0.041397411803383855,
+    "update4_mc2_delta_vs_update2": 0.048705417586566435,
+    "update4_mc2_delta_vs_frozen": 0.01561177297351135,
+    "update4_is_quality_knee": true
+  }
+}

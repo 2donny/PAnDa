@@ -1,0 +1,65 @@
+{
+  "hypothesis": "Short-lived persistence should reduce selected-layer switching noise without becoming as stale as a frozen layer.",
+  "mechanism": {
+    "always_contrast_update1": {
+      "switch_rate": 0.69196780996781,
+      "selected_layer_match_rate": 1.0,
+      "refresh_rate": 1.0,
+      "avg_oracle_jsd_gap": 0.0,
+      "mc2": 0.5344484342160397
+    },
+    "always_contrast_update2": {
+      "switch_rate": 0.3225494227994228,
+      "selected_layer_match_rate": 0.6663910403322169,
+      "refresh_rate": 0.5316751483810307,
+      "avg_oracle_jsd_gap": 0.0016561683542814,
+      "mc2": 0.5271404284328571
+    },
+    "always_contrast_update4": {
+      "switch_rate": 0.1352721167721167,
+      "selected_layer_match_rate": 0.4612401764901764,
+      "refresh_rate": 0.3139613719613719,
+      "avg_oracle_jsd_gap": 0.00250020830761,
+      "mc2": 0.5758458460194236
+    },
+    "always_contrast_frozen": {
+      "switch_rate": 0.0,
+      "selected_layer_match_rate": 0.2584053724053724,
+      "refresh_rate": 0.1645170385170385,
+      "avg_oracle_jsd_gap": 0.0034262473137596,
+      "mc2": 0.5602340730459122
+    }
+  },
+  "quality": {
+    "always_contrast_update1": {
+      "mc1": 0.34,
+      "mc2": 0.5344484342160397,
+      "mc3": 0.2936666666666667
+    },
+    "always_contrast_update2": {
+      "mc1": 0.38,
+      "mc2": 0.5271404284328571,
+      "mc3": 0.331
+    },
+    "always_contrast_update4": {
+      "mc1": 0.4,
+      "mc2": 0.5758458460194236,
+      "mc3": 0.351
+    },
+    "always_contrast_frozen": {
+      "mc1": 0.4,
+      "mc2": 0.5602340730459122,
+      "mc3": 0.3643333333333333
+    }
+  },
+  "key_claims": {
+    "update4_switch_rate_reduction_vs_update1_pct": 80.45109688290133,
+    "update4_switch_rate_reduction_vs_update2_pct": 58.061584609861285,
+    "update4_match_rate_minus_frozen": 0.20283480408480398,
+    "update4_gap_reduction_vs_frozen_pct": 27.02779225628821,
+    "update4_mc2_delta_vs_update1": 0.041397411803383855,
+    "update4_mc2_delta_vs_update2": 0.048705417586566435,
+    "update4_mc2_delta_vs_frozen": 0.01561177297351135,
+    "update4_is_quality_knee": true
+  }
+}

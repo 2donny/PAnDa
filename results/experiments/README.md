@@ -47,3 +47,15 @@ Current experiments:
 - `exp11_core_decoder_comparison/`
   - Compares pure greedy, truncation baselines, DoLa, always-contrast, and the original `panda_switch` in one direct benchmark.
   - Decoders: `pure_greedy`, `top_k`, `top_p`, `dola`, `always_contrast`, `panda_switch`
+
+- `exp12_state_persistence_diagnostics/`
+  - Tests the selected-layer persistence theory behind `always_contrast` using matched variants that differ only in layer refresh schedule.
+  - Decoders: `always_contrast_update1`, `always_contrast_update2`, `always_contrast_update4`, `always_contrast_frozen`
+
+- `exp13_logit_filter_factorial/`
+  - Tests a matched `update1` 2x2 that isolates score space (`logprob` vs `raw-logit`) and the relative-top filter (`on` vs `off`).
+  - Decoders: `exp13_logprob_top`, `exp13_logprob_no_top`, `exp13_logit_top`, `exp13_logit_no_top`
+
+- `exp14_openended_factuality/`
+  - Tests whether longer open-ended generations expose a stronger selected-layer refresh tradeoff than short multiple-choice answer scoring.
+  - Decoders: `exp14_update1`, `exp14_update2`, `exp14_update4`, `exp14_update8`, `exp14_frozen`

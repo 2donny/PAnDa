@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760">
+<rect x="0.00" y="0.00" width="1280.00" height="760.00" fill="#f7f6f3" stroke="none" stroke-width="1.00" rx="0.00" />
+<text x="60.00" y="56.00" font-size="28" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="bold">exp14 Open-Ended Manual Evaluation</text>
+<text x="60.00" y="84.00" font-size="14" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">Human rubric over 250 answers: 0 = wrong / hallucinatory, 1 = mixed / noisy, 2 = broadly correct</text>
+<text x="60.00" y="110.00" font-size="13" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">Ranking: update1 (0.62) &gt; frozen (0.56) &gt; update2 (0.52) &gt; update8 (0.44) &gt; update4 (0.38)</text>
+<rect x="48.00" y="142.00" width="560.00" height="560.00" fill="#ffffff" stroke="#dddddd" stroke-width="1.00" rx="14.00" />
+<text x="328.00" y="166.00" font-size="18" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Mean Human Score</text>
+<text x="328.00" y="186.00" font-size="11" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Average manual rubric score (0=wrong, 2=correct)</text>
+<line x1="124.00" y1="630.00" x2="584.00" y2="630.00" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="114.00" y="634.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.0</text>
+<line x1="124.00" y1="522.50" x2="584.00" y2="522.50" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="114.00" y="526.50" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.5</text>
+<line x1="124.00" y1="415.00" x2="584.00" y2="415.00" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="114.00" y="419.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">1.0</text>
+<line x1="124.00" y1="307.50" x2="584.00" y2="307.50" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="114.00" y="311.50" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">1.5</text>
+<line x1="124.00" y1="200.00" x2="584.00" y2="200.00" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="114.00" y="204.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">2.0</text>
+<line x1="124.00" y1="200.00" x2="124.00" y2="630.00" stroke="#555555" stroke-width="1.10" />
+<line x1="124.00" y1="630.00" x2="584.00" y2="630.00" stroke="#555555" stroke-width="1.10" />
+<text x="328.00" y="674.00" font-size="11" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Higher is better</text>
+<rect x="142.40" y="496.70" width="55.20" height="133.30" fill="#c8553d" stroke="#1f1f1f" stroke-width="1.40" rx="8.00" />
+<line x1="170.00" y1="473.81" x2="170.00" y2="519.59" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="164.00" y1="473.81" x2="176.00" y2="473.81" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="164.00" y1="519.59" x2="176.00" y2="519.59" stroke="#1f1f1f" stroke-width="1.20" />
+<text x="170.00" y="486.70" font-size="12" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.62</text>
+<text x="170.00" y="648.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update1</text>
+<text x="170.00" y="190.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">best</text>
+<rect x="234.40" y="518.20" width="55.20" height="111.80" fill="#2a9d8f" stroke="none" stroke-width="1.00" rx="8.00" />
+<line x1="262.00" y1="497.61" x2="262.00" y2="538.79" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="256.00" y1="497.61" x2="268.00" y2="497.61" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="256.00" y1="538.79" x2="268.00" y2="538.79" stroke="#1f1f1f" stroke-width="1.20" />
+<text x="262.00" y="508.20" font-size="12" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.52</text>
+<text x="262.00" y="648.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update2</text>
+<rect x="326.40" y="548.30" width="55.20" height="81.70" fill="#457b9d" stroke="none" stroke-width="1.00" rx="8.00" />
+<line x1="354.00" y1="529.98" x2="354.00" y2="566.62" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="348.00" y1="529.98" x2="360.00" y2="529.98" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="348.00" y1="566.62" x2="360.00" y2="566.62" stroke="#1f1f1f" stroke-width="1.20" />
+<text x="354.00" y="538.30" font-size="12" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.38</text>
+<text x="354.00" y="648.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update4</text>
+<rect x="418.40" y="535.40" width="55.20" height="94.60" fill="#b08968" stroke="none" stroke-width="1.00" rx="8.00" />
+<line x1="446.00" y1="515.82" x2="446.00" y2="554.98" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="440.00" y1="515.82" x2="452.00" y2="515.82" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="440.00" y1="554.98" x2="452.00" y2="554.98" stroke="#1f1f1f" stroke-width="1.20" />
+<text x="446.00" y="525.40" font-size="12" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.44</text>
+<text x="446.00" y="648.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update8</text>
+<rect x="510.40" y="509.60" width="55.20" height="120.40" fill="#6d597a" stroke="none" stroke-width="1.00" rx="8.00" />
+<line x1="538.00" y1="486.48" x2="538.00" y2="532.72" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="532.00" y1="486.48" x2="544.00" y2="486.48" stroke="#1f1f1f" stroke-width="1.20" />
+<line x1="532.00" y1="532.72" x2="544.00" y2="532.72" stroke="#1f1f1f" stroke-width="1.20" />
+<text x="538.00" y="499.60" font-size="12" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.56</text>
+<text x="538.00" y="648.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">frozen</text>
+<rect x="640.00" y="142.00" width="592.00" height="560.00" fill="#ffffff" stroke="#dddddd" stroke-width="1.00" rx="14.00" />
+<text x="936.00" y="166.00" font-size="18" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Score Breakdown</text>
+<text x="936.00" y="186.00" font-size="11" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Share of answers scored 0, 1, or 2 by manual review</text>
+<line x1="716.00" y1="610.00" x2="1208.00" y2="610.00" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="706.00" y="614.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0%</text>
+<line x1="716.00" y1="507.50" x2="1208.00" y2="507.50" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="706.00" y="511.50" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">25%</text>
+<line x1="716.00" y1="405.00" x2="1208.00" y2="405.00" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="706.00" y="409.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">50%</text>
+<line x1="716.00" y1="302.50" x2="1208.00" y2="302.50" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="706.00" y="306.50" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">75%</text>
+<line x1="716.00" y1="200.00" x2="1208.00" y2="200.00" stroke="#e4e4e4" stroke-width="1.00" />
+<text x="706.00" y="204.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">100%</text>
+<line x1="716.00" y1="200.00" x2="716.00" y2="610.00" stroke="#555555" stroke-width="1.10" />
+<line x1="716.00" y1="610.00" x2="1208.00" y2="610.00" stroke="#555555" stroke-width="1.10" />
+<rect x="739.62" y="388.60" width="51.17" height="221.40" fill="#d1495b" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="765.20" y="503.30" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">27</text>
+<rect x="739.62" y="265.60" width="51.17" height="123.00" fill="#e9c46a" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="765.20" y="331.10" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">15</text>
+<rect x="739.62" y="200.00" width="51.17" height="65.60" fill="#2a9d8f" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="765.20" y="236.80" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">8</text>
+<text x="765.20" y="628.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update1</text>
+<rect x="838.02" y="372.20" width="51.17" height="237.80" fill="#d1495b" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="863.60" y="495.10" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">29</text>
+<rect x="838.02" y="241.00" width="51.17" height="131.20" fill="#e9c46a" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="863.60" y="310.60" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">16</text>
+<rect x="838.02" y="200.00" width="51.17" height="41.00" fill="#2a9d8f" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="863.60" y="628.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update2</text>
+<rect x="936.42" y="331.20" width="51.17" height="278.80" fill="#d1495b" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="962.00" y="474.60" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">34</text>
+<rect x="936.42" y="224.60" width="51.17" height="106.60" fill="#e9c46a" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="962.00" y="281.90" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">13</text>
+<rect x="936.42" y="200.00" width="51.17" height="24.60" fill="#2a9d8f" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="962.00" y="628.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update4</text>
+<rect x="1034.82" y="347.60" width="51.17" height="262.40" fill="#d1495b" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="1060.40" y="482.80" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">32</text>
+<rect x="1034.82" y="232.80" width="51.17" height="114.80" fill="#e9c46a" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="1060.40" y="294.20" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">14</text>
+<rect x="1034.82" y="200.00" width="51.17" height="32.80" fill="#2a9d8f" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="1060.40" y="628.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update8</text>
+<rect x="1133.22" y="364.00" width="51.17" height="246.00" fill="#d1495b" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="1158.80" y="491.00" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">30</text>
+<rect x="1133.22" y="265.60" width="51.17" height="98.40" fill="#e9c46a" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="1158.80" y="318.80" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">12</text>
+<rect x="1133.22" y="200.00" width="51.17" height="65.60" fill="#2a9d8f" stroke="#ffffff" stroke-width="0.80" rx="0.00" />
+<text x="1158.80" y="236.80" font-size="11" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">8</text>
+<text x="1158.80" y="628.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">frozen</text>
+<rect x="704.00" y="648.00" width="14.00" height="14.00" fill="#d1495b" stroke="none" stroke-width="1.00" rx="3.00" />
+<text x="724.00" y="660.00" font-size="11" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">0 = wrong / hallucinated</text>
+<rect x="874.00" y="648.00" width="14.00" height="14.00" fill="#e9c46a" stroke="none" stroke-width="1.00" rx="3.00" />
+<text x="894.00" y="660.00" font-size="11" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">1 = mixed / noisy</text>
+<rect x="1044.00" y="648.00" width="14.00" height="14.00" fill="#2a9d8f" stroke="none" stroke-width="1.00" rx="3.00" />
+<text x="1064.00" y="660.00" font-size="11" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">2 = broadly correct</text>
+</svg>
