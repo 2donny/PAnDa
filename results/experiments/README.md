@@ -59,3 +59,7 @@ Current experiments:
 - `exp14_openended_factuality/`
   - Tests whether longer open-ended generations expose a stronger selected-layer refresh tradeoff than short multiple-choice answer scoring.
   - Decoders: `exp14_update1`, `exp14_update2`, `exp14_update4`, `exp14_update8`, `exp14_frozen`
+
+- `exp15_prefix_probe/`
+  - Tests where `exp14_frozen` and `exp14_update1` begin to diverge by scoring prefixes of the same long generation on targeted disagreement questions.
+  - Decoders: `exp14_frozen`, `exp14_update1`

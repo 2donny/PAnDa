@@ -1,0 +1,21 @@
+{
+  "status": "completed",
+  "experiment": "exp15_prefix_probe",
+  "run_id": "run_01_default",
+  "results_dir": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp15_prefix_probe/runs/run_01_default",
+  "benchmark": "truthfulqa_prefix_probe",
+  "total_examples": 8,
+  "total_decoders": 2,
+  "total_decoder_evals": 16,
+  "completed_examples": 8,
+  "completed_decoder_evals": 16,
+  "started_at_epoch": 1780498537.7741122,
+  "updated_at_epoch": 1780498648.8970196,
+  "last_event": "evaluation_finished",
+  "latest_metrics": {
+    "decoder_name": "exp14_update1",
+    "answer_word_count": 77,
+    "latency_seconds": 10.67607867901097
+  },
+  "percent_complete": 100.0
+}

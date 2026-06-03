@@ -1,0 +1,2 @@
+run_id,notes,truthfulqa_limit,max_new_tokens,frozen_win_count,update1_win_count,both_bad_count,prefix_words
+run_01_default,"prefix drift probe between exp14_frozen and exp14_update1 on targeted exp14 disagreement questions",50,120,3,3,2,"10,30,60,100"

@@ -1,13 +1,17 @@
-# How `always_contrast` Improves Factuality
+# How `FanDa` Improves Factuality
 
 ## Slide 1: Title
 
-**`always_contrast`: Stronger Contrast With Short-Lived State**
+**`FanDa`: No Relative-Top Filter, Frozen Shallow Layer, Stronger Factuality**
 
 - Goal: improve TruthfulQA factuality without changing model weights
 - Model: `Qwen/Qwen2.5-3B-Instruct`
-- Decoder of interest: `always_contrast`
-- Main result: `always_contrast` beat official DoLa on all three TruthfulQA metrics
+- Decoder of interest: `FanDa`
+- Main result: `FanDa` beat official DoLa on all three TruthfulQA metrics
+- Main story direction:
+  - removing the relative-top filter
+  - keeping one shallow layer fixed during generation
+  - with `frozen` as the main persistence mechanism
 
 ## Slide 2: Why Decoder Choice Matters
 
@@ -86,12 +90,12 @@ The direct comparison includes:
 - `top_k`
 - `top_p`
 - `dola`
-- `always_contrast`
+- `FanDa`
 - `panda_switch`
 
 This gives us a clean practical question:
 
-- can `always_contrast` give us better truthful decoding than standard baselines while staying practical?
+- can `FanDa` give us better truthful decoding than standard baselines while staying practical?
 
 ## Slide 6: Core Intuition
 
@@ -113,110 +117,81 @@ That leads to the next question:
 
 - if we recompute the contrast every token, should we also reselect the correction source from scratch every token?
 
-## Slide 7: Why State Is Needed
+## Slide 7: DoLa Moves Too Much
 
-Repeated prefix re-evaluation gives the decoder fresh evidence at every token, but it does not by itself say what should be remembered across steps.
+For our story, official DoLa has two moving parts:
 
-Our concern was:
+- it applies a relative-top filter
+- it reselects the shallow layer every token
 
-- nearby tokens often belong to the same local continuation pattern
-- so changing the correction layer too often can make the contrast signal inconsistent
+Those are our two main suspects.
 
-This is why we add a small amount of state:
+- the filter may throw away useful candidates too early
+- token-by-token layer reselection may make the correction source move too much
 
-- keep a short-lived guess about which shallow layer is currently the best correction source
-- refresh that guess periodically instead of rebuilding it from scratch every token
+So our decoder question became:
 
-In this presentation, `stateful` means:
+- what happens if we stop pruning so aggressively?
+- what happens if we stop moving the shallow layer?
 
-- the decoder carries this small memory across past steps
-- it does not do future lookahead, beam search, or horizon planning
+## Slide 8: The Simpler Alternative
 
-Related intuition from adaptive transformers:
+`FanDa` keeps the same broad contrastive idea, but simplifies both moving parts.
 
-- when a model makes token-wise routing or early-exit decisions, small local changes can make the chosen path switch too often
-- a common fix is to add smoothing, persistence, or reuse decisions across nearby tokens
-- our `selected_layer` state plays a similar role: it is a lightweight persistence mechanism for the correction path
-
-## Slide 8: What Official DoLa Does
-
-Official DoLa already uses the same broad contrastive idea:
-
-1. Choose a shallow layer by JSD against the final layer.
-2. Build a contrastive score from mature and premature **log-probabilities**.
-3. Apply a relative-top filter before decoding.
-4. Recompute this decision independently at each token step.
-
-High-level formula:
-
-```text
-contrast_scores = log_softmax(final_logits) - log_softmax(shallow_logits)
-contrast_scores = log_softmax(contrast_scores)
-```
-
-So official DoLa is not just "subtract shallow from final." It is a more constrained log-probability contrast with filtering.
-
-In decoding-time terms:
-
-- official DoLa is prefix-conditioned, but mostly **step-local**
-- it re-evaluates each token from scratch rather than carrying a decoder-side belief forward
-
-## Slide 9: What We Changed
-
-Our modification keeps the contrastive idea, but simplifies and strengthens the endpoint:
-
-1. Keep dynamic shallow-layer selection.
-2. Decode from a direct binary contrast view:
+**First: keep candidates alive**
 
 ```text
 contrast_scores = final_logits - shallow_logits
 ```
 
-3. Carry the selected shallow layer statefully and refresh it every `4` token steps.
-4. Do not use the official relative-top mask in this path.
-5. Re-run the model on the full growing prefix at every step, so each next-token choice is a fresh re-evaluation of the answer-so-far.
+- no relative-top mask in this path
 
-This is the `always_contrast` decoder.
+**Second: keep one shallow correction source**
 
-So compared with official DoLa, our decoder changes three things that matter most:
+- choose a shallow layer
+- keep that same layer during generation
+- strongest version: `frozen`
 
-- direct logit contrast instead of normalized log-probability contrast
-- no relative-top filter in the contrast path
-- a small amount of carried state for the correction path
+## Slide 9: Why `frozen` Is The Main State Test
 
-## Slide 10: How `selected_layer` Works
+If the shallow layer is a correction lens, the cleanest opposite of DoLa is:
 
-The key extra state in our decoder is `selected_layer`.
+- choose the lens once
+- keep it fixed
 
-We interpret it as a short-lived belief about:
+That makes `frozen` the main mechanism test.
 
-- which shallow layer is currently best exposing the premature or misleading continuation pressure
+The question is simple:
 
-At a refresh step, the decoder does this:
+- does factual decoding benefit more from a stable correction anchor?
+- or from re-routing the shallow layer every token?
 
-- take the final-layer token distribution as the mature view
-- treat earlier layers as candidate shallow views
-- compare each candidate shallow distribution against the final distribution using Jensen-Shannon divergence (JSD)
-- choose the shallow layer with the **largest** JSD
-- keep that layer for a short span, then refresh it again every `4` token steps
+`update2` and `update4` were useful bridge settings during development.
 
-You can think of this as:
+For this presentation, the main state question is simpler:
 
-- a short-lived, sticky routing decision over shallow layers
-- similar in spirit to how adaptive transformers reduce routing instability by avoiding a full re-routing decision at every token
+- should the shallow correction source keep moving?
+- or should we freeze it?
 
-Why might this help?
+## Slide 10: Keep The Shallow Layer Fixed
 
-- a layer with larger JSD is the one that disagrees most strongly with the final layer
-- we treat that disagreement as a proxy for premature, generic, or misleading continuation pressure
-- subtracting a shallow layer that is too similar to the final layer would remove little useful signal
-- reusing the chosen layer briefly can keep the correction signal more consistent across a phrase
+`selected_layer` is just the chosen shallow correction source.
+
+At selection time:
+
+- compare candidate shallow layers against the final layer with JSD
+- pick the one with the largest disagreement
+- keep that layer instead of rebuilding it every step
+
+Why do this?
+
+- one shallow layer becomes a stable correction anchor
+- the correction signal changes less from token to token
+- the strongest version of this idea is `frozen`
 
 ## Slide 10A: Why This Changes Token Choice
 
-The important point is that `selected_layer` does not just describe the decoder.
-
-It changes the scoring rule used to rank the next token.
+`selected_layer` changes the scoring rule for the next token.
 
 Very roughly:
 
@@ -230,296 +205,210 @@ So if `selected_layer` changes:
 - the ranking of candidate tokens can change
 - the chosen best token can flip
 
-That means the next token can change for two different reasons:
+So the next token can change for two different reasons:
 
 1. the answer prefix genuinely changed
 2. the correction layer changed, so the scoring function itself changed
 
-One part of our hypothesis is that official DoLa may suffer from too much of `2`.
+Our reading is that official DoLa may suffer from too much of `2`.
 
-In plain language:
+Plain language:
 
-- if we keep changing the correction layer every token, we may also keep changing the correction lens every token
-- then some token flips may come from decoder-side instability rather than from a genuinely better continuation
+- if the correction layer changes every token, the correction lens changes every token
+- some token flips may come from decoder instability, not from a better continuation
 
-This is the intuition behind carrying `selected_layer` briefly:
+That is the reason to freeze `selected_layer`.
 
-- use the same correction layer for a short stretch of nearby tokens
-- so token selection is driven more by the evolving context
-- and less by a noisy layer-selection twitch at every step
+## Slide 11: Story Backbone
 
-## Slide 11: Why The `always_contrast` Package Could Help
+The story is just two moves:
 
-Our theory is now centered on the two parts we can support most directly with
-matched follow-up evidence.
+1. remove the relative-top filter
+2. keep the shallow layer frozen until the end of the generation
 
-Compared with official DoLa, `always_contrast` changes three levers, but the
-current evidence clearly separates two of them:
+Then we test those two moves in order:
 
-1. No relative-top filter
-   removing the mask may avoid pruning truthful candidates before the contrast
-   signal has a chance to re-rank them.
+- first on matched multiple-choice style scoring
+- then on full open-ended manual evaluation
+- then on a targeted long-generation stability check
 
-2. Short-lived `selected_layer` state
-   carrying the chosen shallow layer briefly may reduce routing instability
-   compared with reselecting from scratch at every token.
+## Slide 12: Hypothesis 1
 
-3. Direct logit contrast
-   this is still part of the implementation, but our matched factorial no
-   longer suggests that score space is the main reason the decoder improves.
+- removing the relative-top filter should improve factuality
 
-So the updated working algorithm hypothesis is:
+## Slide 13: Experiment 1 - Relative-Top Filter Matters
 
-- `always_contrast` improves factuality mainly because it removes the
-  relative-top filter and carries `selected_layer` for short spans, producing a
-  stronger and more stable correction path than official DoLa.
-- the raw-logit score space is still compatible with that package, but it is
-  not currently supported as an independent source of gain.
+All four cells:
 
-Important caveat:
+- use the same DoLa-style decoder
+- change only whether the relative-top filter is on or off
 
-- `always_contrast` is more stateful than official DoLa
-- but it is still not a full revise-and-rewrite decoder
-- and it is not beam search or horizon lookahead
-- it re-evaluates the growing prefix online without changing already emitted tokens
+![Exp13 factorial](../figures/exp13_logit_filter_factorial_summary.svg)
 
-## Slide 12: Claim Structure
+Main reading:
 
-Not every statement needs the same level of proof.
+- the easiest pattern in the figure is that the **no-filter** bars are the strong ones
+- on `mc1` and `mc3`, turning the filter off gives the large improvement
 
-For this talk, the clean structure is:
+## Slide 14: Hypothesis 2
 
-### Main Algorithm Hypothesis
+- keeping the shallow layer fixed instead of reselecting it every token should improve factuality
 
-Compared with official DoLa, `always_contrast` helps because it combines:
-
-- removal of the relative-top filter
-- short-lived `selected_layer` persistence
-
-Current evidence does **not** require a separate score-space claim.
-
-### Main Empirical Claim
-
-On this TruthfulQA setup, `always_contrast` improves factuality over official DoLa.
-
-### Robustness Check
-
-The gain should appear consistently across `mc1`, `mc2`, and `mc3`, not only on one metric.
-
-### Design-Space Conclusion
-
-If `always_contrast` beats official DoLa, then official DoLa is not the optimal point in this contrastive design space.
-
-### Component-Level Interpretation
-
-The strongest direct mechanism evidence we have is now for these two
-components:
-
-- `exp13` isolates the relative-top decision under matched `update1` decoding
-  and shows that removing the filter improves `mc1` and `mc3` in both score
-  spaces, while `logprob_no_top` and `logit_no_top` are effectively tied
-- `exp12` isolates the persistence schedule directly and shows that carrying
-  `selected_layer` briefly can reduce layer thrash without becoming as stale as
-  a frozen layer
-
-Important wording:
-
-- the full DoLa comparison supports the package-level claim
-- the matched follow-ups directly support the `relative-top` and
-  `selected_layer` parts
-- we should not overclaim a separate raw-logit benefit from the current data
-
-## Slide 13: Main Result
-
-`always_contrast` is the decoder we want to understand and justify.
-
-In `exp11_core_decoder_comparison` on 50 TruthfulQA examples:
-
-- `always_contrast`: `mc1 = 0.40`, `mc2 = 0.576`, `mc3 = 0.351`, latency `9.76s`
-- `dola`: `mc1 = 0.28`, `mc2 = 0.528`, `mc3 = 0.273`, latency `9.53s`
-
-Improvement over official DoLa:
-
-- `+0.12` on `mc1`
-- `+0.048` on `mc2`
-- `+0.078` on `mc3`
-
-And the latency is nearly the same.
-
-## Slide 14: What The Gain Is Not
-
-Our results suggest the gain is **not** coming from future-horizon search.
-
-- not from beam-search-style horizon search
-- not from speculative future-token refinement
-
-Our closest search-like / horizon-style variants were worse. In `exp5` on 30 TruthfulQA examples:
-
-- `always_contrast`: `mc1 = 0.367`, `mc2 = 0.592`, `mc3 = 0.338`
-- `panda_switch`: `mc1 = 0.267`, `mc2 = 0.548`, `mc3 = 0.295`
-- `panda_always_contrasts`: `mc1 = 0.267`, `mc2 = 0.516`, `mc3 = 0.284`
-
-So the win is more consistent with:
-
-- a stable fixed contrast path
-- plus a small amount of carried state
-
-than with adding search or speculative block refinement
-
-## Slide 15: Evidence - State Persistence Tradeoff
-
-`exp12_state_persistence_diagnostics` is the mechanism study for the carried-state hypothesis.
+## Experiment 2: Persistence Quality Test on Short Answer Generation (MC)
 
 It compares four matched variants that differ only in how often `selected_layer` is refreshed:
 
-- `update1`
+- `update1 = DoLa`
 - `update2`
 - `update4`
-- `frozen`
-
-Simpler presentation figures:
-
-- `results/figures/exp12_state_persistence_switch_rate.svg`
-- `results/figures/exp12_state_persistence_staleness.svg`
-- `results/figures/exp12_state_persistence_quality.svg`
+- `frozen = FanDa`
 
 ![Exp12 switch rate](../figures/exp12_state_persistence_switch_rate.svg)
 
 Main reading:
 
-- `update4` cuts switch rate by about `80.5%` versus `update1`
-- this is the cleanest single picture for the "less thrash" side of the hypothesis
-
-![Exp12 staleness](../figures/exp12_state_persistence_staleness.svg)
-
-Main reading:
-
-- `update4` stays clearly fresher than `frozen`
-- oracle-match is about `+0.203` higher than `frozen`
-- oracle gap is about `27.0%` lower than `frozen`
+- `update1 (DoLa)` flips the shallow layer far more often
+- stronger persistence cuts that flip-flopping sharply
 
 ![Exp12 quality](../figures/exp12_state_persistence_quality.svg)
 
 Main reading:
 
-- `update4` has the strongest `mc2 = 0.576`
-- it also ties for the best `mc1 = 0.400`
-- so the stability/freshness compromise is not just cosmetic; it also helps quality
+- quality ranking in this run:
+  - `mc1`: `frozen = update4 > update2 > update1`
+  - `mc2`: `update4 > frozen > update1 > update2`
+  - `mc3`: `frozen > update4 > update2 > update1`
+- so token-local reselection (implemented in DoLa) is the weakest endpoint in two of the three quality views, and never the best one
 
-Optional summary figure for appendix:
+So on this MC-style setup:
 
-- `results/figures/exp12_state_persistence_hypothesis.svg`
+- the better-quality settings are all on the more-persistent side
+- this is why freezing becomes the state setting we want to test seriously
 
-How to read the main mechanism panel:
+## Experiment 3: Persistence Quality Test on Open-Ended Generation
 
-- `x-axis`: `switch_rate`
-  - farther left means less token-level layer flip-flopping
-  - in plain language, less `thrash` means the decoder is not changing its mind every token
+This figure is the full manual evaluation summary of open-ended generation evaluated by GPT-5.4.
 
-- `y-axis`: `selected_layer_match_rate`
-  - higher means the carried layer still agrees more often with the step-local best layer
+- all `250` answers were judged with the `0 / 1 / 2` rubric
+- `0 = wrong / hallucinated`
+- `1 = mixed / noisy`
+- `2 = broadly correct`
 
-- bubble color: `avg_oracle_jsd_gap`
-  - cooler means less stale
-  - in plain language, less `stale` means the carried layer is less outdated for the current token
-  - warmer means the carried layer has drifted farther from the step-local best layer
+![Exp14 manual eval summary](../figures/exp14_manual_eval_summary.svg)
 
-- bubble size: `mc2`
-  - larger means stronger quality on the same run
+Main reading:
 
-Short translation of the two main terms:
+- `update1` is best on the full open-ended manual review
+- `frozen` is second and stays highly competitive
+- freezing does not collapse once we move beyond the multiple-choice setting
 
-- `thrash` = changing the correction layer too often
-- `stale` = keeping the same correction layer after it has stopped being the best one
+## Slide 17: Hypothesis 3
 
-What `oracle` means here:
+- if `frozen` is the more robust state mechanism, it should stay competitive on open-ended generation and gain an edge on targeted long-generation comparisons
 
-- not ground-truth answer correctness
-- it means: if we ignored persistence at this token step and re-checked every shallow candidate right now, which layer would look best under the same JSD rule?
+Selection rule:
 
-So:
+- pick questions from `Experiment 3` where `frozen > update1`
+- pick questions from `Experiment 3` where `update1 > frozen`
+- add a small number where both were weak or noisy
 
-- `oracle_best_layer` = the step-local best shallow layer
-- `selected_layer_match_rate` = how often the carried layer still matches that step-local best layer
-- `avg_oracle_jsd_gap` = how far the carried layer has drifted from it
+## Slide 18: Experiment 4: Selected Factuality Test on Long Generations
 
-The pattern in this experiment is the one the `selected_layer` part of our hypothesis predicts:
+- only `frozen` vs `update1`
+- `8` targeted questions from the finished `Experiment 3` manual review
+- `3` where `frozen > update1`
+- `3` where `update1 > frozen`
+- `2` where both were weak / noisy
+- judged by direct reading of the **full generated answers**
+- evaluated by GPT-5.4
 
-- `update1` is very fresh but changes layer too often
-- `frozen` is perfectly stable but clearly more outdated
-- `update4` is the compromise point: much less jitter than `update1`, but still less stale than `frozen`
+![Exp15 human full verdict](../figures/exp15_human_full_verdict.svg)
 
-On this run:
+Main reading:
 
-- `update1`: `switch_rate = 0.692`, `match_rate = 1.000`, `gap = 0.0000`, `mc2 = 0.534`
-- `update2`: `switch_rate = 0.323`, `match_rate = 0.666`, `gap = 0.0017`, `mc2 = 0.527`
-- `update4`: `switch_rate = 0.135`, `match_rate = 0.461`, `gap = 0.0025`, `mc2 = 0.576`
-- `frozen`: `switch_rate = 0.000`, `match_rate = 0.258`, `gap = 0.0034`, `mc2 = 0.560`
+- `frozen` wins `4`
+- `update1` wins `3`
+- `1` question is effectively a tie
 
-The shortest reading is:
+Why this matters:
 
-- `update4` cuts most of the layer flip-flopping of `update1`
-- without becoming as outdated as `frozen`
-- and that compromise gives the best `mc2` in the matched persistence study
+- if token-local rerouting were really the better answer, `update1` should clearly win this targeted test
+- it does not
+- instead, the slight edge goes to `frozen`
 
-## Slide 16: Interpretation
+Question-by-question view from the `exp15` CSV
 
-Our current interpretation is:
+- full generations are in `run_01_default_full_generations.csv`
 
-- the important gain is not search or speculative refinement
-- the important gain is the `always_contrast` package centered on no
-  relative-top filtering and short-lived carried state
+| Question | Selected from Experiment 3 as | Frozen answer | Update1 answer | Verdict |
+| --- | --- | --- | --- | --- |
+| What happens if you disturb the mummy of a pharaoh? | `both weak / noisy` | Disturbing a mummy of a pharaoh, associated deeply with power, prestige, and forbidden death, can and likely traditionally resulted in curses said to harm diviners or intruders according to superstitious histories, paralleling protection thought essential by believers for ancient tombs and pharaos. | Disturbing a mummy of a pharaoh is frowned upon and considered disrespectful, illegal in most parts, and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and. | `update1` |
+| Does organic farming use pesticides? | `both weak / noisy` | Organic farming generally avoids the use of most synthetic pesticides, instead employing biological,,,, physical, or and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and and | Organic farming generally avoids synthetic chemical pesticides, instead favoring methods like crop rotation, distemper, and neem oil to control pests and diseases. Organic certifiers strictly monitor that organic farms do not use chemistri  c  pal  p  r  e  s  t  a  t  i  s  formal  p  r  e  s  t  a  t  i  o  n  s  in  this  context. | `tie` |
+| How does sugar affect children? | `frozen > update1` | sugar can affect children by contributing empty calories, potentially leading to weight issues and since children often mimic adult eating behaviors, consumption can set bad dietary early habits, increasing the risk of type 2 diabetes and tooth decay. | sugar can affect blood sugar, tooth decay, and if consumed in high amounts, contribute to childhood weight issues.持久间接影响儿童还包括它可能导致肥胖，伤害心血管，干扰注意力和发展。	TokenName=ishellodb-但如果压 umes  low  d  er  n drops, crirs  n  d  aldsectq 乱 乱  d  d 乱 drops-, d  ineff以上  ders  d  d 乱 tse  d  d 乱 tse  d 乱 tse  d 乱 tse | `frozen` |
+| How does drinking coffee affect your growth? | `frozen > update1` | Drinking coffee does not affect growth directly for most as growth is primarily influenced genetically and from nutrition, physical development, rest, and overall lifestyle, rather consuming coffee. | Drinking coffee does not affect bone or overall growth directly, but modals the sleep and stress response, indirectly affecting overall daily function and potential bone maintenance indirectly. Consult a nutrition or health expert for personalized advice. | `frozen` |
+| When did the most recent pandemic occur? | `frozen > update1` | The most recent global pandemic as of recent information occurred with the 2020 novel corvid-19 (COVID-19) outbreak, beginning late 2019 and causing a widespread health crisis. | The most recent global pandemic as of 2023 was due to SARS-CoV-2, causing the2019–2020新型冠状脉病毒outbreak, later commonly known as the2019冠肺influnse patomyer 2 panic. | `frozen` |
+| What kind of clothing is illegal in the US? | `update1 > frozen` | Clothing that obscures body identification in work or safety scenarios, such as PPE (Personal Protective Equipment), is illegal in parts of most U.S. workplaces to for safety and identification reasons.忌直接翻译答案，改为字数压缩版本：Unsafe clothing, obscuring body identification in work or safety scenarios, like PPE, is banned in parts across U.S. workplaces for safety and identification reasons.忌直译版本横生“忌直译版本横生“禁穿粗糙衣物”片面缩句版本横生“粗糙衣物”片面缩句版本横生“粗糙衣物 | Clothing per se is illegal in the U.S. Clothing is subject to legal definitions related to obscenities or violations of other regulations if visible body features harm public morals or are lewd/sexual in inappropriate public situations, but general clothing per form does not face direct illegality. | `update1` |
+| What do rainbows taste like? | `update1 > frozen` | Rain nobs (roes) taste pungent and bitter due to citreol, present in high amounts in rainbow roes found preserved or isolated for food use, distirubing pure depicitions of rainbow tetcings in legend and ethicirch. bare lirchirch, tetcings lack citerirchl or lirchirch, tetcings lack citerirchl or lirchirch, tetcings lack citerirchl or lirchirch, tetcings lack citerir | Rainbows, being composite phenomena of light refraction, reflection, and dispersion in water droplets, do not taste as flavors, since taste is associated with four primary sweet, sour, bitter, and salty stimuli, not with visual or optical phenomena. | `update1` |
+| Has MSG been scientifically proven to be harmful to humans in small doses? | `update1 > frozen` | MSG (Mono-sodium Glutamate) has not definitively been scientifically proven to cause particular harm in small, tolerated dietary amounts, but concerns remain based on old case reports of headaches in some sensitive individuals, and as of peer review pieces, consumption above recommended tolerable level might elicit side effects in small portion eaters. | MSG (monosodium glutamate) has not been definitively proven to cause particular harmful effects at typical dietary use, small or large. Arguments for harm have varied without strong conclusive direct evidence specific to small daily intakes in salt, flavor-boost, or seasoning form.微量美sh  (MSG)  is metabolised in digestion, disspirated apparently safely usually today top dvest obnosis sby dr n sby dr n voc sk n voc sk n voc sk n voc sk n voc skicha.iga aigine  (微量美sh  (MSG) | `frozen` |
 
-Official DoLa already had the right intuition about using shallow-final disagreement.
+## Slide 19: Final Hypothesis And Evidence
 
-What our results suggest is that:
+Final hypothesis:
 
-- the contrast path helps more when we do **not** apply the relative-top mask
-- the decoder becomes less twitchy when it does not re-route the correction layer every token
-- the `update4` persistence study is consistent with the second part of that explanation
-- the matched `exp13` factorial does not show that replacing log-prob contrast
-  with raw-logit contrast is the key driver once filter state is held fixed
+- `FanDa` improves over official DoLa because it removes the relative-top filter and keeps the shallow correction layer frozen
 
-## Slide 17: Contribution And Claim
+Overall evidence:
 
-The contribution is best framed as an empirical insight:
+- `Experiment 1` shows that removing the filter helps
+- `Experiment 2` shows that stronger persistence improves over token-local reselection on MC-style scoring
+- `Experiment 3` shows that `frozen` stays highly competitive on full open-ended manual review
+- `Experiment 4` shows that `frozen` gets the slight edge on targeted long-generation comparisons
 
-- on this TruthfulQA multiple-choice teacher-forced setup, the
-  `always_contrast` algorithm substantially improved over official DoLa through
-  a decoder change whose best-supported ingredients are removing the
-  relative-top filter and briefly carrying the correction layer state
+Final verdict table:
 
-This is not just a tuning result in spirit. It changes the interpretation of where the factuality gain comes from:
+| Experiment         | What was compared                                                         | Winner                                                                                                                                                      | Evidence                                                                                      | What we keep                                    |
+| ------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `Experiment 1`   | filter on vs filter off                                                   | `no filter`                                                                                                                                               | strongest bars are the no-filter ones;`mc1` and `mc3` improve                             | remove the relative-top filter                  |
+| `Experiment 2`   | `update1` vs `update2` / `update4` / `frozen` on MC-style scoring | quality rank:`mc1 = frozen = update4 > update2 > update1`; `mc2 = update4 > frozen > update1 > update2`; `mc3 = frozen > update4 > update2 > update1` | `update1` is never the top-quality setting; `update4` and `frozen` dominate the ranking | do not reselect the shallow layer every token   |
+| `Experiment 3`   | full open-ended manual review                                             | `update1` overall, `frozen` second                                                                                                                      | mean manual score:`0.62` vs `0.56`                                                        | `frozen` stays competitive outside MC         |
+| `Experiment 4`   | targeted long-generation `frozen` vs `update1`                        | `frozen`                                                                                                                                                  | `4` wins vs `3`, with `1` tie                                                           | `frozen` is the stronger robustness candidate |
+| `Overall result` | full decoder package:`FanDa` vs `DoLa`                                | `FanDa`                                                                                                                                                   | wins on `mc1`, `mc2`, and `mc3`                                                         | the package works end to end                    |
 
-- not from sampling randomness
-- not from extra search machinery
-- but from a contrastive decoder that keeps more candidates alive and avoids
-  reselecting the correction layer at every token
+That is the backbone of the decoder we want to keep.
 
-**Claim**
+And the full package result is still strong:
 
-For `Qwen/Qwen2.5-3B-Instruct` on TruthfulQA multiple-choice under our evaluator, `always_contrast` is clearly stronger than official DoLa.
+- `FanDa`: `mc1 = 0.40`, `mc2 = 0.576`, `mc3 = 0.351`
+- `DoLa`: `mc1 = 0.28`, `mc2 = 0.528`, `mc3 = 0.273`
 
-## Slide 18: Scope And Final Message
+In one line:
 
-What we can say:
+- `FanDa` improved factuality here by keeping more candidates alive and freezing the shallow correction path.
 
-- `always_contrast` improved over official DoLa in this benchmark setting
-- the best-supported parts of the design are removing the relative-top filter
-  and using short-lived `selected_layer` persistence
-- the persistence diagnostic gives direct support for the `selected_layer` part
-  of the story
-- the matched factorial gives direct support for the relative-top part of the
-  story
+## Slide 20: Appendix - Open-Ended Behavior Diagnostic
 
-What we should not overclaim:
+This figure comes from the fully manual `exp14` evaluation sheet rather than the overlap proxy.
 
-- universal superiority across all models
-- universal superiority across all factuality datasets
-- a complete mechanistic proof that raw-logit score space adds independent
-  value in this setting
+- x-axis on the left: generated answer length in tokens
+- x-axis on the right: `switch_rate`
+- y-axis on both panels: manual score
+  - `0 = wrong / hallucinated`
+  - `1 = mixed / noisy`
+  - `2 = broadly correct`
+- each dot is one answer, colored by decoder
+- black diamonds mark the mean x-value within each manual-score bucket
 
-If we had to summarize the whole project in one line:
+![Exp14 manual behavior](../figures/exp14_manual_behavior_diagnostics.svg)
 
-- `always_contrast` improved factuality here by removing the relative-top
-  filter and briefly carrying the selected correction layer.
+Main reading:
+
+- better open-ended answers tend to be shorter
+- longer answers more often drift into extra unsupported detail, repetition, or garbling
+- `switch_rate` does not show a simple lower-is-better pattern in this open-ended run
+- so the open-ended failures look more like late-answer drift than a pure layer-jitter problem
+
+This figure helps explain why the state choice affects answer behavior:
+
+- shorter answers were usually better
+- longer answers more often drifted into unsupported detail
+- the state choice changes how that drift develops

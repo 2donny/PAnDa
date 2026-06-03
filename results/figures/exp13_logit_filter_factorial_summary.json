@@ -1,0 +1,98 @@
+{
+  "bars": {
+    "mc1": {
+      "exp13_logprob_top": 0.28,
+      "exp13_logprob_no_top": 0.38,
+      "exp13_logit_top": 0.3,
+      "exp13_logit_no_top": 0.38
+    },
+    "mc2": {
+      "exp13_logprob_top": 0.527824148006008,
+      "exp13_logprob_no_top": 0.5274135575933273,
+      "exp13_logit_top": 0.5199547833573481,
+      "exp13_logit_no_top": 0.5274135669590528
+    },
+    "mc3": {
+      "exp13_logprob_top": 0.273,
+      "exp13_logprob_no_top": 0.3286666666666666,
+      "exp13_logit_top": 0.2996666666666666,
+      "exp13_logit_no_top": 0.3286666666666666
+    }
+  },
+  "main_effects": {
+    "mc1": {
+      "no_filter": 0.08999999999999997,
+      "raw_logit": 0.009999999999999953,
+      "interaction": -0.019999999999999962
+    },
+    "mc2": {
+      "no_filter": 0.0035240965945120273,
+      "raw_logit": -0.003934677641467266,
+      "interaction": 0.007869374014385366
+    },
+    "mc3": {
+      "no_filter": 0.04233333333333328,
+      "raw_logit": 0.013333333333333308,
+      "interaction": -0.02666666666666656
+    }
+  },
+  "ranking": {
+    "mc1": [
+      {
+        "decoder": "exp13_logit_no_top",
+        "score_mean": 0.38
+      },
+      {
+        "decoder": "exp13_logprob_no_top",
+        "score_mean": 0.38
+      },
+      {
+        "decoder": "exp13_logit_top",
+        "score_mean": 0.3
+      },
+      {
+        "decoder": "exp13_logprob_top",
+        "score_mean": 0.28
+      }
+    ],
+    "mc2": [
+      {
+        "decoder": "exp13_logprob_top",
+        "score_mean": 0.527824148006008
+      },
+      {
+        "decoder": "exp13_logit_no_top",
+        "score_mean": 0.5274135669590528
+      },
+      {
+        "decoder": "exp13_logprob_no_top",
+        "score_mean": 0.5274135575933273
+      },
+      {
+        "decoder": "exp13_logit_top",
+        "score_mean": 0.5199547833573481
+      }
+    ],
+    "mc3": [
+      {
+        "decoder": "exp13_logit_no_top",
+        "score_mean": 0.3286666666666666
+      },
+      {
+        "decoder": "exp13_logprob_no_top",
+        "score_mean": 0.3286666666666666
+      },
+      {
+        "decoder": "exp13_logit_top",
+        "score_mean": 0.2996666666666666
+      },
+      {
+        "decoder": "exp13_logprob_top",
+        "score_mean": 0.273
+      }
+    ]
+  },
+  "avg_no_filter_effect": 0.04528580997594842,
+  "avg_raw_logit_effect": 0.006466218563955332,
+  "takeaway": "Removing the relative-top filter is the dominant effect. Changing log-prob contrast to raw-logit is much smaller and mixed."
+}

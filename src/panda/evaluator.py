@@ -1,8 +1,11 @@
 """Core evaluator implementation for PAnDa and DoLa variants."""
 
 import os
+from contextlib import contextmanager
+from pathlib import Path
 
 import torch
+from huggingface_hub import try_to_load_from_cache
 
 from .import_shims import suppress_problematic_optional_dependency_detection
 
@@ -27,6 +30,21 @@ from .decoders import (
 from .utils import get_decoder_label, get_decoder_names, parse_bucket_spec
 
 torch.set_grad_enabled(False)
+
+
+@contextmanager
+def _temporary_env(updates):
+    previous = {key: os.environ.get(key) for key in updates}
+    try:
+        for key, value in updates.items():
+            os.environ[key] = value
+        yield
+    finally:
+        for key, old_value in previous.items():
+            if old_value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = old_value
 
 
 class Stage4Evaluator(
@@ -115,26 +133,53 @@ class Stage4Evaluator(
 
     def _load_tokenizer(self):
         print("Loading tokenizer...")
-        tokenizer = AutoTokenizer.from_pretrained(
-            self.args.model_name,
-            token=self.hf_token,
-            local_files_only=self.args.local_files_only,
+        model_name_or_path = self._resolve_local_model_path(self.args.model_name)
+        env_updates = (
+            {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}
+            if self.args.local_files_only
+            else {}
         )
+        with _temporary_env(env_updates):
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_name_or_path,
+                token=self.hf_token,
+                local_files_only=self.args.local_files_only,
+            )
         if tokenizer.pad_token_id is None and tokenizer.eos_token_id is not None:
             tokenizer.pad_token = tokenizer.eos_token
         return tokenizer
 
     def _load_model(self):
         print("Loading model weights...")
-        model = AutoModelForCausalLM.from_pretrained(
-            self.args.model_name,
-            dtype=self.dtype,
-            device_map="auto" if self.device == "cuda" else None,
-            token=self.hf_token,
-            local_files_only=self.args.local_files_only,
+        model_name_or_path = self._resolve_local_model_path(self.args.model_name)
+        env_updates = (
+            {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}
+            if self.args.local_files_only
+            else {}
         )
+        with _temporary_env(env_updates):
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name_or_path,
+                dtype=self.dtype,
+                device_map="auto" if self.device == "cuda" else None,
+                token=self.hf_token,
+                local_files_only=self.args.local_files_only,
+            )
         model.eval()
         return model
+
+    def _resolve_local_model_path(self, model_name_or_path):
+        if not self.args.local_files_only:
+            return model_name_or_path
+        direct_path = Path(str(model_name_or_path))
+        if direct_path.exists():
+            return str(direct_path)
+
+        for filename in ("config.json", "tokenizer_config.json", "tokenizer.json"):
+            cached_path = try_to_load_from_cache(str(model_name_or_path), filename)
+            if isinstance(cached_path, str):
+                return str(Path(cached_path).parent)
+        return model_name_or_path
 
     def _configure_layers(self):
         num_layers = getattr(self.model.config, "num_hidden_layers", None)
