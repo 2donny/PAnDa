@@ -277,6 +277,8 @@ That is the backbone of the decoder we want to keep.
 
 And the full package result is still strong:
 
+![Core decoder quality vs latency with fanda](../figures/exp11_core_decoder_mc_latency_v2.svg)
+
 - `FanDa`: `mc1 = 0.40`, `mc2 = 0.576`, `mc3 = 0.351`
 - `DoLa`: `mc1 = 0.28`, `mc2 = 0.528`, `mc3 = 0.273`
 - `FanDa` improved factuality here by keeping more candidates alive and freezing the shallow correction path.

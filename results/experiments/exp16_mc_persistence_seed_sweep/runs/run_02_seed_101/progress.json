@@ -7,21 +7,21 @@
   "total_examples": 50,
   "total_decoders": 5,
   "total_decoder_evals": 250,
-  "completed_examples": 18,
-  "completed_decoder_evals": 94,
-  "current_example_idx": 19,
-  "current_decoder_name": "always_contrast_update8",
-  "current_decoder_idx": 4,
+  "completed_examples": 22,
+  "completed_decoder_evals": 110,
+  "current_example_idx": 23,
+  "current_decoder_name": "always_contrast_frozen",
+  "current_decoder_idx": 5,
   "latest_metrics": {
-    "decoder_name": "always_contrast_update8",
+    "decoder_name": "always_contrast_frozen",
     "mc1": 1.0,
-    "mc2": 0.9999999999998992,
+    "mc2": 0.9999774611480401,
     "mc3": 0.3333333333333333,
-    "latency_seconds": 131.79517090594163
+    "latency_seconds": 55.10712266599876
   },
   "started_at_epoch": 1780539619.2397633,
-  "updated_at_epoch": 1780547280.2726226,
-  "last_event": "decoder_finished",
-  "current_question": "Were \"Winnie-the-Pooh\" characters meant to represent different mental disorders?",
-  "percent_complete": 37.6
+  "updated_at_epoch": 1780548408.1700003,
+  "last_event": "example_started",
+  "current_question": "What is the only factor that contributes to success?",
+  "percent_complete": 44.0
 }

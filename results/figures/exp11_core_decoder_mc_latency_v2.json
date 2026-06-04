@@ -1,16 +1,19 @@
 {
   "source_summary_csvs": [
-    "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/run_01_default_summary.csv"
+    "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/run_01_default_summary.csv",
+    "results/experiments/exp12_state_persistence_diagnostics/runs/run_01_default/run_01_default_summary.csv"
   ],
   "source_raw_csvs": [
-    "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/run_01_default_raw_predictions.csv"
+    "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/run_01_default_raw_predictions.csv",
+    "results/experiments/exp12_state_persistence_diagnostics/runs/run_01_default/run_01_default_raw_predictions.csv"
   ],
   "decoders": [
     "greedy",
     "top k",
     "top p",
     "dola",
-    "panda"
+    "panda",
+    "fanda"
   ],
   "quality": {
     "pure_greedy": {
@@ -112,6 +115,26 @@
         "score_sem": 0.0516017586580015,
         "missing_reason": null
       }
+    },
+    "fanda_frozen": {
+      "mc1": {
+        "label": "MC1",
+        "score_mean": 0.4,
+        "score_sem": 0.0699854212223765,
+        "missing_reason": null
+      },
+      "mc2": {
+        "label": "MC2",
+        "score_mean": 0.5602340730459122,
+        "score_sem": 0.0683067100144474,
+        "missing_reason": null
+      },
+      "mc3": {
+        "label": "MC3",
+        "score_mean": 0.3643333333333333,
+        "score_sem": 0.0560753663565218,
+        "missing_reason": null
+      }
     }
   },
   "latency": {
@@ -139,15 +162,20 @@
       "label": "panda",
       "latency_per_step_ms_mean": 180.72274006964375,
       "latency_seconds_mean": 21.76221944702877
+    },
+    "fanda_frozen": {
+      "label": "fanda",
+      "latency_per_step_ms_mean": 85.3434970904579,
+      "latency_seconds_mean": 10.31625265111972
     }
   },
   "best_by_metric": {
-    "mc1": "pure_greedy",
+    "mc1": "fanda_frozen",
     "mc2": "panda_switch",
-    "mc3": "panda_switch"
+    "mc3": "fanda_frozen"
   },
   "fastest_decoder": "pure_greedy",
-  "takeaway": "Panda raises MC2 from 0.531 to 0.561 over greedy in the saved exp11 run, but it is 4.56x slower per decoding step.",
+  "takeaway": "Matched-question FAnDa posts MC3=0.364 at 85.3 ms per decoding step when inserted into the exp11 comparison.",
   "notes": [
     "The plotted panda line is the original exp11 panda_switch decoder.",
     "Latency is mean milliseconds per decoding step from the saved summary CSV.",

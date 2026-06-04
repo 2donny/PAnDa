@@ -13,7 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 
-DECODER_ORDER = (
+BASE_DECODER_ORDER = (
     "pure_greedy",
     "top_k",
     "top_p",
@@ -21,12 +21,15 @@ DECODER_ORDER = (
     "panda_switch",
 )
 
+V2_DECODER_ORDER = BASE_DECODER_ORDER + ("fanda_frozen",)
+
 DISPLAY_LABELS = {
     "pure_greedy": "greedy",
     "top_k": "top k",
     "top_p": "top p",
     "dola": "dola",
     "panda_switch": "panda",
+    "fanda_frozen": "fanda",
 }
 
 QUALITY_ORDER = (
@@ -36,11 +39,12 @@ QUALITY_ORDER = (
 )
 
 COLORS = {
-    "pure_greedy": "#355070",
-    "top_k": "#e07a5f",
-    "top_p": "#2a9d8f",
-    "dola": "#6d597a",
-    "panda_switch": "#5f0f40",
+    "pure_greedy": "#0072B2",
+    "top_k": "#E69F00",
+    "top_p": "#009E73",
+    "dola": "#CC79A7",
+    "panda_switch": "#D55E00",
+    "fanda_frozen": "#56B4E9",
 }
 
 BACKGROUND = "#ffffff"
@@ -71,10 +75,36 @@ def parse_args() -> argparse.Namespace:
         default=Path("results/figures/exp11_core_decoder_mc_latency.svg"),
     )
     parser.add_argument(
+        "--title",
+        type=str,
+        default="Core decoder quality vs latency",
+    )
+    parser.add_argument(
         "--raw-csv",
         type=Path,
         default=Path(
             "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/"
+            "run_01_default_raw_predictions.csv"
+        ),
+    )
+    parser.add_argument(
+        "--include-fanda-frozen",
+        action="store_true",
+        help="Append exp12's fanda_frozen result as a fanda bar using the matched question set.",
+    )
+    parser.add_argument(
+        "--fanda-summary-csv",
+        type=Path,
+        default=Path(
+            "results/experiments/exp12_state_persistence_diagnostics/runs/run_01_default/"
+            "run_01_default_summary.csv"
+        ),
+    )
+    parser.add_argument(
+        "--fanda-raw-csv",
+        type=Path,
+        default=Path(
+            "results/experiments/exp12_state_persistence_diagnostics/runs/run_01_default/"
             "run_01_default_raw_predictions.csv"
         ),
     )
@@ -179,19 +209,20 @@ def nice_latency_ticks(max_value: float) -> tuple[float, list[float]]:
     return upper, ticks
 
 
-def load_summary(path: Path) -> pd.DataFrame:
+def load_summary(path: Path, decoder_mapping: dict[str, str]) -> pd.DataFrame:
     df = pd.read_csv(path)
     df = df[
         (df["benchmark"] == "truthfulqa")
-        & (df["decoder"].isin(DECODER_ORDER))
+        & (df["decoder"].isin(decoder_mapping))
         & (df["metric_name"].isin([metric for metric, _ in QUALITY_ORDER]))
     ].copy()
+    df["decoder"] = df["decoder"].map(decoder_mapping)
     for column in ("score_mean", "score_sem", "latency_per_step_ms_mean", "latency_seconds_mean"):
         df[column] = pd.to_numeric(df[column], errors="coerce")
     return df
 
 
-def load_missing_reasons(path: Path) -> dict[tuple[str, str], str]:
+def load_missing_reasons(path: Path, decoder_mapping: dict[str, str]) -> dict[tuple[str, str], str]:
     if not path.exists():
         return {}
 
@@ -202,7 +233,7 @@ def load_missing_reasons(path: Path) -> dict[tuple[str, str], str]:
             decoder = row.get("decoder")
             metric_name = row.get("metric_name")
             benchmark = row.get("benchmark")
-            if benchmark != "truthfulqa" or decoder not in DECODER_ORDER:
+            if benchmark != "truthfulqa" or decoder not in decoder_mapping:
                 continue
             if metric_name not in {metric for metric, _ in QUALITY_ORDER}:
                 continue
@@ -215,7 +246,8 @@ def load_missing_reasons(path: Path) -> dict[tuple[str, str], str]:
             all_truncated = bool(choice_scores) and all(
                 value == float("-inf") for value in choice_scores.values()
             )
-            grouped.setdefault((decoder, metric_name), []).append(all_truncated)
+            canonical_decoder = decoder_mapping[decoder]
+            grouped.setdefault((canonical_decoder, metric_name), []).append(all_truncated)
 
     reasons: dict[tuple[str, str], str] = {}
     for key, flags in grouped.items():
@@ -226,13 +258,14 @@ def load_missing_reasons(path: Path) -> dict[tuple[str, str], str]:
 
 def build_stats(
     df: pd.DataFrame,
-    source_path: Path,
-    raw_path: Path,
+    source_paths: list[Path],
+    raw_paths: list[Path],
     missing_reasons: dict[tuple[str, str], str],
+    decoder_order: tuple[str, ...],
 ) -> dict[str, object]:
     quality: dict[str, dict[str, dict[str, float | None]]] = {}
     latency: dict[str, dict[str, float | str | None]] = {}
-    for decoder in DECODER_ORDER:
+    for decoder in decoder_order:
         part = df[df["decoder"] == decoder]
         quality[decoder] = {}
         for metric_name, metric_label in QUALITY_ORDER:
@@ -265,34 +298,46 @@ def build_stats(
     for metric_name, _ in QUALITY_ORDER:
         scores = [
             (decoder, quality[decoder][metric_name]["score_mean"])
-            for decoder in DECODER_ORDER
+            for decoder in decoder_order
             if quality[decoder][metric_name]["score_mean"] is not None
         ]
         best_by_metric[metric_name] = max(scores, key=lambda item: float(item[1]))[0] if scores else None
 
     fastest_decoder = min(
-        DECODER_ORDER,
+        decoder_order,
         key=lambda decoder: float(latency[decoder]["latency_per_step_ms_mean"] or float("inf")),
     )
-    greedy_latency = clean_float(latency["pure_greedy"]["latency_per_step_ms_mean"])
-    panda_latency = clean_float(latency["panda_switch"]["latency_per_step_ms_mean"])
-    panda_mc2 = clean_float(quality["panda_switch"]["mc2"]["score_mean"])
-    greedy_mc2 = clean_float(quality["pure_greedy"]["mc2"]["score_mean"])
-    takeaway = (
-        "Panda preserves the strong greedy-like MC profile in exp11 while paying a much larger "
-        "step-time cost than the non-block baselines."
-    )
-    if all(value is not None for value in (greedy_latency, panda_latency, panda_mc2, greedy_mc2)):
-        slowdown = float(panda_latency) / float(greedy_latency)
+    if "fanda_frozen" in decoder_order:
+        fanda_mc3 = clean_float(quality["fanda_frozen"]["mc3"]["score_mean"])
+        fanda_latency = clean_float(latency["fanda_frozen"]["latency_per_step_ms_mean"])
         takeaway = (
-            f"Panda raises MC2 from {greedy_mc2:.3f} to {panda_mc2:.3f} over greedy in the saved exp11 run, "
-            f"but it is {slowdown:.2f}x slower per decoding step."
+            "V2 adds the matched exp12 frozen FAnDa result to the exp11 decoder comparison."
         )
+        if fanda_mc3 is not None and fanda_latency is not None:
+            takeaway = (
+                f"Matched-question FAnDa posts MC3={fanda_mc3:.3f} at {fanda_latency:.1f} ms per decoding step "
+                "when inserted into the exp11 comparison."
+            )
+    else:
+        greedy_latency = clean_float(latency["pure_greedy"]["latency_per_step_ms_mean"])
+        panda_latency = clean_float(latency["panda_switch"]["latency_per_step_ms_mean"])
+        panda_mc2 = clean_float(quality["panda_switch"]["mc2"]["score_mean"])
+        greedy_mc2 = clean_float(quality["pure_greedy"]["mc2"]["score_mean"])
+        takeaway = (
+            "Panda preserves the strong greedy-like MC profile in exp11 while paying a much larger "
+            "step-time cost than the non-block baselines."
+        )
+        if all(value is not None for value in (greedy_latency, panda_latency, panda_mc2, greedy_mc2)):
+            slowdown = float(panda_latency) / float(greedy_latency)
+            takeaway = (
+                f"Panda raises MC2 from {greedy_mc2:.3f} to {panda_mc2:.3f} over greedy in the saved exp11 run, "
+                f"but it is {slowdown:.2f}x slower per decoding step."
+            )
 
     return {
-        "source_summary_csv": str(source_path),
-        "source_raw_csv": str(raw_path),
-        "decoders": [DISPLAY_LABELS[decoder] for decoder in DECODER_ORDER],
+        "source_summary_csvs": [str(path) for path in source_paths],
+        "source_raw_csvs": [str(path) for path in raw_paths],
+        "decoders": [DISPLAY_LABELS[decoder] for decoder in decoder_order],
         "quality": quality,
         "latency": latency,
         "best_by_metric": best_by_metric,
@@ -314,9 +359,9 @@ def draw_missing_label(svg: list[str], x: float, baseline_y: float, label: str) 
     svg.append(svg_text(x, baseline_y, label, size=10, fill=TEXT_MUTED, anchor="middle"))
 
 
-def draw_legend(svg: list[str], *, left: float, top: float) -> None:
+def draw_legend(svg: list[str], *, left: float, top: float, decoder_order: tuple[str, ...]) -> None:
     x = left
-    for idx, decoder in enumerate(DECODER_ORDER):
+    for idx, decoder in enumerate(decoder_order):
         if idx == 3:
             x = left
             top += 22
@@ -336,15 +381,15 @@ def draw_quality_panel(
 ) -> None:
     quality = stats["quality"]
     best_by_metric = stats["best_by_metric"]
+    decoder_order = tuple(quality.keys())
 
     svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke=PANEL_STROKE, stroke_width=1.0, rx=14))
     svg.append(svg_text(left + width / 2, top + 24, "TruthfulQA MC results", size=17, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, "Experiment 11 saved run, selected decoders only", size=11, fill=TEXT_MUTED, anchor="middle"))
-    draw_legend(svg, left=left + 24, top=top + 70)
+    draw_legend(svg, left=left + 24, top=top + 48, decoder_order=decoder_order)
 
     axis_left = left + 82
     axis_right = left + width - 26
-    axis_top = top + 106
+    axis_top = top + 84
     axis_bottom = top + height - 76
     axis_width = axis_right - axis_left
 
@@ -360,11 +405,11 @@ def draw_quality_panel(
     group_width = axis_width / len(QUALITY_ORDER)
     bar_width = 24.0
     gap = 8.0
-    offset = (len(DECODER_ORDER) - 1) / 2.0
+    offset = (len(decoder_order) - 1) / 2.0
 
     for metric_idx, (metric_name, metric_label) in enumerate(QUALITY_ORDER):
         center_x = axis_left + group_width * (metric_idx + 0.5)
-        for decoder_idx, decoder in enumerate(DECODER_ORDER):
+        for decoder_idx, decoder in enumerate(decoder_order):
             x = center_x + (decoder_idx - offset) * (bar_width + gap)
             score = quality[decoder][metric_name]["score_mean"]
             sem = quality[decoder][metric_name]["score_sem"]
@@ -388,14 +433,6 @@ def draw_quality_panel(
                     rx=6,
                 )
             )
-
-            if sem is not None and sem > 0:
-                y_hi = scale(min(1.0, float(score) + float(sem)), 0.0, 1.0, axis_bottom, axis_top)
-                y_lo = scale(max(0.0, float(score) - float(sem)), 0.0, 1.0, axis_bottom, axis_top)
-                svg.append(svg_line(x, y_hi, x, y_lo, stroke="#1f1f1f", stroke_width=1.0))
-                svg.append(svg_line(x - 5, y_hi, x + 5, y_hi, stroke="#1f1f1f", stroke_width=1.0))
-                svg.append(svg_line(x - 5, y_lo, x + 5, y_lo, stroke="#1f1f1f", stroke_width=1.0))
-
             label_y = max(axis_top + 14, y - 8)
             svg.append(svg_text(x, label_y, f"{float(score):.3f}", size=10, fill=COLORS[decoder], anchor="middle"))
 
@@ -412,18 +449,18 @@ def draw_latency_panel(
     stats: dict[str, object],
 ) -> None:
     latency = stats["latency"]
-    max_latency = max(float(latency[decoder]["latency_per_step_ms_mean"] or 0.0) for decoder in DECODER_ORDER)
+    decoder_order = tuple(latency.keys())
+    max_latency = max(float(latency[decoder]["latency_per_step_ms_mean"] or 0.0) for decoder in decoder_order)
     upper, ticks = nice_latency_ticks(max_latency)
 
     svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke=PANEL_STROKE, stroke_width=1.0, rx=14))
     svg.append(svg_text(left + width / 2, top + 24, "Latency", size=17, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, "Mean ms per decoding step", size=11, fill=TEXT_MUTED, anchor="middle"))
 
     axis_left = left + 92
     axis_right = left + width - 30
-    axis_top = top + 76
+    axis_top = top + 54
     axis_bottom = top + height - 84
-    row_gap = (axis_bottom - axis_top) / len(DECODER_ORDER)
+    row_gap = (axis_bottom - axis_top) / len(decoder_order)
     bar_height = min(30.0, row_gap * 0.58)
 
     for tick in ticks:
@@ -435,7 +472,7 @@ def draw_latency_panel(
     svg.append(svg_line(axis_left, axis_bottom, axis_right, axis_bottom, stroke=AXIS, stroke_width=1.1))
     svg.append(svg_text((axis_left + axis_right) / 2, axis_bottom + 46, "Milliseconds", size=11, fill=TEXT_MUTED, anchor="middle"))
 
-    for idx, decoder in enumerate(DECODER_ORDER):
+    for idx, decoder in enumerate(decoder_order):
         y_center = axis_top + row_gap * (idx + 0.5)
         y = y_center - bar_height / 2
         value = float(latency[decoder]["latency_per_step_ms_mean"] or 0.0)
@@ -446,35 +483,38 @@ def draw_latency_panel(
         svg.append(svg_text(bar_right + 8, y_center + 4, f"{value:.1f}", size=11, fill=COLORS[decoder], weight="bold"))
 
 
-def build_figure(stats: dict[str, object]) -> str:
+def build_figure(stats: dict[str, object], title: str) -> str:
     width = 1180
     height = 520
     body: list[str] = [svg_rect(0, 0, width, height, fill=BACKGROUND)]
-    body.append(svg_text(width / 2, 26, "Experiment 11: core decoder quality vs latency", size=18, anchor="middle", weight="bold"))
+    body.append(svg_text(width / 2, 26, title, size=18, anchor="middle", weight="bold"))
 
     draw_quality_panel(body, left=26, top=44, width=736, height=428, stats=stats)
     draw_latency_panel(body, left=784, top=44, width=370, height=428, stats=stats)
-
-    body.append(
-        svg_text(
-            width / 2,
-            496,
-            "Note: panda here refers to the original exp11 panda_switch path. top_p mc2 is blank in the summary because the raw exp11 rows show all choices truncated.",
-            size=10,
-            fill=TEXT_MUTED,
-            anchor="middle",
-        )
-    )
     return wrap_svg(body, width, height)
 
 
 def main() -> None:
     args = parse_args()
     stats_output = args.stats_output or args.output.with_suffix(".json")
-    summary_df = load_summary(args.summary_csv)
-    missing_reasons = load_missing_reasons(args.raw_csv)
-    stats = build_stats(summary_df, args.summary_csv, args.raw_csv, missing_reasons)
-    svg = build_figure(stats)
+    exp11_mapping = {decoder: decoder for decoder in BASE_DECODER_ORDER}
+    summary_frames = [load_summary(args.summary_csv, exp11_mapping)]
+    missing_reasons = load_missing_reasons(args.raw_csv, exp11_mapping)
+    source_summary_paths = [args.summary_csv]
+    source_raw_paths = [args.raw_csv]
+    decoder_order = BASE_DECODER_ORDER
+
+    if args.include_fanda_frozen:
+        fanda_mapping = {"fanda_frozen": "fanda_frozen"}
+        summary_frames.append(load_summary(args.fanda_summary_csv, fanda_mapping))
+        missing_reasons.update(load_missing_reasons(args.fanda_raw_csv, fanda_mapping))
+        source_summary_paths.append(args.fanda_summary_csv)
+        source_raw_paths.append(args.fanda_raw_csv)
+        decoder_order = V2_DECODER_ORDER
+
+    summary_df = pd.concat(summary_frames, ignore_index=True)
+    stats = build_stats(summary_df, source_summary_paths, source_raw_paths, missing_reasons, decoder_order)
+    svg = build_figure(stats, args.title)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     stats_output.parent.mkdir(parents=True, exist_ok=True)
