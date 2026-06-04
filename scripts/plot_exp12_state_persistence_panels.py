@@ -21,10 +21,10 @@ from plot_exp12_state_persistence_hypothesis import (
 )
 
 
-BACKGROUND = "#f7f6f3"
-GRID = "#e8e8e8"
-AXIS = "#555555"
-TEXT_MUTED = "#555555"
+BACKGROUND = "#ffffff"
+GRID = "#d9d9d9"
+AXIS = "#222222"
+TEXT_MUTED = "#444444"
 
 
 def parse_args() -> argparse.Namespace:
@@ -104,8 +104,7 @@ def draw_bar_chart(
     axis_h = axis_bottom - axis_top
 
     svg.append(svg_rect(left, top, width, height, fill="#ffffff", stroke="#dddddd", rx=14))
-    svg.append(svg_text(left + width / 2, top + 24, title, size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, subtitle, size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text(left + width / 2, top + 24, title, size=17, anchor="middle", weight="bold"))
 
     for tick in ticks:
         y = scale(tick, y_min, y_max, axis_bottom, axis_top)
@@ -114,16 +113,6 @@ def draw_bar_chart(
 
     svg.append(svg_line(axis_left, axis_top, axis_left, axis_bottom, stroke=AXIS, stroke_width=1.2))
     svg.append(svg_line(axis_left, axis_bottom, axis_right, axis_bottom, stroke=AXIS, stroke_width=1.2))
-    svg.append(
-        svg_text(
-            left + width / 2,
-            top + height - 24,
-            "Higher is better" if higher_is_better else "Lower is better",
-            size=11,
-            fill=TEXT_MUTED,
-            anchor="middle",
-        )
-    )
 
     band = axis_w / len(DECODER_ORDER)
     bar_w = min(72.0, band * 0.58)
@@ -147,18 +136,18 @@ def draw_bar_chart(
 
 def build_switch_rate_svg(mechanism_df, stats: dict[str, object]) -> str:
     width = 920
-    height = 450
+    height = 390
     values = {decoder: mechanism_df.loc[mechanism_df["decoder"] == decoder, "switch_rate"].iloc[0] for decoder in DECODER_ORDER}
     body = [svg_rect(0, 0, width, height, fill=BACKGROUND)]
     draw_bar_chart(
         body,
         values,
         left=28,
-        top=26,
+        top=18,
         width=864,
-        height=384,
-        title="Exp12: Layer Flip-Flopping",
-        subtitle="How often the decoder changes its correction layer across the answer.",
+        height=344,
+        title="Layer switch rate",
+        subtitle="",
         y_min=0.0,
         y_max=0.8,
         ticks=[0.0, 0.2, 0.4, 0.6, 0.8],
@@ -182,8 +171,8 @@ def build_staleness_svg(mechanism_df, stats: dict[str, object]) -> str:
         top=26,
         width=554,
         height=412,
-        title="Exp12: Freshness",
-        subtitle="How often the carried layer still matches the step-local best layer.",
+        title="Selected-layer match rate",
+        subtitle="",
         y_min=0.0,
         y_max=1.05,
         ticks=[0.0, 0.25, 0.5, 0.75, 1.0],
@@ -196,8 +185,8 @@ def build_staleness_svg(mechanism_df, stats: dict[str, object]) -> str:
         top=26,
         width=554,
         height=412,
-        title="Exp12: Staleness Gap",
-        subtitle="How far the carried layer drifts from the step-local best layer.",
+        title="Selected-layer gap",
+        subtitle="",
         y_min=0.0,
         y_max=0.0038,
         ticks=[0.0, 0.001, 0.002, 0.003],
@@ -207,24 +196,23 @@ def build_staleness_svg(mechanism_df, stats: dict[str, object]) -> str:
 
 
 def build_quality_svg(quality_df, stats: dict[str, object]) -> str:
-    width = 1060
-    height = 486
+    width = 980
+    height = 420
     scores = quality_map(quality_df)
     body = [svg_rect(0, 0, width, height, fill=BACKGROUND)]
-    left = 34
-    top = 26
-    chart_w = 992
-    chart_h = 412
+    left = 28
+    top = 18
+    chart_w = 924
+    chart_h = 364
     axis_left = left + 74
     axis_right = left + chart_w - 26
-    axis_top = top + 54
-    axis_bottom = top + chart_h - 72
+    axis_top = top + 40
+    axis_bottom = top + chart_h - 58
     axis_w = axis_right - axis_left
     axis_h = axis_bottom - axis_top
 
     body.append(svg_rect(left, top, chart_w, chart_h, fill="#ffffff", stroke="#dddddd", rx=14))
-    body.append(svg_text(left + chart_w / 2, top + 24, "Exp12: Quality Check", size=18, anchor="middle", weight="bold"))
-    body.append(svg_text(left + chart_w / 2, top + 44, "Mechanism claims matter only if the refresh schedule also preserves or improves quality.", size=11, fill=TEXT_MUTED, anchor="middle"))
+    body.append(svg_text(left + chart_w / 2, top + 24, "TruthfulQA MC quality", size=17, anchor="middle", weight="bold"))
 
     for tick in [0.0, 0.25, 0.5, 0.75, 1.0]:
         y = scale(tick, 0.0, 1.0, axis_bottom, axis_top)

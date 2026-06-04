@@ -21,10 +21,10 @@ EXPERIMENT_DIR = Path(__file__).resolve().parent
 RUN_MATRIX_PATH = EXPERIMENT_DIR / "run_matrix.csv"
 RUNS_DIR = EXPERIMENT_DIR / "runs"
 EXP12_DECODER_NAMES = (
-    "always_contrast_update1",
-    "always_contrast_update2",
-    "always_contrast_update4",
-    "always_contrast_frozen",
+    "fanda_update1",
+    "fanda_update2",
+    "fanda_update4",
+    "fanda_frozen",
 )
 
 
@@ -105,7 +105,7 @@ def main():
                 "without_becoming_as_stale_as_a_frozen_layer"
             ),
             "experiment_note": (
-                "matched_always_contrast_variants_that_change_only_the_selected_layer_refresh_schedule"
+                "matched_fanda_variants_that_change_only_the_selected_layer_refresh_schedule"
             ),
             "mechanism_metrics": [
                 "switch_rate",
@@ -117,10 +117,10 @@ def main():
                 "trigger_rate",
             ],
             "refresh_schedule": {
-                "always_contrast_update1": 1,
-                "always_contrast_update2": 2,
-                "always_contrast_update4": 4,
-                "always_contrast_frozen": "first_step_only_then_hold",
+                "fanda_update1": 1,
+                "fanda_update2": 2,
+                "fanda_update4": 4,
+                "fanda_frozen": "first_step_only_then_hold",
             },
             "binary_rule": "final_logits_minus_selected_shallow_logits",
             "mechanism_claim": (

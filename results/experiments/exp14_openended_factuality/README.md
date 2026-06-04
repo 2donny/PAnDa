@@ -4,8 +4,8 @@ This experiment asks whether selected-layer persistence matters more when the
 decoder has to generate a longer answer instead of only scoring short fixed
 multiple-choice strings.
 
-The motivation comes from `exp12`: `always_contrast_update4` and
-`always_contrast_frozen` were close on the TruthfulQA multiple-choice setup,
+The motivation comes from `exp12`: `fanda_update4` and
+`fanda_frozen` were close on the TruthfulQA multiple-choice setup,
 but that evaluator is teacher-forced over short candidate answers. In that
 setting, `update4` and `frozen` may differ only a few times before the answer
 ends.

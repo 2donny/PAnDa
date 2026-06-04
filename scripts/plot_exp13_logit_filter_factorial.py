@@ -11,12 +11,13 @@ from pathlib import Path
 import pandas as pd
 
 
-BACKGROUND = "#f7f6f3"
+BACKGROUND = "#ffffff"
 PANEL_BG = "#ffffff"
-GRID = "#e4e4e4"
-AXIS = "#555555"
+GRID = "#d9d9d9"
+AXIS = "#222222"
 TEXT = "#222222"
-TEXT_MUTED = "#666666"
+TEXT_MUTED = "#444444"
+FONT_FAMILY = "Times New Roman, Times, serif"
 
 METRIC_ORDER = ("mc1", "mc2", "mc3")
 CELL_ORDER = (
@@ -82,7 +83,7 @@ def svg_text(
 ) -> str:
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}" '
-        f'font-family="Arial, Helvetica, sans-serif" text-anchor="{anchor}" '
+        f'font-family="{FONT_FAMILY}" text-anchor="{anchor}" '
         f'font-weight="{weight}">{escape(text)}</text>'
     )
 
@@ -196,15 +197,6 @@ def load_factorial(summary_csv: Path) -> tuple[pd.DataFrame, dict[str, object]]:
     return df, stats
 
 
-def draw_legend(svg: list[str], *, left: float, top: float) -> None:
-    cursor_x = left
-    for decoder in CELL_ORDER:
-        svg.append(svg_rect(cursor_x, top - 10, 18, 12, fill=COLORS[decoder], rx=3))
-        label = DISPLAY_LABELS[decoder].replace("\n", " ")
-        svg.append(svg_text(cursor_x + 26, top, label, size=11, fill=TEXT_MUTED))
-        cursor_x += 210
-
-
 def draw_bar_panel(
     svg: list[str],
     *,
@@ -215,12 +207,11 @@ def draw_bar_panel(
     stats: dict[str, object],
 ) -> None:
     svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke="#dddddd", stroke_width=1.0, rx=14))
-    svg.append(svg_text(left + width / 2, top + 24, "2x2 Cells by Metric", size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, "Same data as before, but flattened into simple bars", size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text(left + width / 2, top + 24, "Relative-top filter factorial", size=17, anchor="middle", weight="bold"))
 
     axis_left = left + 64
     axis_right = left + width - 28
-    axis_top = top + 72
+    axis_top = top + 48
     axis_bottom = top + height - 96
     y_min = 0.0
     y_max = 0.6
@@ -253,106 +244,14 @@ def draw_bar_panel(
                 svg.append(svg_text(x + bar_w / 2, base_y + line_idx * 13, line, size=9, fill=TEXT_MUTED, anchor="middle"))
 
 
-def draw_effect_panel(
-    svg: list[str],
-    *,
-    left: float,
-    top: float,
-    width: float,
-    height: float,
-    main_effects: dict[str, dict[str, float]],
-) -> None:
-    svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke="#dddddd", stroke_width=1.0, rx=14))
-    svg.append(svg_text(left + width / 2, top + 24, "Main Effects", size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, "Positive means the factor helps", size=11, fill=TEXT_MUTED, anchor="middle"))
-
-    axis_left = left + 112
-    axis_right = left + width - 28
-    axis_top = top + 76
-    axis_bottom = top + height - 70
-    x_min = -0.02
-    x_max = 0.10
-    zero_x = scale(0.0, x_min, x_max, axis_left, axis_right)
-
-    for tick in (-0.02, 0.0, 0.02, 0.04, 0.06, 0.08, 0.10):
-        x = scale(tick, x_min, x_max, axis_left, axis_right)
-        svg.append(svg_line(x, axis_top, x, axis_bottom, stroke=GRID, stroke_width=1.0))
-        svg.append(svg_text(x, axis_bottom + 22, f"{tick:+.02f}", size=10, fill=TEXT_MUTED, anchor="middle"))
-    svg.append(svg_line(zero_x, axis_top, zero_x, axis_bottom, stroke=AXIS, stroke_width=1.2))
-
-    row_gap = (axis_bottom - axis_top) / len(METRIC_ORDER)
-    bar_h = 14
-    for idx, metric in enumerate(METRIC_ORDER):
-        y_mid = axis_top + row_gap * idx + row_gap / 2
-        svg.append(svg_text(left + 20, y_mid + 4, metric_label(metric), size=12, fill=TEXT_MUTED))
-
-        nf = float(main_effects[metric]["no_filter"])
-        rl = float(main_effects[metric]["raw_logit"])
-
-        nf_x = scale(nf, x_min, x_max, axis_left, axis_right)
-        rl_x = scale(rl, x_min, x_max, axis_left, axis_right)
-
-        svg.append(svg_rect(min(zero_x, nf_x), y_mid - 18, abs(nf_x - zero_x), bar_h, fill="#2a9d8f", rx=6))
-        svg.append(svg_text(nf_x + (8 if nf >= 0 else -8), y_mid - 6, f"{nf:+.003f}", size=10, anchor="start" if nf >= 0 else "end"))
-
-        svg.append(svg_rect(min(zero_x, rl_x), y_mid + 4, abs(rl_x - zero_x), bar_h, fill="#c8553d", rx=6))
-        svg.append(svg_text(rl_x + (8 if rl >= 0 else -8), y_mid + 16, f"{rl:+.003f}", size=10, anchor="start" if rl >= 0 else "end"))
-
-    legend_y = top + height - 30
-    svg.append(svg_rect(left + 26, legend_y - 9, 16, 10, fill="#2a9d8f", rx=4))
-    svg.append(svg_text(left + 50, legend_y, "remove filter (off - on)", size=11, fill=TEXT_MUTED))
-    svg.append(svg_rect(left + 240, legend_y - 9, 16, 10, fill="#c8553d", rx=4))
-    svg.append(svg_text(left + 264, legend_y, "raw-logit - logprob", size=11, fill=TEXT_MUTED))
-
-
-def draw_takeaway_panel(
-    svg: list[str],
-    *,
-    left: float,
-    top: float,
-    width: float,
-    height: float,
-    stats: dict[str, object],
-) -> None:
-    svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke="#dddddd", stroke_width=1.0, rx=14))
-    svg.append(svg_text(left + 22, top + 28, "Reading", size=17, weight="bold"))
-    lines = [
-        "The no-filter bars are the important pattern.",
-        "On mc1 and mc3, turning the filter off helps a lot.",
-        "Once the filter is off, logprob and raw-logit become identical on mc1 and mc3.",
-        f"Average no-filter effect: {stats['avg_no_filter_effect']:+.03f}",
-        f"Average raw-logit effect: {stats['avg_raw_logit_effect']:+.03f}",
-        "So exp13 says the simpler story is the right one:",
-        "most of the gain comes from removing the relative-top filter,",
-        "not from switching score space by itself.",
-    ]
-    y = top + 58
-    for line in lines:
-        svg.append(svg_text(left + 22, y, line, size=12, fill=TEXT_MUTED))
-        y += 22
-
-
 def main() -> None:
     args = parse_args()
     _, stats = load_factorial(args.summary_csv)
 
-    width = 1280
-    height = 760
+    width = 860
+    height = 560
     body: list[str] = [svg_rect(0, 0, width, height, fill=BACKGROUND)]
-    body.append(svg_text(34, 36, "exp13 Logit / Filter Factorial", size=28, weight="bold"))
-    body.append(
-        svg_text(
-            34,
-            60,
-            "Matched update1 2x2 ablation: easier view of the four cells and the two main effects.",
-            size=13,
-            fill=TEXT_MUTED,
-        )
-    )
-    draw_legend(body, left=34, top=88)
-    draw_bar_panel(body, left=30, top=112, width=760, height=620, stats=stats)
-    draw_effect_panel(body, left=812, top=112, width=438, height=300, main_effects=stats["main_effects"])
-    draw_takeaway_panel(body, left=812, top=434, width=438, height=298, stats=stats)
+    draw_bar_panel(body, left=28, top=24, width=804, height=500, stats=stats)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.stats_output.parent.mkdir(parents=True, exist_ok=True)

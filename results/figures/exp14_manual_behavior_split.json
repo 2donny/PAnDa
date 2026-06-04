@@ -1,0 +1,33 @@
+{
+  "source_manual_csv": "results/experiments/exp14_openended_factuality/runs/run_01_default/run_01_default_manual_eval.csv",
+  "answer_length_figure": "results/figures/exp14_manual_behavior_answer_length.svg",
+  "switch_rate_figure": "results/figures/exp14_manual_behavior_switch_rate.svg",
+  "stats": {
+    "total_rows": 250,
+    "correlation_manual_score_vs_answer_length": -0.19154990038921152,
+    "correlation_manual_score_vs_switch_rate": 0.10326261602448136,
+    "by_score": {
+      "0": {
+        "count": 152,
+        "mean_answer_token_count": 35.55921052631579,
+        "median_answer_token_count": 35.0,
+        "mean_switch_rate": 0.2299365321795306,
+        "median_switch_rate": 0.1428571428571428
+      },
+      "1": {
+        "count": 70,
+        "mean_answer_token_count": 33.285714285714285,
+        "median_answer_token_count": 33.0,
+        "mean_switch_rate": 0.27672739308432776,
+        "median_switch_rate": 0.1889880952380952
+      },
+      "2": {
+        "count": 28,
+        "mean_answer_token_count": 28.5,
+        "median_answer_token_count": 27.5,
+        "mean_switch_rate": 0.29746392446374853,
+        "median_switch_rate": 0.2069099378881987
+      }
+    }
+  }
+}

@@ -5,13 +5,13 @@ works better than fixed full contrast.
 
 Compared decoders:
 
-- `always_contrast`
+- `fanda`
   - fixed contrast-subtracted endpoint on the stateful carried-layer scaffold
   - carries a shallow layer across steps and refreshes it every `update_every`
   - uses `scores = final_logits - shallow_logits`
 
 - `adaptive_lambda_contrast`
-  - uses the same stateful carried-layer scaffold as `always_contrast`
+  - uses the same stateful carried-layer scaffold as `fanda`
   - replaces hard full contrast with
     `scores = final_logits - lambda_t * shallow_logits`
   - computes `lambda_t` from:
@@ -21,7 +21,7 @@ Compared decoders:
 
 How to read the result:
 
-- if `adaptive_lambda_contrast` beats `always_contrast`, then full contrast was
+- if `adaptive_lambda_contrast` beats `fanda`, then full contrast was
   probably too blunt and a continuous correction strength is worthwhile
 - if it ties or loses, then the current setup likely prefers persistent full
   contrast over per-token strength adaptation

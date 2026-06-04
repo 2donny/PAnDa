@@ -10,12 +10,13 @@ from html import escape
 from pathlib import Path
 
 
-BACKGROUND = "#f7f6f3"
+BACKGROUND = "#ffffff"
 PANEL_BG = "#ffffff"
-GRID = "#e4e4e4"
-AXIS = "#555555"
+GRID = "#d9d9d9"
+AXIS = "#222222"
 TEXT = "#222222"
-TEXT_MUTED = "#666666"
+TEXT_MUTED = "#444444"
+FONT_FAMILY = "Times New Roman, Times, serif"
 COLORS = {
     "frozen": "#6d597a",
     "update1": "#c8553d",
@@ -60,7 +61,7 @@ def svg_text(
 ) -> str:
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}" '
-        f'font-family="Arial, Helvetica, sans-serif" text-anchor="{anchor}" '
+        f'font-family="{FONT_FAMILY}" text-anchor="{anchor}" '
         f'font-weight="{weight}">{escape(text)}</text>'
     )
 
@@ -97,21 +98,6 @@ def svg_line(
     )
 
 
-def svg_circle(
-    cx: float,
-    cy: float,
-    r: float,
-    *,
-    fill: str,
-    stroke: str = "none",
-    stroke_width: float = 1.0,
-) -> str:
-    return (
-        f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="{r:.2f}" fill="{fill}" '
-        f'stroke="{stroke}" stroke-width="{stroke_width:.2f}" />'
-    )
-
-
 def wrap_svg(body: list[str], width: int, height: int) -> str:
     return "\n".join(
         [
@@ -120,13 +106,6 @@ def wrap_svg(body: list[str], width: int, height: int) -> str:
             "</svg>",
         ]
     )
-
-
-def shorten(text: str, limit: int = 58) -> str:
-    text = str(text).strip()
-    if len(text) <= limit:
-        return text
-    return text[: limit - 1].rstrip() + "…"
 
 
 def scale(value: float, src_min: float, src_max: float, dst_min: float, dst_max: float) -> float:
@@ -169,13 +148,12 @@ def build_stats(rows: list[dict[str, str]]) -> dict[str, object]:
 def draw_count_panel(svg: list[str], *, left: float, top: float, width: float, height: float, stats: dict[str, object]) -> None:
     counts = stats["verdict_counts"]
     svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke="#dddddd", stroke_width=1.0, rx=14))
-    svg.append(svg_text(left + width / 2, top + 26, "Question-Level Verdicts", size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 46, "Full-answer assistant review on 8 targeted exp15 questions", size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text(left + width / 2, top + 26, "Selected long-generation verdicts", size=17, anchor="middle", weight="bold"))
 
     axis_left = left + 60
     axis_right = left + width - 24
-    axis_top = top + 70
-    axis_bottom = top + height - 56
+    axis_top = top + 52
+    axis_bottom = top + height - 48
     max_count = max(int(v) for v in counts.values())
 
     for tick in range(max_count + 1):
@@ -194,54 +172,16 @@ def draw_count_panel(svg: list[str], *, left: float, top: float, width: float, h
         svg.append(svg_rect(axis_left, y, bar_w, bar_h, fill=COLORS[key], rx=10))
         svg.append(svg_text(axis_left + bar_w + 10, y + 24, str(counts[key]), size=12, weight="bold"))
 
-    summary = f"Frozen leads overall ({counts['frozen']} wins) but not by much."
-    svg.append(svg_text(left + width / 2, top + height - 18, summary, size=12, fill=TEXT_MUTED, anchor="middle"))
-
-
-def draw_case_panel(svg: list[str], *, left: float, top: float, width: float, height: float, rows: list[dict[str, str]]) -> None:
-    svg.append(svg_rect(left, top, width, height, fill=PANEL_BG, stroke="#dddddd", stroke_width=1.0, rx=14))
-    svg.append(svg_text(left + width / 2, top + 26, "Per-Question Human Read", size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 46, "Clear wins use solid emphasis; probable wins are softer calls", size=11, fill=TEXT_MUTED, anchor="middle"))
-
-    start_y = top + 78
-    row_h = 50
-    for idx, row in enumerate(rows):
-        y = start_y + idx * row_h
-        if idx:
-            svg.append(svg_line(left + 18, y - 14, left + width - 18, y - 14, stroke=GRID, stroke_width=1.0))
-        verdict = row["verdict"]
-        confidence = row["confidence"]
-        fill = COLORS[verdict]
-        stroke = "#222222" if confidence == "clear" else "none"
-        stroke_w = 2.0 if confidence == "clear" else 1.0
-        svg.append(svg_circle(left + 26, y, 8.0, fill=fill, stroke=stroke, stroke_width=stroke_w))
-        svg.append(svg_text(left + 44, y + 4, f"{row['example_idx']}. {shorten(row['question'])}", size=12, weight="bold"))
-        tag = verdict if verdict != "tie" else "tie / both messy"
-        conf_text = confidence if confidence != "tie" else "no clean winner"
-        svg.append(svg_text(left + width - 16, y + 4, f"{tag} ({conf_text})", size=11, fill=TEXT_MUTED, anchor="end"))
-
 
 def main() -> None:
     args = parse_args()
     rows = load_rows(args.input)
     stats = build_stats(rows)
 
-    width = 1260
-    height = 620
+    width = 640
+    height = 420
     body: list[str] = [svg_rect(0, 0, width, height, fill=BACKGROUND)]
-    body.append(svg_text(36, 34, "exp15 Prefix Probe: Human Verdict", size=26, weight="bold"))
-    body.append(
-        svg_text(
-            36,
-            56,
-            "Assistant full-answer review of frozen vs update1 on the 8 targeted disagreement questions.",
-            size=12,
-            fill=TEXT_MUTED,
-        )
-    )
-
-    draw_count_panel(body, left=28, top=84, width=420, height=504, stats=stats)
-    draw_case_panel(body, left=470, top=84, width=762, height=504, rows=rows)
+    draw_count_panel(body, left=26, top=24, width=588, height=360, stats=stats)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.stats_output.parent.mkdir(parents=True, exist_ok=True)

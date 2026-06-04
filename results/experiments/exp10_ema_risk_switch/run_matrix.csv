@@ -1,3 +1,3 @@
 run_id,notes,shallow_bucket,exp10_risk_beta,exp10_entropy_weight,exp10_margin_weight,exp10_layer_jsd_weight,exp10_risk_threshold,exp10_sticky_hold_steps
-run_01_layer4_default,Fixed-layer EMA-risk switch against matched always_contrast using layer 4 and no sticky hold.,4,0.8,1.0,1.0,1.0,0.55,0
-run_02_layer8_default,Fixed-layer EMA-risk switch against matched always_contrast using layer 8 and no sticky hold.,8,0.8,1.0,1.0,1.0,0.55,0
+run_01_layer4_default,Fixed-layer EMA-risk switch against matched fanda using layer 4 and no sticky hold.,4,0.8,1.0,1.0,1.0,0.55,0
+run_02_layer8_default,Fixed-layer EMA-risk switch against matched fanda using layer 8 and no sticky hold.,8,0.8,1.0,1.0,1.0,0.55,0

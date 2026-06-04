@@ -1,0 +1,50 @@
+{
+  "experiment_name": "exp16_mc_persistence_seed_sweep",
+  "run_id": "run_01_anchor_subset",
+  "notes": "exact_exp12_question_sequence_for_direct_continuity",
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "mode": "subset",
+  "seed": 42,
+  "strict_eval": false,
+  "decoder_names": [
+    "fanda_update1",
+    "fanda_update2",
+    "fanda_update4",
+    "fanda_update8",
+    "fanda_frozen"
+  ],
+  "primary_metric": "mc2",
+  "secondary_metrics": ["mc1", "mc3"],
+  "subset_strategy": "anchor_exp12_run_01",
+  "anchor_subset_reference": "exp12_state_persistence_diagnostics/run_01_default",
+  "experiment_question": "across_different_truthfulqa_subsets_is_the_mc_ranking_of_update1_update2_update4_update8_and_frozen_stable",
+  "experiment_note": "one_anchor_subset_matches_exp12_exactly_and_four_additional_runs_use_fresh_seeded_random_subsets_of_equal_size",
+  "refresh_schedule": {
+    "fanda_update1": 1,
+    "fanda_update2": 2,
+    "fanda_update4": 4,
+    "fanda_update8": 8,
+    "fanda_frozen": "first_step_only_then_hold"
+  },
+  "binary_rule": "final_logits_minus_selected_shallow_logits",
+  "evaluation_benchmark": "truthfulqa",
+  "truthfulqa_source": "truthful_qa/multiple_choice",
+  "truthfulqa_sampling": {
+    "total_candidates": 817,
+    "requested_limit": 50,
+    "resolved_limit": 50,
+    "sampling_mode": "fixed_source_indices",
+    "selected_source_indices": [
+      5, 7, 15, 21, 30, 31, 44, 51, 73, 131, 151, 163, 170, 179, 189, 194, 196,
+      233, 236, 248, 267, 280, 312, 318, 323, 328, 341, 361, 389, 399, 414, 428,
+      467, 519, 543, 568, 572, 600, 620, 632, 634, 641, 667, 686, 719, 727, 760,
+      770, 771, 803
+    ],
+    "anchor_experiment": "exp12_state_persistence_diagnostics",
+    "anchor_run_id": "run_01_default",
+    "anchor_metadata_path": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp12_state_persistence_diagnostics/runs/run_01_default/run_01_default_metadata.json"
+  },
+  "truthfulqa_limit": 50,
+  "truthfulqa_metrics": ["mc1", "mc2", "mc3"],
+  "latency_measurement": "wall_clock_seconds_with_cuda_synchronize"
+}

@@ -1,3 +1,3 @@
 run_id,notes,exp9_lambda_min,exp9_lambda_max,exp9_uncertainty_weight,exp9_confidence_gap_weight
-run_01_default,Test whether a conservative uncertainty-and-confidence adaptive lambda can match or beat fixed always_contrast.,0.5,1.0,1.0,2.0
+run_01_default,Test whether a conservative uncertainty-and-confidence adaptive lambda can match or beat fixed fanda.,0.5,1.0,1.0,2.0
 run_02_lambda_floor_025,Test whether a more aggressive adaptive lambda floor can outperform the conservative setting without collapsing useful contrast.,0.25,1.0,1.0,2.0

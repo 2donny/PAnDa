@@ -12,27 +12,28 @@ import pandas as pd
 
 
 DECODER_ORDER = (
-    "always_contrast_update1",
-    "always_contrast_update2",
-    "always_contrast_update4",
-    "always_contrast_frozen",
+    "fanda_update1",
+    "fanda_update2",
+    "fanda_update4",
+    "fanda_frozen",
 )
 
 DISPLAY_LABELS = {
-    "always_contrast_update1": "update1",
-    "always_contrast_update2": "update2",
-    "always_contrast_update4": "update4",
-    "always_contrast_frozen": "frozen",
+    "fanda_update1": "update1",
+    "fanda_update2": "update2",
+    "fanda_update4": "update4",
+    "fanda_frozen": "frozen",
 }
 
 COLORS = {
-    "always_contrast_update1": "#c8553d",
-    "always_contrast_update2": "#e9c46a",
-    "always_contrast_update4": "#2a9d8f",
-    "always_contrast_frozen": "#355070",
+    "fanda_update1": "#c8553d",
+    "fanda_update2": "#e9c46a",
+    "fanda_update4": "#2a9d8f",
+    "fanda_frozen": "#355070",
 }
 
 QUALITY_ORDER = ("mc1", "mc2", "mc3")
+FONT_FAMILY = "Times New Roman, Times, serif"
 
 
 def parse_args() -> argparse.Namespace:
@@ -88,10 +89,10 @@ def build_stats(mechanism_df: pd.DataFrame, quality_df: pd.DataFrame) -> dict[st
         for decoder in DECODER_ORDER
     }
 
-    u1 = mechanism_rows["always_contrast_update1"]
-    u2 = mechanism_rows["always_contrast_update2"]
-    u4 = mechanism_rows["always_contrast_update4"]
-    frozen = mechanism_rows["always_contrast_frozen"]
+    u1 = mechanism_rows["fanda_update1"]
+    u2 = mechanism_rows["fanda_update2"]
+    u4 = mechanism_rows["fanda_update4"]
+    frozen = mechanism_rows["fanda_frozen"]
 
     stats = {
         "hypothesis": (
@@ -142,7 +143,7 @@ def svg_text(
 ) -> str:
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}" '
-        f'font-family="Arial, Helvetica, sans-serif" text-anchor="{anchor}" '
+        f'font-family="{FONT_FAMILY}" text-anchor="{anchor}" '
         f'font-weight="{weight}">{escape(text)}</text>'
     )
 
@@ -291,16 +292,16 @@ def build_svg(mechanism_df: pd.DataFrame, quality_df: pd.DataFrame, stats: dict[
     svg.append(svg_line(plot_x + plot_w * 0.36, plot_y + plot_h * 0.22, plot_x + plot_w * 0.11, plot_y + plot_h * 0.08, stroke="#95d5b2", stroke_width=2.0, dash="7,5"))
 
     label_offsets = {
-        "always_contrast_update1": (10, -34),
-        "always_contrast_update2": (10, -18),
-        "always_contrast_update4": (10, 30),
-        "always_contrast_frozen": (10, 28),
+        "fanda_update1": (10, -34),
+        "fanda_update2": (10, -18),
+        "fanda_update4": (10, 30),
+        "fanda_frozen": (10, 28),
     }
     label_widths = {
-        "always_contrast_update1": 58,
-        "always_contrast_update2": 58,
-        "always_contrast_update4": 58,
-        "always_contrast_frozen": 54,
+        "fanda_update1": 58,
+        "fanda_update2": 58,
+        "fanda_update4": 58,
+        "fanda_frozen": 54,
     }
     card_x = plot_x + plot_w + 34
     card_w = left_panel[0] + left_panel[2] - card_x - 22
@@ -313,10 +314,10 @@ def build_svg(mechanism_df: pd.DataFrame, quality_df: pd.DataFrame, stats: dict[
     svg.append(svg_rect(card_x + card_w - 88, plot_y + 48, 30, 12, fill=interpolate_color("#2a9d8f", "#e76f51", 0.0), rx=4))
     svg.append(svg_rect(card_x + card_w - 50, plot_y + 48, 30, 12, fill=interpolate_color("#2a9d8f", "#e76f51", 1.0), rx=4))
     card_positions = {
-        "always_contrast_update1": plot_y + 98,
-        "always_contrast_update2": plot_y + 190,
-        "always_contrast_update4": plot_y + 282,
-        "always_contrast_frozen": plot_y + 374,
+        "fanda_update1": plot_y + 98,
+        "fanda_update2": plot_y + 190,
+        "fanda_update4": plot_y + 282,
+        "fanda_frozen": plot_y + 374,
     }
 
     for row in mechanism_df.itertuples():
@@ -409,8 +410,8 @@ def build_svg(mechanism_df: pd.DataFrame, quality_df: pd.DataFrame, stats: dict[
             76,
             callout_y + 64,
             (
-                f"Quality companion: update4 has the strongest mc2 ({stats['quality']['always_contrast_update4']['mc2']:.3f}) "
-                f"while staying tied-best on mc1 ({stats['quality']['always_contrast_update4']['mc1']:.3f})."
+                f"Quality companion: update4 has the strongest mc2 ({stats['quality']['fanda_update4']['mc2']:.3f}) "
+                f"while staying tied-best on mc1 ({stats['quality']['fanda_update4']['mc1']:.3f})."
             ),
             size=12,
             fill="#333333",
@@ -440,10 +441,10 @@ def main() -> None:
             {
                 "figure": str(output_path),
                 "stats": str(stats_output),
-                "update4_switch_rate": stats["mechanism"]["always_contrast_update4"]["switch_rate"],
-                "update4_match_rate": stats["mechanism"]["always_contrast_update4"]["selected_layer_match_rate"],
-                "update4_gap": stats["mechanism"]["always_contrast_update4"]["avg_oracle_jsd_gap"],
-                "update4_mc2": stats["mechanism"]["always_contrast_update4"]["mc2"],
+                "update4_switch_rate": stats["mechanism"]["fanda_update4"]["switch_rate"],
+                "update4_match_rate": stats["mechanism"]["fanda_update4"]["selected_layer_match_rate"],
+                "update4_gap": stats["mechanism"]["fanda_update4"]["avg_oracle_jsd_gap"],
+                "update4_mc2": stats["mechanism"]["fanda_update4"]["mc2"],
             },
             indent=2,
         )

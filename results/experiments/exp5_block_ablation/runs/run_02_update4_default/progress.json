@@ -10,10 +10,10 @@
   "completed_examples": 30,
   "completed_decoder_evals": 120,
   "current_example_idx": 30,
-  "current_decoder_name": "panda_always_contrasts",
+  "current_decoder_name": "panda_fandas",
   "current_decoder_idx": 4,
   "latest_metrics": {
-    "decoder_name": "panda_always_contrasts",
+    "decoder_name": "panda_fandas",
     "mc1": 1.0,
     "mc2": 0.9992576058452634,
     "mc3": 1.0,

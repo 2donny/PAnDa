@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1500" height="620" viewBox="0 0 1500 620">
 <rect x="0.00" y="0.00" width="1500.00" height="620.00" fill="#f7f6f3" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="0.00" />
 <text x="750.00" y="34.00" font-size="22" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Selected-Layer Jitter Diagnostics From Completed Runs</text>
-<text x="750.00" y="58.00" font-size="12" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Completed results only: DoLa reselects every token, while the default always_contrast path refreshes the layer every 4 steps.</text>
+<text x="750.00" y="58.00" font-size="12" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Completed results only: DoLa reselects every token, while the default fanda path refreshes the layer every 4 steps.</text>
 <rect x="34.00" y="84.00" width="360.00" height="472.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="12.00" />
 <text x="214.00" y="104.00" font-size="14" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Exp11: DoLa Thrashes More Than update4</text>
 <line x1="92.00" y1="496.00" x2="376.00" y2="496.00" stroke="#e8e8e8" stroke-width="1.00" />
@@ -135,7 +135,7 @@
 <line x1="286.00" y1="442.00" x2="324.00" y2="442.00" stroke="#222222" stroke-width="1.70" />
 <line x1="286.00" y1="444.87" x2="324.00" y2="444.87" stroke="#2a9d8f" stroke-width="2.40" />
 <text x="305.00" y="436.87" font-size="10" fill="#2a9d8f" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.135</text>
-<text x="305.00" y="518.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">always_contrast</text>
+<text x="305.00" y="518.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">fanda</text>
 <text x="305.00" y="531.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">(update4)</text>
 <rect x="416.00" y="84.00" width="540.00" height="472.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="12.00" />
 <text x="686.00" y="104.00" font-size="14" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Exp5: update4 Lowers Thrash Inside The Block Family</text>
@@ -191,7 +191,7 @@
 <line x1="513.00" y1="437.50" x2="551.00" y2="437.50" stroke="#222222" stroke-width="1.70" />
 <line x1="513.00" y1="442.22" x2="551.00" y2="442.22" stroke="#2a9d8f" stroke-width="2.40" />
 <text x="532.00" y="434.22" font-size="10" fill="#2a9d8f" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.142</text>
-<text x="532.00" y="518.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">always_contrast</text>
+<text x="532.00" y="518.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">fanda</text>
 <text x="532.00" y="531.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">(update4)</text>
 <circle cx="636.17" cy="496.00" r="4.00" fill="#457b9d" fill-opacity="0.780" stroke="white" stroke-width="0.70" />
 <circle cx="653.99" cy="496.00" r="4.00" fill="#457b9d" fill-opacity="0.780" stroke="white" stroke-width="0.70" />
@@ -311,7 +311,7 @@
 <line x1="861.00" y1="251.88" x2="899.00" y2="251.88" stroke="#222222" stroke-width="1.70" />
 <line x1="861.00" y1="247.42" x2="899.00" y2="247.42" stroke="#b56576" stroke-width="2.40" />
 <text x="880.00" y="239.42" font-size="10" fill="#b56576" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.658</text>
-<text x="880.00" y="518.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">panda_always_contrasts</text>
+<text x="880.00" y="518.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">panda_fandas</text>
 <text x="880.00" y="531.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">(per-step)</text>
 <rect x="978.00" y="84.00" width="488.00" height="472.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="12.00" />
 <text x="1222.00" y="104.00" font-size="14" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Exp11: Quality On The Same Saved Run</text>
@@ -347,13 +347,13 @@
 <rect x="1042.00" y="123.00" width="12.00" height="12.00" fill="#c8553d" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="3.00" />
 <text x="1060.00" y="133.00" font-size="10" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">DoLa</text>
 <rect x="1042.00" y="141.00" width="12.00" height="12.00" fill="#2a9d8f" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="3.00" />
-<text x="1060.00" y="151.00" font-size="10" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">always_contrast (update4)</text>
+<text x="1060.00" y="151.00" font-size="10" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">fanda (update4)</text>
 <rect x="90.00" y="140.00" width="282.00" height="48.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="10.00" />
 <text x="104.00" y="161.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="bold">DoLa / update4 mean switch-rate ratio: 5.35x</text>
 <text x="104.00" y="178.00" font-size="10" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">The completed exp11 run already shows a large gap.</text>
 <rect x="478.00" y="140.00" width="338.00" height="62.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="10.00" />
 <text x="492.00" y="161.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="bold">panda_switch / update4: 4.63x</text>
-<text x="492.00" y="179.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="bold">panda_always_contrasts / update4: 4.65x</text>
+<text x="492.00" y="179.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="bold">panda_fandas / update4: 4.65x</text>
 <text x="492.00" y="196.00" font-size="10" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="start" font-weight="normal">The update-4 cadence stays low-switch across two scaffolds.</text>
 <text x="750.00" y="594.00" font-size="11" fill="#444444" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Interpretation: this figure supports the stability claim from completed runs, but a stronger mechanism proof would still come from finishing exp12, which isolates update1/update2/update4/frozen directly.</text>
 </svg>

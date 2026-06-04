@@ -239,18 +239,22 @@ def save_experiment_outputs(results_df, summary_df, pairwise_df, metadata, resul
     )
 
 
-def run_truthfulqa_suite(evaluator, decoder_names, cli_args, artifact_prefix, results_dir, metadata):
-    from panda.benchmarks import load_truthfulqa_rows
-
+def run_truthfulqa_suite_on_rows(
+    evaluator,
+    decoder_names,
+    cli_args,
+    artifact_prefix,
+    results_dir,
+    metadata,
+    truthfulqa_rows,
+    truthfulqa_source,
+    truthfulqa_manifest,
+    truthfulqa_limit,
+):
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
     progress_json_path = results_dir / "progress.json"
     progress_events_path = results_dir / "progress.ndjson"
-    truthfulqa_limit = resolve_limit(cli_args.truthfulqa_limit, cli_args.mode, 5)
-    truthfulqa_rows, truthfulqa_source, truthfulqa_manifest = load_truthfulqa_rows(
-        truthfulqa_limit,
-        make_sampling_rng(cli_args.seed, "truthfulqa"),
-    )
     assert_eval_sources(cli_args, truthfulqa_source)
 
     print(
@@ -379,3 +383,25 @@ def run_truthfulqa_suite(evaluator, decoder_names, cli_args, artifact_prefix, re
     )
     save_experiment_outputs(results_df, summary_df, pairwise_df, metadata, Path(results_dir), artifact_prefix)
     return results_df, summary_df, pairwise_df
+
+
+def run_truthfulqa_suite(evaluator, decoder_names, cli_args, artifact_prefix, results_dir, metadata):
+    from panda.benchmarks import load_truthfulqa_rows
+
+    truthfulqa_limit = resolve_limit(cli_args.truthfulqa_limit, cli_args.mode, 5)
+    truthfulqa_rows, truthfulqa_source, truthfulqa_manifest = load_truthfulqa_rows(
+        truthfulqa_limit,
+        make_sampling_rng(cli_args.seed, "truthfulqa"),
+    )
+    return run_truthfulqa_suite_on_rows(
+        evaluator=evaluator,
+        decoder_names=decoder_names,
+        cli_args=cli_args,
+        artifact_prefix=artifact_prefix,
+        results_dir=results_dir,
+        metadata=metadata,
+        truthfulqa_rows=truthfulqa_rows,
+        truthfulqa_source=truthfulqa_source,
+        truthfulqa_manifest=truthfulqa_manifest,
+        truthfulqa_limit=truthfulqa_limit,
+    )

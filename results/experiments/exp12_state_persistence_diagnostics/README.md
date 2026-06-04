@@ -1,27 +1,27 @@
 # Experiment 12: State Persistence Diagnostics
 
 This experiment is not mainly about winning TruthfulQA. It is a mechanism study
-for the theory behind `always_contrast`:
+for the theory behind `fanda`:
 
 - a hallucination-prone local mode may persist for a few nearby tokens
 - reselecting the correction layer every token may be noisier than necessary
 - carrying `selected_layer` for a short span may stabilize the correction signal
 - but holding it too long may make it stale
 
-So `exp12` compares matched `always_contrast` variants that differ only in how
+So `exp12` compares matched `fanda` variants that differ only in how
 often the shallow correction layer is refreshed:
 
-- `always_contrast_update1`
+- `fanda_update1`
   - refresh the selected shallow layer every token
 
-- `always_contrast_update2`
+- `fanda_update2`
   - refresh every 2 teacher-forced token steps
 
-- `always_contrast_update4`
+- `fanda_update4`
   - refresh every 4 steps
-  - this matches the current default stateful `always_contrast` behavior
+  - this matches the current default stateful `fanda` behavior
 
-- `always_contrast_frozen`
+- `fanda_frozen`
   - pick the best JSD layer at step 0, then keep it for the rest of the answer
 
 ## Main Question

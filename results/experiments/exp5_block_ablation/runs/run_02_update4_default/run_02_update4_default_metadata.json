@@ -1,19 +1,19 @@
 {
   "experiment_name": "exp5_block_ablation",
   "run_id": "run_02_update4_default",
-  "notes": "Compare always_contrast vs panda_switch vs panda_switch_update4 vs panda_always_contrasts under the default block settings with jacobi_window_size=2.",
+  "notes": "Compare fanda vs panda_switch vs panda_switch_update4 vs panda_fandas under the default block settings with jacobi_window_size=2.",
   "model_name": "Qwen/Qwen2.5-3B-Instruct",
   "mode": "subset",
   "seed": 42,
   "strict_eval": false,
   "decoder_names": [
-    "always_contrast",
+    "fanda",
     "panda_switch",
     "panda_switch_update4",
-    "panda_always_contrasts"
+    "panda_fandas"
   ],
-  "hypothesis": "if_block_refinement_is_still_useful_after_the_oracle_diagnosis_then_a_forced_contrast_block_should_outperform_plain_always_contrast_without_needing_greedy_arbitration",
-  "experiment_note": "always_contrast_vs_panda_switch_vs_panda_switch_update4_vs_panda_always_contrasts",
+  "hypothesis": "if_block_refinement_is_still_useful_after_the_oracle_diagnosis_then_a_forced_contrast_block_should_outperform_plain_fanda_without_needing_greedy_arbitration",
+  "experiment_note": "fanda_vs_panda_switch_vs_panda_switch_update4_vs_panda_fandas",
   "binary_rule": "final_logits_vs_final_logits_minus_shallow_logits",
   "hybrid_rule": "jacobi_block_refinement_with_per_position_dynamic_layer_selection_and_forced_contrast_view_at_every_position",
   "panda_divergence_threshold": 0.05,
@@ -27,43 +27,11 @@
     "selected_row_count": 30,
     "sampling_mode": "seeded_random_subset",
     "selected_source_indices": [
-      5,
-      21,
-      30,
-      31,
-      51,
-      73,
-      131,
-      151,
-      163,
-      170,
-      179,
-      194,
-      233,
-      236,
-      248,
-      267,
-      280,
-      312,
-      318,
-      323,
-      328,
-      467,
-      519,
-      543,
-      572,
-      600,
-      632,
-      641,
-      727,
-      770
+      5, 21, 30, 31, 51, 73, 131, 151, 163, 170, 179, 194, 233, 236, 248, 267,
+      280, 312, 318, 323, 328, 467, 519, 543, 572, 600, 632, 641, 727, 770
     ]
   },
   "truthfulqa_limit": 30,
-  "truthfulqa_metrics": [
-    "mc1",
-    "mc2",
-    "mc3"
-  ],
+  "truthfulqa_metrics": ["mc1", "mc2", "mc3"],
   "latency_measurement": "wall_clock_seconds_with_cuda_synchronize"
 }

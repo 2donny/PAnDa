@@ -10,7 +10,7 @@
         "mean_avg_instability": null,
         "num_examples": 50
       },
-      "always_contrast": {
+      "fanda": {
         "mean_switch_rate": 0.13527211677211676,
         "median_switch_rate": 0.1428571428571428,
         "mean_switch_count_est": 15.29478832278832,
@@ -25,7 +25,7 @@
         "mc2": 0.527824148006008,
         "mc3": 0.273
       },
-      "always_contrast": {
+      "fanda": {
         "mc1": 0.4,
         "mc2": 0.5758458460194236,
         "mc3": 0.35100000000000003
@@ -36,7 +36,7 @@
   },
   "exp5": {
     "switch_metrics": {
-      "always_contrast": {
+      "fanda": {
         "mean_switch_rate": 0.14226699226699227,
         "median_switch_rate": 0.1547619047619047,
         "mean_switch_count_est": 14.675818070818071,
@@ -60,7 +60,7 @@
         "mean_avg_instability": 12.397587245610318,
         "num_examples": 30
       },
-      "panda_always_contrasts": {
+      "panda_fandas": {
         "mean_switch_rate": 0.6576302401302402,
         "median_switch_rate": 0.6458333333333333,
         "mean_switch_count_est": 76.48019434269433,
@@ -70,6 +70,6 @@
       }
     },
     "mean_switch_rate_ratio_panda_switch_over_update4": 4.628166240188609,
-    "mean_switch_rate_ratio_panda_always_contrasts_over_update4": 4.645632673011127
+    "mean_switch_rate_ratio_panda_fandas_over_update4": 4.645632673011127
   }
 }

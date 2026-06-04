@@ -1,2 +1,2 @@
 run_id,notes
-run_01_default,Compare pure_greedy vs top_k vs top_p vs dola vs always_contrast vs panda_switch under the standard truncation and original panda settings.
+run_01_default,Compare pure_greedy vs top_k vs top_p vs dola vs fanda vs panda_switch under the standard truncation and original panda settings.

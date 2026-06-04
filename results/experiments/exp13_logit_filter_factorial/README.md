@@ -1,6 +1,6 @@
 # Experiment 13: Logit/Filter Factorial
 
-This experiment is a matched component ablation for the `always_contrast`
+This experiment is a matched component ablation for the `fanda`
 story.
 
 The earlier family baselines already suggested that the raw-logit family was
@@ -47,7 +47,7 @@ Which part matters more for the gain over official DoLa:
 
 ## Why This Experiment Exists
 
-If we only compare official DoLa against `always_contrast`, we change too many
+If we only compare official DoLa against `fanda`, we change too many
 things at once:
 
 - score space

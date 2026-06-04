@@ -42,12 +42,13 @@ SCORE_COLORS = {
     2: "#2a9d8f",
 }
 
-BACKGROUND = "#f7f6f3"
+BACKGROUND = "#ffffff"
 PANEL_BG = "#ffffff"
-GRID = "#e4e4e4"
-AXIS = "#555555"
+GRID = "#d9d9d9"
+AXIS = "#222222"
 TEXT = "#222222"
-TEXT_MUTED = "#666666"
+TEXT_MUTED = "#444444"
+FONT_FAMILY = "Times New Roman, Times, serif"
 
 
 def parse_args() -> argparse.Namespace:
@@ -88,7 +89,7 @@ def svg_text(
 ) -> str:
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}" '
-        f'font-family="Arial, Helvetica, sans-serif" text-anchor="{anchor}" '
+        f'font-family="{FONT_FAMILY}" text-anchor="{anchor}" '
         f'font-weight="{weight}">{escape(text)}</text>'
     )
 
@@ -189,8 +190,7 @@ def draw_mean_panel(
     axis_bottom = top + height - 72
     axis_width = axis_right - axis_left
 
-    svg.append(svg_text(left + width / 2, top + 24, "Mean Human Score", size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, "Average manual rubric score (0=wrong, 2=correct)", size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text(left + width / 2, top + 24, "Mean manual score", size=17, anchor="middle", weight="bold"))
 
     ticks = [0.0, 0.5, 1.0, 1.5, 2.0]
     for tick in ticks:
@@ -235,8 +235,6 @@ def draw_mean_panel(
 
         svg.append(svg_text(x_center, bar_top - 10, f"{mean:.2f}", size=12, weight="bold", anchor="middle"))
         svg.append(svg_text(x_center, axis_bottom + 18, DISPLAY_LABELS[decoder], size=11, anchor="middle"))
-        if decoder == leader:
-            svg.append(svg_text(x_center, axis_top - 10, "best", size=10, fill=TEXT_MUTED, anchor="middle"))
 
 
 def draw_distribution_panel(
@@ -256,8 +254,7 @@ def draw_distribution_panel(
     axis_bottom = top + height - 92
     axis_width = axis_right - axis_left
 
-    svg.append(svg_text(left + width / 2, top + 24, "Score Breakdown", size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 44, "Share of answers scored 0, 1, or 2 by manual review", size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text(left + width / 2, top + 24, "Score distribution", size=17, anchor="middle", weight="bold"))
 
     ticks = [0.0, 0.25, 0.50, 0.75, 1.0]
     for tick in ticks:
@@ -322,35 +319,13 @@ def draw_distribution_panel(
 
 
 def build_svg(stats: dict[str, dict[str, float | int]]) -> str:
-    width = 1280
-    height = 760
+    width = 1180
+    height = 650
     svg: list[str] = []
     svg.append(svg_rect(0, 0, width, height, fill=BACKGROUND))
 
-    svg.append(svg_text(60, 56, "exp14 Open-Ended Manual Evaluation", size=28, weight="bold"))
-    svg.append(
-        svg_text(
-            60,
-            84,
-            "Human rubric over 250 answers: 0 = wrong / hallucinatory, 1 = mixed / noisy, 2 = broadly correct",
-            size=14,
-            fill=TEXT_MUTED,
-        )
-    )
-
-    ranked = sorted(
-        DECODER_ORDER,
-        key=lambda key: float(stats[key]["mean_manual_score"]),
-        reverse=True,
-    )
-    ranking_text = "Ranking: " + " > ".join(
-        f"{DISPLAY_LABELS[key]} ({float(stats[key]['mean_manual_score']):.2f})"
-        for key in ranked
-    )
-    svg.append(svg_text(60, 110, ranking_text, size=13, fill=TEXT_MUTED))
-
-    draw_mean_panel(svg, left=48, top=142, width=560, height=560, stats=stats)
-    draw_distribution_panel(svg, left=640, top=142, width=592, height=560, stats=stats)
+    draw_mean_panel(svg, left=34, top=28, width=520, height=580, stats=stats)
+    draw_distribution_panel(svg, left=594, top=28, width=552, height=580, stats=stats)
 
     return wrap_svg(svg, width, height)
 

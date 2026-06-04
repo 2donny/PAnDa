@@ -10,10 +10,10 @@
   "completed_examples": 10,
   "completed_decoder_evals": 30,
   "current_example_idx": 10,
-  "current_decoder_name": "block_refined_always_contrast",
+  "current_decoder_name": "block_refined_fanda",
   "current_decoder_idx": 3,
   "latest_metrics": {
-    "decoder_name": "block_refined_always_contrast",
+    "decoder_name": "block_refined_fanda",
     "mc1": 0.0,
     "mc2": 1.841414476684761e-15,
     "mc3": 0.0,

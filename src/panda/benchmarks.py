@@ -1,5 +1,7 @@
 """Benchmark loaders kept in sync with the public TruthfulQA evaluator."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from datasets import Dataset, load_dataset
@@ -30,8 +32,7 @@ def _load_truthfulqa_validation_dataset():
         return Dataset.from_file(str(arrow_path))
 
 
-def load_truthfulqa_rows(limit, rng):
-    dataset = _load_truthfulqa_validation_dataset()
+def _build_truthfulqa_candidates(dataset):
     candidates = []
     for source_idx, row in enumerate(dataset):
         mc1_targets = row.get("mc1_targets") or {}
@@ -57,5 +58,39 @@ def load_truthfulqa_rows(limit, rng):
                 "mc2_labels": mc2_labels,
             }
         )
+    return candidates
+
+
+def load_truthfulqa_rows(limit, rng):
+    dataset = _load_truthfulqa_validation_dataset()
+    candidates = _build_truthfulqa_candidates(dataset)
     rows, manifest = sample_candidate_rows(candidates, limit, rng)
     return rows, "truthful_qa/multiple_choice", manifest
+
+
+def load_truthfulqa_rows_from_source_indices(source_indices):
+    dataset = _load_truthfulqa_validation_dataset()
+    candidates = _build_truthfulqa_candidates(dataset)
+    by_source_idx = {int(row["source_idx"]): row for row in candidates}
+    selected_rows = []
+    missing_source_indices = []
+    for source_idx in source_indices:
+        source_idx = int(source_idx)
+        row = by_source_idx.get(source_idx)
+        if row is None:
+            missing_source_indices.append(source_idx)
+            continue
+        selected_rows.append(dict(row))
+    if missing_source_indices:
+        raise ValueError(
+            "TruthfulQA source indices were requested that are not available after candidate "
+            f"filtering: {missing_source_indices}"
+        )
+    manifest = {
+        "total_candidates": len(candidates),
+        "requested_limit": len(selected_rows),
+        "resolved_limit": len(selected_rows),
+        "sampling_mode": "fixed_source_indices",
+        "selected_source_indices": [int(source_idx) for source_idx in source_indices],
+    }
+    return selected_rows, "truthful_qa/multiple_choice", manifest

@@ -1,28 +1,28 @@
 {
   "hypothesis": "Short-lived persistence should reduce selected-layer switching noise without becoming as stale as a frozen layer.",
   "mechanism": {
-    "always_contrast_update1": {
+    "fanda_update1": {
       "switch_rate": 0.69196780996781,
       "selected_layer_match_rate": 1.0,
       "refresh_rate": 1.0,
       "avg_oracle_jsd_gap": 0.0,
       "mc2": 0.5344484342160397
     },
-    "always_contrast_update2": {
+    "fanda_update2": {
       "switch_rate": 0.3225494227994228,
       "selected_layer_match_rate": 0.6663910403322169,
       "refresh_rate": 0.5316751483810307,
       "avg_oracle_jsd_gap": 0.0016561683542814,
       "mc2": 0.5271404284328571
     },
-    "always_contrast_update4": {
+    "fanda_update4": {
       "switch_rate": 0.1352721167721167,
       "selected_layer_match_rate": 0.4612401764901764,
       "refresh_rate": 0.3139613719613719,
       "avg_oracle_jsd_gap": 0.00250020830761,
       "mc2": 0.5758458460194236
     },
-    "always_contrast_frozen": {
+    "fanda_frozen": {
       "switch_rate": 0.0,
       "selected_layer_match_rate": 0.2584053724053724,
       "refresh_rate": 0.1645170385170385,
@@ -31,22 +31,22 @@
     }
   },
   "quality": {
-    "always_contrast_update1": {
+    "fanda_update1": {
       "mc1": 0.34,
       "mc2": 0.5344484342160397,
       "mc3": 0.2936666666666667
     },
-    "always_contrast_update2": {
+    "fanda_update2": {
       "mc1": 0.38,
       "mc2": 0.5271404284328571,
       "mc3": 0.331
     },
-    "always_contrast_update4": {
+    "fanda_update4": {
       "mc1": 0.4,
       "mc2": 0.5758458460194236,
       "mc3": 0.351
     },
-    "always_contrast_frozen": {
+    "fanda_frozen": {
       "mc1": 0.4,
       "mc2": 0.5602340730459122,
       "mc3": 0.3643333333333333

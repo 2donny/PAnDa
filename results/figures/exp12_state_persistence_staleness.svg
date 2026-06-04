@@ -1,57 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="486" viewBox="0 0 1180 486">
-<rect x="0.00" y="0.00" width="1180.00" height="486.00" fill="#f7f6f3" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="0.00" />
+<rect x="0.00" y="0.00" width="1180.00" height="486.00" fill="#ffffff" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="0.00" />
 <rect x="26.00" y="26.00" width="554.00" height="412.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="14.00" />
-<text x="303.00" y="50.00" font-size="18" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Exp12: Freshness</text>
-<text x="303.00" y="70.00" font-size="11" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">How often the carried layer still matches the step-local best layer.</text>
-<line x1="98.00" y1="366.00" x2="556.00" y2="366.00" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="88.00" y="370.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.00</text>
-<line x1="98.00" y1="297.90" x2="556.00" y2="297.90" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="88.00" y="301.90" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.25</text>
-<line x1="98.00" y1="229.81" x2="556.00" y2="229.81" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="88.00" y="233.81" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.50</text>
-<line x1="98.00" y1="161.71" x2="556.00" y2="161.71" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="88.00" y="165.71" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.75</text>
-<line x1="98.00" y1="93.62" x2="556.00" y2="93.62" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="88.00" y="97.62" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">1.00</text>
-<line x1="98.00" y1="80.00" x2="98.00" y2="366.00" stroke="#555555" stroke-width="1.20" />
-<line x1="98.00" y1="366.00" x2="556.00" y2="366.00" stroke="#555555" stroke-width="1.20" />
-<text x="303.00" y="414.00" font-size="11" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Higher is better</text>
+<text x="303.00" y="50.00" font-size="17" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">Selected-layer match rate</text>
+<line x1="98.00" y1="366.00" x2="556.00" y2="366.00" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="88.00" y="370.00" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.00</text>
+<line x1="98.00" y1="297.90" x2="556.00" y2="297.90" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="88.00" y="301.90" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.25</text>
+<line x1="98.00" y1="229.81" x2="556.00" y2="229.81" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="88.00" y="233.81" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.50</text>
+<line x1="98.00" y1="161.71" x2="556.00" y2="161.71" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="88.00" y="165.71" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.75</text>
+<line x1="98.00" y1="93.62" x2="556.00" y2="93.62" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="88.00" y="97.62" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">1.00</text>
+<line x1="98.00" y1="80.00" x2="98.00" y2="366.00" stroke="#222222" stroke-width="1.20" />
+<line x1="98.00" y1="366.00" x2="556.00" y2="366.00" stroke="#222222" stroke-width="1.20" />
 <rect x="122.05" y="93.62" width="66.41" height="272.38" fill="#c8553d" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="155.25" y="94.00" font-size="11" fill="#c8553d" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">1.000</text>
-<text x="155.25" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update1</text>
+<text x="155.25" y="94.00" font-size="11" fill="#c8553d" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">1.000</text>
+<text x="155.25" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">update1</text>
 <rect x="236.55" y="184.49" width="66.41" height="181.51" fill="#e9c46a" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="269.75" y="175.49" font-size="11" fill="#e9c46a" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.666</text>
-<text x="269.75" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update2</text>
+<text x="269.75" y="175.49" font-size="11" fill="#e9c46a" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.666</text>
+<text x="269.75" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">update2</text>
 <rect x="351.05" y="240.37" width="66.41" height="125.63" fill="#2a9d8f" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="384.25" y="231.37" font-size="11" fill="#2a9d8f" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.461</text>
-<text x="384.25" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update4</text>
+<text x="384.25" y="231.37" font-size="11" fill="#2a9d8f" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.461</text>
+<text x="384.25" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">update4</text>
 <rect x="465.55" y="295.62" width="66.41" height="70.38" fill="#355070" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="498.75" y="286.62" font-size="11" fill="#355070" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.258</text>
-<text x="498.75" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">frozen</text>
+<text x="498.75" y="286.62" font-size="11" fill="#355070" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.258</text>
+<text x="498.75" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">frozen</text>
 <rect x="600.00" y="26.00" width="554.00" height="412.00" fill="#ffffff" fill-opacity="1.000" stroke="#dddddd" stroke-width="1.00" rx="14.00" />
-<text x="877.00" y="50.00" font-size="18" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">Exp12: Staleness Gap</text>
-<text x="877.00" y="70.00" font-size="11" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">How far the carried layer drifts from the step-local best layer.</text>
-<line x1="672.00" y1="366.00" x2="1130.00" y2="366.00" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="662.00" y="370.00" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.00</text>
-<line x1="672.00" y1="290.74" x2="1130.00" y2="290.74" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="662.00" y="294.74" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.00</text>
-<line x1="672.00" y1="215.47" x2="1130.00" y2="215.47" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="662.00" y="219.47" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.00</text>
-<line x1="672.00" y1="140.21" x2="1130.00" y2="140.21" stroke="#e8e8e8" stroke-width="1.00" />
-<text x="662.00" y="144.21" font-size="10" fill="#666666" font-family="Arial, Helvetica, sans-serif" text-anchor="end" font-weight="normal">0.00</text>
-<line x1="672.00" y1="80.00" x2="672.00" y2="366.00" stroke="#555555" stroke-width="1.20" />
-<line x1="672.00" y1="366.00" x2="1130.00" y2="366.00" stroke="#555555" stroke-width="1.20" />
-<text x="877.00" y="414.00" font-size="11" fill="#555555" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">Lower is better</text>
+<text x="877.00" y="50.00" font-size="17" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">Selected-layer gap</text>
+<line x1="672.00" y1="366.00" x2="1130.00" y2="366.00" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="662.00" y="370.00" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.00</text>
+<line x1="672.00" y1="290.74" x2="1130.00" y2="290.74" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="662.00" y="294.74" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.00</text>
+<line x1="672.00" y1="215.47" x2="1130.00" y2="215.47" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="662.00" y="219.47" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.00</text>
+<line x1="672.00" y1="140.21" x2="1130.00" y2="140.21" stroke="#d9d9d9" stroke-width="1.00" />
+<text x="662.00" y="144.21" font-size="10" fill="#666666" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">0.00</text>
+<line x1="672.00" y1="80.00" x2="672.00" y2="366.00" stroke="#222222" stroke-width="1.20" />
+<line x1="672.00" y1="366.00" x2="1130.00" y2="366.00" stroke="#222222" stroke-width="1.20" />
 <rect x="696.04" y="366.00" width="66.41" height="1.00" fill="#c8553d" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="729.25" y="357.00" font-size="11" fill="#c8553d" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.000</text>
-<text x="729.25" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update1</text>
+<text x="729.25" y="357.00" font-size="11" fill="#c8553d" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.000</text>
+<text x="729.25" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">update1</text>
 <rect x="810.54" y="241.35" width="66.41" height="124.65" fill="#e9c46a" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="843.75" y="232.35" font-size="11" fill="#e9c46a" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.002</text>
-<text x="843.75" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update2</text>
+<text x="843.75" y="232.35" font-size="11" fill="#e9c46a" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.002</text>
+<text x="843.75" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">update2</text>
 <rect x="925.04" y="177.83" width="66.41" height="188.17" fill="#2a9d8f" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="958.25" y="168.83" font-size="11" fill="#2a9d8f" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.003</text>
-<text x="958.25" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">update4</text>
+<text x="958.25" y="168.83" font-size="11" fill="#2a9d8f" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.003</text>
+<text x="958.25" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">update4</text>
 <rect x="1039.55" y="108.13" width="66.41" height="257.87" fill="#355070" fill-opacity="1.000" stroke="none" stroke-width="1.00" rx="7.00" />
-<text x="1072.75" y="99.13" font-size="11" fill="#355070" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="bold">0.003</text>
-<text x="1072.75" y="388.00" font-size="11" fill="#222222" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" font-weight="normal">frozen</text>
+<text x="1072.75" y="99.13" font-size="11" fill="#355070" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">0.003</text>
+<text x="1072.75" y="388.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">frozen</text>
 </svg>

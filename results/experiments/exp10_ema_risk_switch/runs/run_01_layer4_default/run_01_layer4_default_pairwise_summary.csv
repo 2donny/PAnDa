@@ -1,7 +1,7 @@
 sweep_id,benchmark,metric_name,left_decoder_label,right_decoder_label,num_examples,mean_score_delta,median_score_delta,win_rate,tie_rate,loss_rate
-,truthfulqa,mc1,always_contrast,ema_risk_switch,50,0.06,0.0,0.08,0.9,0.02
-,truthfulqa,mc1,ema_risk_switch,always_contrast,50,-0.06,0.0,0.02,0.9,0.08
-,truthfulqa,mc2,always_contrast,ema_risk_switch,50,-0.0025809912488395435,-9.143585719527691e-12,0.42,0.0,0.58
-,truthfulqa,mc2,ema_risk_switch,always_contrast,50,0.0025809912488395435,9.143585719527691e-12,0.58,0.0,0.42
-,truthfulqa,mc3,always_contrast,ema_risk_switch,50,0.04566666666666666,0.0,0.24,0.64,0.12
-,truthfulqa,mc3,ema_risk_switch,always_contrast,50,-0.04566666666666666,0.0,0.12,0.64,0.24
+,truthfulqa,mc1,fanda,ema_risk_switch,50,0.06,0.0,0.08,0.9,0.02
+,truthfulqa,mc1,ema_risk_switch,fanda,50,-0.06,0.0,0.02,0.9,0.08
+,truthfulqa,mc2,fanda,ema_risk_switch,50,-0.0025809912488395435,-9.143585719527691e-12,0.42,0.0,0.58
+,truthfulqa,mc2,ema_risk_switch,fanda,50,0.0025809912488395435,9.143585719527691e-12,0.58,0.0,0.42
+,truthfulqa,mc3,fanda,ema_risk_switch,50,0.04566666666666666,0.0,0.24,0.64,0.12
+,truthfulqa,mc3,ema_risk_switch,fanda,50,-0.04566666666666666,0.0,0.12,0.64,0.24

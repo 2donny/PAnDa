@@ -21,7 +21,7 @@ EXPERIMENT_DIR = Path(__file__).resolve().parent
 RUN_MATRIX_PATH = EXPERIMENT_DIR / "run_matrix.csv"
 RUNS_DIR = EXPERIMENT_DIR / "runs"
 EXP10_DECODER_NAMES = (
-    "always_contrast",
+    "fanda",
     "ema_risk_switch",
 )
 
@@ -103,7 +103,7 @@ def main():
                 "can_keep_useful_contrast_while_skipping_bad_spans"
             ),
             "experiment_note": (
-                "single_pass_fixed_layer_ema_risk_switch_vs_matched_always_contrast_control"
+                "single_pass_fixed_layer_ema_risk_switch_vs_matched_fanda_control"
             ),
             "binary_rule": "final_logits_vs_final_logits_minus_shallow_logits",
             "panda_divergence_threshold": evaluator_args.panda_divergence_threshold,

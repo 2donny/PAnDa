@@ -1,11 +1,11 @@
 # Experiment 10: EMA Risk Switch
 
 This experiment tests whether a **single-pass temporal risk memory** can improve
-on a matched `always_contrast` control without returning to speculative blocks.
+on a matched `fanda` control without returning to speculative blocks.
 
 Compared decoders:
 
-- `always_contrast`
+- `fanda`
   - fixed contrast-subtracted endpoint on the carried-layer scaffold
   - under this experiment, the shallow layer is fixed by the run row
 
@@ -63,7 +63,7 @@ Included run rows:
 
 How to read the result:
 
-- if `ema_risk_switch` beats `always_contrast`, then temporal smoothing of local
+- if `ema_risk_switch` beats `fanda`, then temporal smoothing of local
   risk is doing something useful beyond memoryless switching
 - if it ties or loses, then the repo likely still prefers persistent contrast on
   this benchmark slice

@@ -42,12 +42,13 @@ SCORE_LABELS = {
     2: "2 = broadly correct",
 }
 
-BACKGROUND = "#f7f6f3"
+BACKGROUND = "#ffffff"
 PANEL_BG = "#ffffff"
-GRID = "#e4e4e4"
-AXIS = "#555555"
+GRID = "#d9d9d9"
+AXIS = "#222222"
 TEXT = "#222222"
-TEXT_MUTED = "#666666"
+TEXT_MUTED = "#444444"
+FONT_FAMILY = "Times New Roman, Times, serif"
 
 
 def parse_args() -> argparse.Namespace:
@@ -88,7 +89,7 @@ def svg_text(
 ) -> str:
     return (
         f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}" '
-        f'font-family="Arial, Helvetica, sans-serif" text-anchor="{anchor}" '
+        f'font-family="{FONT_FAMILY}" text-anchor="{anchor}" '
         f'font-weight="{weight}">{escape(text)}</text>'
     )
 
@@ -230,8 +231,7 @@ def draw_scatter_panel(
     axis_top = top + 64
     axis_bottom = top + height - 84
 
-    svg.append(svg_text(left + width / 2, top + 26, title, size=18, anchor="middle", weight="bold"))
-    svg.append(svg_text(left + width / 2, top + 46, subtitle, size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text(left + width / 2, top + 26, title, size=17, anchor="middle", weight="bold"))
 
     for score in [0, 1, 2]:
         y = scale(float(score), -0.35, 2.35, axis_bottom, axis_top)
@@ -246,7 +246,7 @@ def draw_scatter_panel(
 
     svg.append(svg_line(axis_left, axis_top, axis_left, axis_bottom, stroke=AXIS, stroke_width=1.1))
     svg.append(svg_line(axis_left, axis_bottom, axis_right, axis_bottom, stroke=AXIS, stroke_width=1.1))
-    svg.append(svg_text((axis_left + axis_right) / 2, axis_bottom + 48, x_label, size=11, fill=TEXT_MUTED, anchor="middle"))
+    svg.append(svg_text((axis_left + axis_right) / 2, axis_bottom + 42, x_label, size=11, fill=TEXT_MUTED, anchor="middle"))
 
     for idx, row in enumerate(df.itertuples(index=False)):
         x = scale(float(getattr(row, x_col)), x_min, x_max, axis_left, axis_right)
@@ -269,10 +269,6 @@ def draw_scatter_panel(
         y = scale(float(score), -0.35, 2.35, axis_bottom, axis_top)
         svg.append(svg_diamond(x, y, 8.5, fill="#111111", stroke="#ffffff", stroke_width=1.2))
         svg.append(svg_text(x + 12, y - 8, f"mean {mean_value:.1f}" if x_col == "proxy_answer_token_count" else f"mean {mean_value:.3f}", size=10, fill=TEXT_MUTED))
-
-    corr = correlation(df[x_col], df["manual_score_0_2"])
-    svg.append(svg_text(left + width - 24, top + 24, f"corr = {corr:+.2f}", size=11, fill=TEXT_MUTED, anchor="end"))
-
 
 def draw_decoder_legend(svg: list[str], *, left: float, top: float) -> None:
     cursor_x = left
@@ -303,33 +299,22 @@ def build_stats_payload(df: pd.DataFrame) -> dict[str, object]:
 
 
 def build_svg(df: pd.DataFrame, payload: dict[str, object]) -> str:
-    width = 1380
-    height = 760
+    width = 1280
+    height = 700
     svg: list[str] = []
     svg.append(svg_rect(0, 0, width, height, fill=BACKGROUND))
 
-    svg.append(svg_text(54, 54, "exp14 Manual Behavior Diagnostics", size=28, weight="bold"))
-    svg.append(
-        svg_text(
-            54,
-            82,
-            "Each dot is one manually judged answer. Diamonds mark the mean x-value within each human score bucket.",
-            size=14,
-            fill=TEXT_MUTED,
-        )
-    )
-
     draw_scatter_panel(
         svg,
-        left=46,
-        top=124,
-        width=620,
-        height=560,
+        left=34,
+        top=28,
+        width=592,
+        height=592,
         df=df,
         x_col="proxy_answer_token_count",
         x_label="Generated answer length (tokens)",
-        title="Manual Score vs Answer Length",
-        subtitle="Correct answers are usually shorter; long answers more often drift into extra unsupported detail.",
+        title="Manual score vs answer length",
+        subtitle="",
         x_min=8.0,
         x_max=66.0,
         x_ticks=[10, 20, 30, 40, 50, 60],
@@ -337,23 +322,21 @@ def build_svg(df: pd.DataFrame, payload: dict[str, object]) -> str:
 
     draw_scatter_panel(
         svg,
-        left=712,
-        top=124,
-        width=620,
-        height=560,
+        left=654,
+        top=28,
+        width=592,
+        height=592,
         df=df,
         x_col="switch_rate",
         x_label="Layer switch rate",
-        title="Manual Score vs Switch Rate",
-        subtitle="In this open-ended run, higher switch_rate is not obviously harmful; the best decoder was update1.",
+        title="Manual score vs switch rate",
+        subtitle="",
         x_min=-0.02,
         x_max=0.98,
         x_ticks=[0.0, 0.2, 0.4, 0.6, 0.8],
     )
 
-    draw_decoder_legend(svg, left=72, top=714)
-    svg.append(svg_text(732, 708, f"Length corr: {payload['correlation_manual_score_vs_answer_length']:+.2f}", size=12, fill=TEXT_MUTED))
-    svg.append(svg_text(732, 730, f"Switch corr: {payload['correlation_manual_score_vs_switch_rate']:+.2f}", size=12, fill=TEXT_MUTED))
+    draw_decoder_legend(svg, left=182, top=664)
 
     return wrap_svg(svg, width, height)
 

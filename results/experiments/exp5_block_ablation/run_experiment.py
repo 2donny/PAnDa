@@ -21,18 +21,18 @@ EXPERIMENT_DIR = Path(__file__).resolve().parent
 RUN_MATRIX_PATH = EXPERIMENT_DIR / "run_matrix.csv"
 RUNS_DIR = EXPERIMENT_DIR / "runs"
 EXP5_DECODER_NAMES = (
-    "always_contrast",
+    "fanda",
     "panda_switch",
     "panda_switch_update4",
-    "panda_always_contrasts",
+    "panda_fandas",
 )
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
-            "Run exp5 as always_contrast vs panda_switch vs panda_switch_update4 "
-            "vs panda_always_contrasts."
+            "Run exp5 as fanda vs panda_switch vs panda_switch_update4 "
+            "vs panda_fandas."
         )
     )
     parser.add_argument("--model-name", default="Qwen/Qwen2.5-3B-Instruct")
@@ -101,12 +101,12 @@ def main():
             "decoder_names": list(EXP5_DECODER_NAMES),
             "hypothesis": (
                 "if_block_refinement_or_slower_carried_layer_refresh_is_still_useful_after_"
-                "always_contrast_became_the_strongest_fixed_baseline_then_at_least_one_exp5_"
-                "variant_should_match_or_beat_plain_always_contrast"
+                "fanda_became_the_strongest_fixed_baseline_then_at_least_one_exp5_"
+                "variant_should_match_or_beat_plain_fanda"
             ),
             "experiment_note": (
-                "always_contrast_vs_panda_switch_vs_panda_switch_update4_vs_"
-                "panda_always_contrasts"
+                "fanda_vs_panda_switch_vs_panda_switch_update4_vs_"
+                "panda_fandas"
             ),
             "binary_rule": "final_logits_vs_final_logits_minus_shallow_logits",
             "hybrid_rule": (

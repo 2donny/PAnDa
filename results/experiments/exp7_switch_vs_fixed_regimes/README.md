@@ -15,11 +15,11 @@ Decoder set:
 - `pure_greedy`
   - true final-layer greedy baseline using the repo's direct `greedy` decoder path
 
-- `always_greedy`
+- `fanda_greedy`
   - stateful fixed-endpoint baseline that always decodes from `final_logits`
   - still carries a shallow layer across steps and refreshes it every `update_every`
 
-- `always_contrast`
+- `fanda`
   - stateful fixed-endpoint baseline that always decodes from `final_logits - shallow_logits`
   - carries a shallow layer across steps and refreshes it every `update_every`
 
@@ -29,7 +29,7 @@ Decoder set:
 
 - `pure_argmax_switchv2`
   - uses the same top-token switch rule as `pure_argmax_switch`
-  - but runs on the stateful carried-layer scaffold used by `always_greedy` and `always_contrast`
+  - but runs on the stateful carried-layer scaffold used by `fanda_greedy` and `fanda`
   - carries a shallow layer across steps and refreshes it every `update_every`
 
 - `dola`

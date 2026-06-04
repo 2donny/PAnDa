@@ -22,8 +22,8 @@ RUN_MATRIX_PATH = EXPERIMENT_DIR / "run_matrix.csv"
 RUNS_DIR = EXPERIMENT_DIR / "runs"
 EXP7_DECODER_NAMES = (
     "pure_greedy",
-    "always_greedy",
-    "always_contrast",
+    "fanda_greedy",
+    "fanda",
     "pure_argmax_switch",
     "pure_argmax_switchv2",
     "dola",

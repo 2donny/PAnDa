@@ -21,7 +21,7 @@ EXPERIMENT_DIR = Path(__file__).resolve().parent
 RUN_MATRIX_PATH = EXPERIMENT_DIR / "run_matrix.csv"
 RUNS_DIR = EXPERIMENT_DIR / "runs"
 EXP9_DECODER_NAMES = (
-    "always_contrast",
+    "fanda",
     "adaptive_lambda_contrast",
 )
 

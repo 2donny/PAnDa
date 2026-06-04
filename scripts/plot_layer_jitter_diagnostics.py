@@ -13,29 +13,29 @@ from pathlib import Path
 import pandas as pd
 
 
-EXP11_DECODERS = ("dola", "always_contrast")
+EXP11_DECODERS = ("dola", "fanda")
 EXP5_DECODERS = (
-    "always_contrast",
+    "fanda",
     "panda_switch_update4",
     "panda_switch",
-    "panda_always_contrasts",
+    "panda_fandas",
 )
 QUALITY_ORDER = ("mc1", "mc2", "mc3")
 
 DISPLAY_LABELS = {
     "dola": "DoLa",
-    "always_contrast": "always_contrast\n(update4)",
+    "fanda": "fanda\n(update4)",
     "panda_switch_update4": "panda_switch\n(update4)",
     "panda_switch": "panda_switch\n(per-step)",
-    "panda_always_contrasts": "panda_always_contrasts\n(per-step)",
+    "panda_fandas": "panda_fandas\n(per-step)",
 }
 
 COLORS = {
     "dola": "#c8553d",
-    "always_contrast": "#2a9d8f",
+    "fanda": "#2a9d8f",
     "panda_switch_update4": "#457b9d",
     "panda_switch": "#6d597a",
-    "panda_always_contrasts": "#b56576",
+    "panda_fandas": "#b56576",
 }
 
 
@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Create a figure that contrasts DoLa's per-token layer reselection "
-            "against the update-every-4 always_contrast path using saved experiment outputs."
+            "against the update-every-4 fanda path using saved experiment outputs."
         )
     )
     parser.add_argument(
@@ -126,10 +126,10 @@ def build_stats_payload(
     }
 
     dola_switch = float(exp11_summary["dola"]["mean_switch_rate"])
-    update4_switch = float(exp11_summary["always_contrast"]["mean_switch_rate"])
+    update4_switch = float(exp11_summary["fanda"]["mean_switch_rate"])
     exp5_update4_switch = float(exp5_summary["panda_switch_update4"]["mean_switch_rate"])
     exp5_per_step_switch = float(exp5_summary["panda_switch"]["mean_switch_rate"])
-    exp5_always_per_step_switch = float(exp5_summary["panda_always_contrasts"]["mean_switch_rate"])
+    exp5_always_per_step_switch = float(exp5_summary["panda_fandas"]["mean_switch_rate"])
 
     return {
         "figure_claim": (
@@ -149,7 +149,7 @@ def build_stats_payload(
             "mean_switch_rate_ratio_panda_switch_over_update4": (
                 exp5_per_step_switch / exp5_update4_switch if exp5_update4_switch else None
             ),
-            "mean_switch_rate_ratio_panda_always_contrasts_over_update4": (
+            "mean_switch_rate_ratio_panda_fandas_over_update4": (
                 exp5_always_per_step_switch / exp5_update4_switch if exp5_update4_switch else None
             ),
         },
@@ -387,7 +387,7 @@ def build_svg(
         svg_text(
             width / 2,
             58,
-            "Completed results only: DoLa reselects every token, while the default always_contrast path refreshes the layer every 4 steps.",
+            "Completed results only: DoLa reselects every token, while the default fanda path refreshes the layer every 4 steps.",
             size=12,
             fill="#555555",
             anchor="middle",
@@ -425,7 +425,7 @@ def build_svg(
 
     exp11_ratio = float(stats["exp11"]["mean_switch_rate_ratio_dola_over_update4"])
     exp5_ratio = float(stats["exp5"]["mean_switch_rate_ratio_panda_switch_over_update4"])
-    exp5_ratio_contrast = float(stats["exp5"]["mean_switch_rate_ratio_panda_always_contrasts_over_update4"])
+    exp5_ratio_contrast = float(stats["exp5"]["mean_switch_rate_ratio_panda_fandas_over_update4"])
 
     note_w = 282
     note_h = 48
@@ -439,7 +439,7 @@ def build_svg(
     note2_y = panels[1][1] + 56
     svg.append(svg_rect(note2_x, note2_y, 338, 62, fill="#ffffff", stroke="#dddddd", rx=10))
     svg.append(svg_text(note2_x + 14, note2_y + 21, f"panda_switch / update4: {exp5_ratio:.2f}x", size=11, weight="bold"))
-    svg.append(svg_text(note2_x + 14, note2_y + 39, f"panda_always_contrasts / update4: {exp5_ratio_contrast:.2f}x", size=11, weight="bold"))
+    svg.append(svg_text(note2_x + 14, note2_y + 39, f"panda_fandas / update4: {exp5_ratio_contrast:.2f}x", size=11, weight="bold"))
     svg.append(svg_text(note2_x + 14, note2_y + 56, "The update-4 cadence stays low-switch across two scaffolds.", size=10, fill="#555555"))
 
     footer = (
@@ -473,7 +473,7 @@ def main() -> None:
                 "figure": str(output_path),
                 "stats": str(stats_output),
                 "exp11_mean_switch_rate_dola": stats["exp11"]["switch_metrics"]["dola"]["mean_switch_rate"],
-                "exp11_mean_switch_rate_update4": stats["exp11"]["switch_metrics"]["always_contrast"][
+                "exp11_mean_switch_rate_update4": stats["exp11"]["switch_metrics"]["fanda"][
                     "mean_switch_rate"
                 ],
                 "exp11_switch_rate_ratio_dola_over_update4": stats["exp11"][

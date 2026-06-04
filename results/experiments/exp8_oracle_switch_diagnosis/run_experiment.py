@@ -22,7 +22,7 @@ RUN_MATRIX_PATH = EXPERIMENT_DIR / "run_matrix.csv"
 RUNS_DIR = EXPERIMENT_DIR / "runs"
 EXP8_DECODER_NAMES = (
     "pure_greedy",
-    "always_contrast",
+    "fanda",
     "pure_argmax_switchv2",
     "oracle_token_switch",
     "dola",

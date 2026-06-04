@@ -10,10 +10,10 @@
   "completed_examples": 50,
   "completed_decoder_evals": 200,
   "current_example_idx": 50,
-  "current_decoder_name": "always_contrast_frozen",
+  "current_decoder_name": "fanda_frozen",
   "current_decoder_idx": 4,
   "latest_metrics": {
-    "decoder_name": "always_contrast_frozen",
+    "decoder_name": "fanda_frozen",
     "mc1": 0.0,
     "mc2": 6.735946074463885e-16,
     "mc3": 0.0,

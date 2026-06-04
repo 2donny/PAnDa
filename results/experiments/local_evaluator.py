@@ -66,16 +66,19 @@ EXP6_DECODER_NAMES = (
 )
 
 EXP7_FIXED_VIEW_DECODERS = {
-    "always_greedy": False,
-    "always_contrast": True,
+    "fanda_greedy": {"use_contrast": False, "update_every": 10**9},
+    # FanDa now means the full packaged recipe:
+    # raw-logit contrast, no relative-top filter, and a frozen shallow layer.
+    "fanda": {"use_contrast": True, "update_every": 10**9},
 }
 
 EXP12_STATEFUL_FIXED_VIEW_DECODERS = {
-    "always_contrast_update1": {"use_contrast": True, "update_every": 1},
-    "always_contrast_update2": {"use_contrast": True, "update_every": 2},
-    "always_contrast_update4": {"use_contrast": True, "update_every": 4},
+    "fanda_update1": {"use_contrast": True, "update_every": 1},
+    "fanda_update2": {"use_contrast": True, "update_every": 2},
+    "fanda_update4": {"use_contrast": True, "update_every": 4},
+    "fanda_update8": {"use_contrast": True, "update_every": 8},
     # Step 0 still refreshes once, then the layer is held for the rest of the answer.
-    "always_contrast_frozen": {"use_contrast": True, "update_every": 10**9},
+    "fanda_frozen": {"use_contrast": True, "update_every": 10**9},
 }
 
 EXP13_FACTORIAL_DECODERS = {
@@ -118,8 +121,8 @@ PANDA_SWITCH_UPDATE_DECODERS = (
 )
 
 BLOCK_REFINED_CONTRAST_DECODERS = (
-    "panda_always_contrasts",
-    "block_refined_always_contrast",
+    "panda_fandas",
+    "block_refined_fanda",
 )
 
 EXP7_ALIAS_DECODERS = {
@@ -133,6 +136,7 @@ EXP4_DECODER_NAMES = (
 TRUNCATION_DECODER_NAMES = (
     "top_k",
     "top_p",
+    "top_p_backoff",
 )
 
 MATCHED_ALPHA_VALUES = {
@@ -151,18 +155,20 @@ EXPERIMENT_DECODER_LABELS = {
     "contrastive_decoding": "contrastive_decoding",
     "top_k": "top_k",
     "top_p": "top_p",
+    "top_p_backoff": "top_p_backoff",
     "panda_w4": "panda_w4",
     "panda_w2": "panda_w2",
     "panda_w1": "panda_w1",
     "panda_no_block_h1": "panda_no_block_h1",
     "dola": "dola",
     "pure_greedy": "pure_greedy",
-    "always_greedy": "always_greedy",
-    "always_contrast": "always_contrast",
-    "always_contrast_update1": "always_contrast_update1",
-    "always_contrast_update2": "always_contrast_update2",
-    "always_contrast_update4": "always_contrast_update4",
-    "always_contrast_frozen": "always_contrast_frozen",
+    "fanda_greedy": "fanda_greedy",
+    "fanda": "fanda",
+    "fanda_update1": "fanda_update1",
+    "fanda_update2": "fanda_update2",
+    "fanda_update4": "fanda_update4",
+    "fanda_update8": "fanda_update8",
+    "fanda_frozen": "fanda_frozen",
     "exp13_logprob_top": "logprob + relative-top (u1)",
     "exp13_logprob_no_top": "logprob + no-filter (u1)",
     "exp13_logit_top": "raw-logit + relative-top (u1)",
@@ -179,8 +185,8 @@ EXPERIMENT_DECODER_LABELS = {
     "ema_risk_switch": "ema_risk_switch",
     "panda_switch": "panda_switch",
     "panda_switch_update4": "panda_switch_update4",
-    "panda_always_contrasts": "panda_always_contrasts",
-    "block_refined_always_contrast": "block_refined_always_contrast",
+    "panda_fandas": "panda_fandas",
+    "block_refined_fanda": "block_refined_fanda",
     "guarded_argmax_switch": "guarded_argmax_switch",
     "sticky_contrast_switch": "sticky_contrast_switch",
     "contrast_margin_switch": "contrast_margin_switch",
@@ -222,7 +228,7 @@ class ExperimentEvaluator(Stage4Evaluator):
         if self.top_k_value < 1:
             raise ValueError("top_k requires top_k_value >= 1.")
         if not (0.0 < self.top_p_value <= 1.0):
-            raise ValueError("top_p requires 0 < top_p_value <= 1.")
+            raise ValueError("top_p and top_p_backoff require 0 < top_p_value <= 1.")
         if self.exp6_guarded_top_k < 1:
             raise ValueError("exp6_guarded_top_k must be >= 1.")
         if self.exp6_sticky_hold_steps < 0:
@@ -283,12 +289,16 @@ class ExperimentEvaluator(Stage4Evaluator):
                 "top_k_value": int(getattr(self.args, "top_k_value", 50)),
                 "top_p_value": float(getattr(self.args, "top_p_value", 0.9)),
             }
+            if "top_p_backoff" in self._experiment_decoder_names:
+                config["truncation_baseline_config"]["top_p_backoff_note"] = (
+                    "teacher_forced_gold_tokens_outside_the_nucleus_fall_back_to_full_distribution_logprob"
+                )
         if any(name in EXP5_DECODER_NAMES for name in self._experiment_decoder_names):
             config["exp5_block_ablation_config"] = {
                 "decoder_names": [name for name in self._experiment_decoder_names if name in EXP5_DECODER_NAMES],
                 "experiment_question": (
                     "whether_speculative_block_refinement_or_slower_carried_layer_refresh_still_"
-                    "helps_after_always_contrast_became_the_strongest_fixed_baseline"
+                    "helps_after_fanda_became_the_strongest_fixed_baseline"
                 ),
                 "jacobi_window_size": int(getattr(self.args, "jacobi_window_size", 0)),
                 "jacobi_max_iters": int(getattr(self.args, "jacobi_max_iters", 0)),
@@ -312,11 +322,18 @@ class ExperimentEvaluator(Stage4Evaluator):
                     if name in EXP7_ALIAS_DECODERS
                 },
                 "fixed_view_decoders": {
-                    name: (
-                        "contrast_subtracted_view"
-                        if EXP7_FIXED_VIEW_DECODERS[name]
-                        else "greedy_view"
-                    )
+                    name: {
+                        "view": (
+                            "contrast_subtracted_view"
+                            if EXP7_FIXED_VIEW_DECODERS[name]["use_contrast"]
+                            else "greedy_view"
+                        ),
+                        "layer_update_every": (
+                            "first_step_only_then_hold"
+                            if int(EXP7_FIXED_VIEW_DECODERS[name]["update_every"]) >= 10**9
+                            else int(EXP7_FIXED_VIEW_DECODERS[name]["update_every"])
+                        ),
+                    }
                     for name in self._experiment_decoder_names
                     if name in EXP7_FIXED_VIEW_DECODERS
                 },
@@ -505,6 +522,9 @@ class ExperimentEvaluator(Stage4Evaluator):
                 choice_text,
                 decoder_name,
             )
+
+        if decoder_name == "top_p_backoff":
+            return self._score_candidate_with_top_p_backoff(prompt, choice_text)
 
         if decoder_name in TRUNCATION_DECODER_NAMES:
             return self._score_candidate_with_custom_step(prompt, choice_text, decoder_name)
@@ -746,6 +766,49 @@ class ExperimentEvaluator(Stage4Evaluator):
             generated_tokens=len(token_ids),
         )
 
+    def _score_candidate_with_top_p_backoff(self, prompt, choice_text):
+        generated = self.prepare_prompt(prompt)
+        total_logprob = 0.0
+        token_ids = self.candidate_to_ids(choice_text)
+        trace = []
+        forward_passes = 0
+
+        self.synchronize_cuda()
+        start_time = time.perf_counter()
+        for token_id in token_ids:
+            truncated_log_probs, full_log_probs, keep_mask, trace_row = self.build_top_p_backoff_scores(
+                generated
+            )
+            forward_passes += 1
+            gold_token_kept = bool(keep_mask[0, token_id].item())
+            if gold_token_kept:
+                selected_logprob = float(truncated_log_probs[0, token_id].item())
+            else:
+                selected_logprob = float(full_log_probs[0, token_id].item())
+            total_logprob += selected_logprob
+
+            next_token = torch.tensor([[token_id]], device=generated.device)
+            row = dict(trace_row)
+            row["step"] = len(trace)
+            row["token_id"] = int(token_id)
+            row["token_text"] = self.decode_token(token_id)
+            row["fallback_used"] = float(not gold_token_kept)
+            row["top_p_gold_token_kept"] = float(gold_token_kept)
+            row["top_p_backoff_used"] = float(not gold_token_kept)
+            row["top_p_selected_logprob"] = selected_logprob
+            row["top_p_full_logprob"] = float(full_log_probs[0, token_id].item())
+            trace.append(row)
+            generated = torch.cat([generated, next_token], dim=-1)
+        self.synchronize_cuda()
+        elapsed = time.perf_counter() - start_time
+
+        return total_logprob, trace, make_runtime_summary(
+            elapsed,
+            len(token_ids),
+            forward_passes=forward_passes,
+            generated_tokens=len(token_ids),
+        )
+
     def _score_candidate_with_oracle_switch(self, prompt, choice_text, decoder_name):
         generated = self.prepare_prompt(prompt)
         total_logprob = 0.0
@@ -882,11 +945,13 @@ class ExperimentEvaluator(Stage4Evaluator):
             return selected_scores, False, trace_row, 1, next_state
 
         if decoder_name in EXP7_FIXED_VIEW_DECODERS:
+            variant = EXP7_FIXED_VIEW_DECODERS[decoder_name]
             selected_scores, trace_row, next_state = self.compute_stateful_fixed_binary_view_step(
                 generated,
                 decoder_name,
                 decoder_state=decoder_state,
-                use_contrast=EXP7_FIXED_VIEW_DECODERS[decoder_name],
+                use_contrast=bool(variant["use_contrast"]),
+                update_every_override=int(variant["update_every"]),
             )
             return selected_scores, False, trace_row, 1, next_state
 
@@ -1172,7 +1237,7 @@ class ExperimentEvaluator(Stage4Evaluator):
             generated_tokens=len(token_ids),
         )
 
-    def run_block_refined_always_contrast(self, generated, window_size, decoder_name):
+    def run_block_refined_fanda(self, generated, window_size, decoder_name):
         window_size = int(window_size)
         buffer = self.repeat_last_token_buffer(generated, window_size)
         previous_buffer = buffer.clone()
@@ -1336,7 +1401,7 @@ class ExperimentEvaluator(Stage4Evaluator):
         for token_idx, token_id in enumerate(token_ids):
             remaining_tokens = len(token_ids) - token_idx
             block_window_size = min(self.jacobi_window_size, remaining_tokens)
-            block_result = self.run_block_refined_always_contrast(
+            block_result = self.run_block_refined_fanda(
                 generated,
                 block_window_size,
                 decoder_name,
@@ -1373,7 +1438,7 @@ class ExperimentEvaluator(Stage4Evaluator):
 
         if decoder_name == "top_k":
             truncated_log_probs, kept_fraction = self.apply_top_k_truncation(log_probs, self.top_k_value)
-        elif decoder_name == "top_p":
+        elif decoder_name in ("top_p", "top_p_backoff"):
             truncated_log_probs, kept_fraction = self.apply_top_p_truncation(log_probs, self.top_p_value)
         else:  # pragma: no cover - protected by dispatch
             raise ValueError(f"Unsupported truncation decoder {decoder_name!r}.")
@@ -1397,6 +1462,39 @@ class ExperimentEvaluator(Stage4Evaluator):
         }
         return truncated_log_probs, trace_row
 
+    def build_top_p_backoff_scores(self, generated):
+        outputs = self.model(
+            input_ids=generated,
+            use_cache=False,
+            return_dict=True,
+        )
+        final_logits = outputs.logits[:, -1, :].float()
+        full_log_probs = F.log_softmax(final_logits, dim=-1)
+        truncated_log_probs, kept_fraction, keep_mask = self.apply_top_p_truncation(
+            full_log_probs,
+            self.top_p_value,
+            return_keep_mask=True,
+        )
+
+        trace_row = {
+            "step": None,
+            "selected_layer": None,
+            "divergence": None,
+            "margin": None,
+            "instability": None,
+            "alpha": None,
+            "ablation_mode": "top_p_backoff",
+            "risk_triggered": None,
+            "risk_score": None,
+            "jsd_current": None,
+            "selection_margin": None,
+            "selection_score": kept_fraction,
+            "fallback_used": 0.0,
+            "baseline_margin": None,
+            "truncation_kept_fraction": kept_fraction,
+        }
+        return truncated_log_probs, full_log_probs, keep_mask, trace_row
+
     @staticmethod
     def apply_top_k_truncation(log_probs, k):
         vocab_size = log_probs.shape[-1]
@@ -1410,7 +1508,7 @@ class ExperimentEvaluator(Stage4Evaluator):
         return truncated_log_probs, kept_fraction
 
     @staticmethod
-    def apply_top_p_truncation(log_probs, p):
+    def apply_top_p_truncation(log_probs, p, return_keep_mask=False):
         sorted_log_probs, sorted_indices = torch.sort(log_probs, dim=-1, descending=True)
         sorted_probs = torch.exp(sorted_log_probs)
         cumulative_probs = torch.cumsum(sorted_probs, dim=-1)
@@ -1424,6 +1522,8 @@ class ExperimentEvaluator(Stage4Evaluator):
         filtered = torch.where(keep_mask, log_probs, torch.full_like(log_probs, float("-inf")))
         truncated_log_probs = F.log_softmax(filtered, dim=-1)
         kept_fraction = float(keep_mask.float().mean().item())
+        if return_keep_mask:
+            return truncated_log_probs, kept_fraction, keep_mask
         return truncated_log_probs, kept_fraction
 
     def build_contrastive_decoding_scores(self, generated, decoder_name):

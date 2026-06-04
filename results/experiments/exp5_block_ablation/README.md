@@ -1,4 +1,4 @@
-# Experiment 5: Block-Refined Always Contrast
+# Experiment 5: Block-Refined FAnDa
 
 This repurposed `exp5` asks the cleaner follow-up question after the oracle
 diagnosis:
@@ -8,7 +8,7 @@ diagnosis:
 
 Compared decoders:
 
-- `always_contrast`
+- `fanda`
   - single-token stateful fixed contrast endpoint
   - always uses `final_logits - shallow_logits`
 
@@ -20,7 +20,7 @@ Compared decoders:
   - but refreshes one shared JSD-selected shallow layer only every `4` scored tokens
   - reuses that same shallow layer across every speculative position inside the block
 
-- `panda_always_contrasts`
+- `panda_fandas`
   - uses the same Jacobi block refinement scaffold as `panda_switch`
   - selects the best shallow layer per speculative position
   - but always decodes from the contrast view at every position
@@ -28,7 +28,7 @@ Compared decoders:
 
 Interpretation:
 
-- if `panda_always_contrasts` beats `always_contrast`, then block
+- if `panda_fandas` beats `fanda`, then block
   refinement still adds value beyond plain fixed contrast
 - if `panda_switch_update4` stays competitive with `panda_switch`, then
   per-position layer reselection may be unnecessary inside the block

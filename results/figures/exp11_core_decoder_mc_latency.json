@@ -1,0 +1,152 @@
+{
+  "source_summary_csv": "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/run_01_default_summary.csv",
+  "source_raw_csv": "results/experiments/exp11_core_decoder_comparison/runs/run_01_default/run_01_default_raw_predictions.csv",
+  "decoders": [
+    "greedy",
+    "top k",
+    "top p",
+    "dola",
+    "panda"
+  ],
+  "quality": {
+    "pure_greedy": {
+      "mc1": {
+        "label": "MC1",
+        "score_mean": 0.34,
+        "score_sem": 0.0676726816132972,
+        "missing_reason": null
+      },
+      "mc2": {
+        "label": "MC2",
+        "score_mean": 0.5314276191876766,
+        "score_sem": 0.0671929090885667,
+        "missing_reason": null
+      },
+      "mc3": {
+        "label": "MC3",
+        "score_mean": 0.307,
+        "score_sem": 0.0524676555154072,
+        "missing_reason": null
+      }
+    },
+    "top_k": {
+      "mc1": {
+        "label": "MC1",
+        "score_mean": 0.04,
+        "score_sem": 0.0279941684889506,
+        "missing_reason": null
+      },
+      "mc2": {
+        "label": "MC2",
+        "score_mean": 0.2222219754900986,
+        "score_sem": 0.062360887202168,
+        "missing_reason": null
+      },
+      "mc3": {
+        "label": "MC3",
+        "score_mean": 0.04,
+        "score_sem": 0.0279941684889506,
+        "missing_reason": null
+      }
+    },
+    "top_p": {
+      "mc1": {
+        "label": "MC1",
+        "score_mean": 0.0,
+        "score_sem": 0.0,
+        "missing_reason": "all choices truncated"
+      },
+      "mc2": {
+        "label": "MC2",
+        "score_mean": null,
+        "score_sem": 0.0,
+        "missing_reason": "all choices truncated"
+      },
+      "mc3": {
+        "label": "MC3",
+        "score_mean": 0.0,
+        "score_sem": 0.0,
+        "missing_reason": "all choices truncated"
+      }
+    },
+    "dola": {
+      "mc1": {
+        "label": "MC1",
+        "score_mean": 0.28,
+        "score_sem": 0.0641426980589818,
+        "missing_reason": null
+      },
+      "mc2": {
+        "label": "MC2",
+        "score_mean": 0.527824148006008,
+        "score_sem": 0.0688526204174373,
+        "missing_reason": null
+      },
+      "mc3": {
+        "label": "MC3",
+        "score_mean": 0.273,
+        "score_sem": 0.0472434952750639,
+        "missing_reason": null
+      }
+    },
+    "panda_switch": {
+      "mc1": {
+        "label": "MC1",
+        "score_mean": 0.34,
+        "score_sem": 0.0676726816132971,
+        "missing_reason": null
+      },
+      "mc2": {
+        "label": "MC2",
+        "score_mean": 0.5611622345040939,
+        "score_sem": 0.0673617175042502,
+        "missing_reason": null
+      },
+      "mc3": {
+        "label": "MC3",
+        "score_mean": 0.3136666666666666,
+        "score_sem": 0.0516017586580015,
+        "missing_reason": null
+      }
+    }
+  },
+  "latency": {
+    "pure_greedy": {
+      "label": "greedy",
+      "latency_per_step_ms_mean": 39.66951255094894,
+      "latency_seconds_mean": 4.782452191700576
+    },
+    "top_k": {
+      "label": "top k",
+      "latency_per_step_ms_mean": 40.86087089666359,
+      "latency_seconds_mean": 4.9375745807823845
+    },
+    "top_p": {
+      "label": "top p",
+      "latency_per_step_ms_mean": 41.29700423858803,
+      "latency_seconds_mean": 4.977944699240034
+    },
+    "dola": {
+      "label": "dola",
+      "latency_per_step_ms_mean": 79.12661588886367,
+      "latency_seconds_mean": 9.533601276077388
+    },
+    "panda_switch": {
+      "label": "panda",
+      "latency_per_step_ms_mean": 180.72274006964375,
+      "latency_seconds_mean": 21.76221944702877
+    }
+  },
+  "best_by_metric": {
+    "mc1": "pure_greedy",
+    "mc2": "panda_switch",
+    "mc3": "panda_switch"
+  },
+  "fastest_decoder": "pure_greedy",
+  "takeaway": "Panda raises MC2 from 0.531 to 0.561 over greedy in the saved exp11 run, but it is 4.56x slower per decoding step.",
+  "notes": [
+    "The plotted panda line is the original exp11 panda_switch decoder.",
+    "Latency is mean milliseconds per decoding step from the saved summary CSV.",
+    "When a missing metric can be traced to all candidate choice scores being -Infinity in the raw rows, the figure labels it as all choices truncated."
+  ]
+}
