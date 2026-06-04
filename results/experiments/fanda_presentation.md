@@ -43,6 +43,8 @@ The direct comparison includes:
 - `dola`
 - `PAnDa`
 
+![Core decoder quality vs latency](../figures/exp11_core_decoder_mc_latency.svg)
+
 The performance of PAnDa motivated us to move toward a simpler decoding strategy, which we call FAnDa. To support this shift, we first present the empirical performance of FAnDa.
 
 ## Slide 5: Motivation 1: DoLa Moves Too Much
