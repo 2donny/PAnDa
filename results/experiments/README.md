@@ -67,3 +67,7 @@ Current experiments:
 - `exp16_mc_persistence_seed_sweep/`
   - Tests whether the MC ranking of `update1`, `update2`, `update4`, `update8`, and `frozen` stays stable across one anchor subset plus four fresh random TruthfulQA subsets.
   - Decoders: `fanda_update1`, `fanda_update2`, `fanda_update4`, `fanda_update8`, `fanda_frozen`
+
+- `exp17_openended_dola_trace/`
+  - Replays selected `exp14_update1` open-ended answers and dumps true token-level traces, using the `exp14` codex manual-eval sheet to pick strong (`manual_score_0_2=2`) and weak (`manual_score_0_2=0`) cases.
+  - Decoders: `exp14_update1`

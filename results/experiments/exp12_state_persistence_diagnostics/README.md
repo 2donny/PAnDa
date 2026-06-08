@@ -3,6 +3,8 @@
 This experiment is not mainly about winning TruthfulQA. It is a mechanism study
 for the theory behind `fanda`:
 
+For a theorem-oriented companion note, see [fanda-derivation.md](../../../docs/algorithms/fanda-derivation.md).
+
 - a hallucination-prone local mode may persist for a few nearby tokens
 - reselecting the correction layer every token may be noisier than necessary
 - carrying `selected_layer` for a short span may stabilize the correction signal

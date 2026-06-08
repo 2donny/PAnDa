@@ -1,6 +1,5 @@
 # Slide 1: Title: FAnDa: Frozen Anchor Contrastive DoLa
 
-
 ## Slide 2: What Makes A Decoder Effective?
 
 For this presentation, we judge a decoder using three practical criteria.
@@ -261,6 +260,15 @@ Plain language:
 - some token flips may come from decoder instability, not from a better continuation
 
 That is the reason to freeze `selected_layer`.
+
+## Experiment 5: Tested on full DataSet On different Model
+
+Qwen/Qwen2.5-3B-Instruct (FANDA)
+Gemma 3 4B (FANDA)
+DeepSeek-R1-Distill-Llama-3B (FANDA)
+
+**Falcon 3 3B**
+HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration (FANDA)
 
 ## Slide 9: Final Hypothesis And Evidence
 

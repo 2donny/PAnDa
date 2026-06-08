@@ -7,7 +7,10 @@ Files:
 - [greedy.md](greedy.md)
 - [dola.md](dola.md)
 - [fixed-alpha-dola.md](fixed-alpha-dola.md)
+- [fanda-derivation.md](fanda-derivation.md)
 - [panda.md](panda.md)
+
+`fanda-derivation.md` is a theorem-oriented note for the experiment-local FAnDa persistence family under `results/experiments/`. It complements the empirical mechanism study in `exp12`.
 
 ## Shared Runtime
 

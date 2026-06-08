@@ -1,0 +1,5 @@
+run_id,enabled,model_name,model_label,notes,seed,subset_strategy
+run_01_gemma3_4b_it,true,google/gemma-3-4b-it,Gemma 3 4B,core_transfer_on_locked_exp11_subset,42,anchor_exp11_run_01
+run_02_falcon3_3b_instruct,true,tiiuae/Falcon3-3B-Instruct,Falcon 3 3B,core_transfer_on_locked_exp11_subset,42,anchor_exp11_run_01
+run_03_deepseek_r1_distill_llama_3b,false,REPLACE_ME_WITH_YOUR_EXACT_DEEPSEEK_R1_DISTILL_LLAMA_3B_MODEL_ID,DeepSeek-R1-Distill-Llama-3B,disabled_until_exact_model_id_is_confirmed,42,anchor_exp11_run_01
+run_04_hint_selfcal_qwen_1p5b,true,HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration,HINT Self-Cal Qwen 1.5B,core_transfer_on_locked_exp11_subset,42,anchor_exp11_run_01

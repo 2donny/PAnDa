@@ -11,7 +11,7 @@ from .import_shims import suppress_problematic_optional_dependency_detection
 
 suppress_problematic_optional_dependency_detection()
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 from .config import (
     DynDoLaConfig,
@@ -59,9 +59,9 @@ class Stage4Evaluator(
     def __init__(self, args):
         self.args = args
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.dtype = torch.float16 if self.device == "cuda" else torch.float32
         self.hf_token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_HUB_TOKEN")
         self.use_chat_template = not args.no_chat_template
+        self.dtype = self._resolve_model_dtype()
 
         self.decoder_names = get_decoder_names(args)
         self.decoder_labels = {name: get_decoder_label(name) for name in self.decoder_names}
@@ -168,6 +168,20 @@ class Stage4Evaluator(
         model.eval()
         return model
 
+    def _load_model_config(self):
+        model_name_or_path = self._resolve_local_model_path(self.args.model_name)
+        env_updates = (
+            {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}
+            if self.args.local_files_only
+            else {}
+        )
+        with _temporary_env(env_updates):
+            return AutoConfig.from_pretrained(
+                model_name_or_path,
+                token=self.hf_token,
+                local_files_only=self.args.local_files_only,
+            )
+
     def _resolve_local_model_path(self, model_name_or_path):
         if not self.args.local_files_only:
             return model_name_or_path
@@ -181,8 +195,40 @@ class Stage4Evaluator(
                 return str(Path(cached_path).parent)
         return model_name_or_path
 
+    def _resolve_model_dtype(self):
+        if self.device != "cuda":
+            return torch.float32
+
+        preferred_dtype = self._infer_config_torch_dtype()
+        if preferred_dtype == torch.bfloat16 and torch.cuda.is_bf16_supported():
+            return torch.bfloat16
+        if preferred_dtype in (torch.float32, torch.float64):
+            return preferred_dtype
+        return torch.float16
+
+    def _infer_config_torch_dtype(self):
+        try:
+            config = self._load_model_config()
+        except Exception:
+            return None
+
+        for config_node in (
+            config,
+            self._read_config_attr(config, "text_config"),
+            self._read_config_attr(config, "language_config"),
+            self._read_config_attr(config, "llm_config"),
+            self._read_config_attr(config, "decoder_config"),
+        ):
+            dtype = self._normalize_torch_dtype(
+                self._read_config_attr(config_node, "torch_dtype")
+                or self._read_config_attr(config_node, "dtype")
+            )
+            if dtype is not None:
+                return dtype
+        return None
+
     def _configure_layers(self):
-        num_layers = getattr(self.model.config, "num_hidden_layers", None)
+        num_layers = self._infer_num_hidden_layers(self.model.config)
         if num_layers is None:
             raise ValueError("Could not infer num_hidden_layers from model.config.")
 
@@ -206,6 +252,61 @@ class Stage4Evaluator(
                 "dola_mature_layer": self.mature_layer_index,
             }
         )
+
+    @staticmethod
+    def _read_config_attr(config_node, attr_name):
+        if config_node is None:
+            return None
+        if isinstance(config_node, dict):
+            return config_node.get(attr_name)
+        return getattr(config_node, attr_name, None)
+
+    @staticmethod
+    def _normalize_torch_dtype(dtype_value):
+        if dtype_value is None:
+            return None
+        if isinstance(dtype_value, torch.dtype):
+            return dtype_value
+        if not isinstance(dtype_value, str):
+            return None
+
+        normalized = dtype_value.replace("torch.", "").strip().lower()
+        if normalized in {"float16", "half"}:
+            return torch.float16
+        if normalized in {"bfloat16", "bf16"}:
+            return torch.bfloat16
+        if normalized in {"float32", "float"}:
+            return torch.float32
+        if normalized in {"float64", "double"}:
+            return torch.float64
+        return None
+
+    @classmethod
+    def _extract_layer_count(cls, config_node):
+        for attr_name in ("num_hidden_layers", "num_layers", "n_layer"):
+            value = cls._read_config_attr(config_node, attr_name)
+            if isinstance(value, bool) or value is None:
+                continue
+            try:
+                parsed = int(value)
+            except (TypeError, ValueError):
+                continue
+            if parsed > 0:
+                return parsed
+        return None
+
+    @classmethod
+    def _infer_num_hidden_layers(cls, config):
+        num_layers = cls._extract_layer_count(config)
+        if num_layers is not None:
+            return num_layers
+
+        # Multimodal wrappers such as Gemma 3 keep the decoder depth in a nested text config.
+        for attr_name in ("text_config", "language_config", "llm_config", "decoder_config", "decoder"):
+            num_layers = cls._extract_layer_count(cls._read_config_attr(config, attr_name))
+            if num_layers is not None:
+                return num_layers
+        return None
 
     def _resolve_default_bucket(self, num_layers):
         default_bucket = self.global_bucket_override

@@ -1,0 +1,14 @@
+{
+  "status": "completed",
+  "experiment": "exp17_openended_dola_trace",
+  "run_id": "run_01_default",
+  "results_dir": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp17_openended_dola_trace/runs/run_01_default",
+  "source_decoder": "exp14_update1",
+  "total_cases": 6,
+  "completed_cases": 6,
+  "current_example_idx": 45,
+  "current_group": "manual_score_0_2=0",
+  "started_at_epoch": 1780641746.023508,
+  "updated_at_epoch": 1780641773.665935,
+  "percent_complete": 100.0
+}

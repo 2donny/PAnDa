@@ -1,0 +1,39 @@
+{
+  "experiment_name": "exp17_openended_dola_trace",
+  "run_id": "run_01_default",
+  "notes": "trace_selected_exp14_update1_openended_answers_using_codex_manual_eval",
+  "model_name": "Qwen/Qwen2.5-3B-Instruct",
+  "mode": "subset",
+  "seed": 42,
+  "strict_eval": false,
+  "source_experiment_name": "exp14_openended_factuality",
+  "source_run_id": "run_01_default",
+  "source_decoder": "exp14_update1",
+  "source_manual_eval_csv": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp14_openended_factuality/runs/run_01_default/run_01_default_manual_eval.csv",
+  "source_metadata_json": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp14_openended_factuality/runs/run_01_default/run_01_default_metadata.json",
+  "source_review_status_counts": {
+    "prefilled_by_codex": 50
+  },
+  "source_reviewer_counts": {
+    "codex": 50
+  },
+  "selection_rule": "pick_top_manual_score_cases_by_proxy_margin_desc_and_bottom_manual_score_cases_by_proxy_margin_asc_from_exp14_update1_codex_manual_eval_sheet",
+  "manual_positive_score": 2,
+  "manual_negative_score": 0,
+  "top_k": 3,
+  "wrong_k": 3,
+  "max_new_tokens": 64,
+  "selected_example_indices": [
+    39,
+    13,
+    41,
+    49,
+    5,
+    45
+  ],
+  "elapsed_seconds": 27.63038242499988,
+  "artifact_paths": {
+    "selected_cases_csv": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp17_openended_dola_trace/runs/run_01_default/run_01_default_selected_cases.csv",
+    "token_trace_csv": "/mnt/c/Users/naufalkmd/Documents/GithubProjects/PAnDa/results/experiments/exp17_openended_dola_trace/runs/run_01_default/run_01_default_token_trace.csv"
+  }
+}
