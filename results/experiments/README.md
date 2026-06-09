@@ -71,3 +71,7 @@ Current experiments:
 - `exp17_openended_dola_trace/`
   - Replays selected `exp14_update1` open-ended answers and dumps true token-level traces, using the `exp14` codex manual-eval sheet to pick strong (`manual_score_0_2=2`) and weak (`manual_score_0_2=0`) cases.
   - Decoders: `exp14_update1`
+
+- `exp18_cross_model_transfer/`
+  - Tests whether the core `pure_greedy` vs `dola` vs `fanda` ranking transfers across models while reusing the locked `50`-question subset from `exp11`.
+  - Decoders: `pure_greedy`, `dola`, `fanda`

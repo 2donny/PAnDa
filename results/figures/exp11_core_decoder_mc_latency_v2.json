@@ -25,8 +25,8 @@
       },
       "mc2": {
         "label": "MC2",
-        "score_mean": 0.5314276191876766,
-        "score_sem": 0.0671929090885667,
+        "score_mean": 0.530732138175678,
+        "score_sem": 0.0667223811900128,
         "missing_reason": null
       },
       "mc3": {
@@ -39,60 +39,60 @@
     "top_k": {
       "mc1": {
         "label": "MC1",
-        "score_mean": 0.04,
-        "score_sem": 0.0279941684889506,
+        "score_mean": 0.34,
+        "score_sem": 0.0676726816132972,
         "missing_reason": null
       },
       "mc2": {
         "label": "MC2",
-        "score_mean": 0.2222219754900986,
-        "score_sem": 0.062360887202168,
+        "score_mean": 0.5306879394685953,
+        "score_sem": 0.0667051636147328,
         "missing_reason": null
       },
       "mc3": {
         "label": "MC3",
-        "score_mean": 0.04,
-        "score_sem": 0.0279941684889506,
+        "score_mean": 0.307,
+        "score_sem": 0.0524676555154072,
         "missing_reason": null
       }
     },
     "top_p": {
       "mc1": {
         "label": "MC1",
-        "score_mean": 0.0,
-        "score_sem": 0.0,
-        "missing_reason": "all choices truncated"
+        "score_mean": 0.36,
+        "score_sem": 0.0685714285714285,
+        "missing_reason": null
       },
       "mc2": {
         "label": "MC2",
-        "score_mean": null,
-        "score_sem": 0.0,
-        "missing_reason": "all choices truncated"
+        "score_mean": 0.5315741761303079,
+        "score_sem": 0.0666170736100342,
+        "missing_reason": null
       },
       "mc3": {
         "label": "MC3",
-        "score_mean": 0.0,
-        "score_sem": 0.0,
-        "missing_reason": "all choices truncated"
+        "score_mean": 0.3136666666666666,
+        "score_sem": 0.0529571983077627,
+        "missing_reason": null
       }
     },
     "dola": {
       "mc1": {
         "label": "MC1",
-        "score_mean": 0.28,
-        "score_sem": 0.0641426980589818,
+        "score_mean": 0.26,
+        "score_sem": 0.0626620348556037,
         "missing_reason": null
       },
       "mc2": {
         "label": "MC2",
-        "score_mean": 0.527824148006008,
-        "score_sem": 0.0688526204174373,
+        "score_mean": 0.526359490793537,
+        "score_sem": 0.0687322875311531,
         "missing_reason": null
       },
       "mc3": {
         "label": "MC3",
-        "score_mean": 0.273,
-        "score_sem": 0.0472434952750639,
+        "score_mean": 0.268,
+        "score_sem": 0.0470172448702892,
         "missing_reason": null
       }
     },
@@ -105,14 +105,14 @@
       },
       "mc2": {
         "label": "MC2",
-        "score_mean": 0.5611622345040939,
-        "score_sem": 0.0673617175042502,
+        "score_mean": 0.5624286304450689,
+        "score_sem": 0.0676677318259846,
         "missing_reason": null
       },
       "mc3": {
         "label": "MC3",
-        "score_mean": 0.3136666666666666,
-        "score_sem": 0.0516017586580015,
+        "score_mean": 0.3236666666666666,
+        "score_sem": 0.0532803520856173,
         "missing_reason": null
       }
     },
@@ -140,28 +140,28 @@
   "latency": {
     "pure_greedy": {
       "label": "greedy",
-      "latency_per_step_ms_mean": 39.66951255094894,
-      "latency_seconds_mean": 4.782452191700576
+      "latency_per_step_ms_mean": 39.20303113032709,
+      "latency_seconds_mean": 4.714047856639372
     },
     "top_k": {
       "label": "top k",
-      "latency_per_step_ms_mean": 40.86087089666359,
-      "latency_seconds_mean": 4.9375745807823845
+      "latency_per_step_ms_mean": 39.28443079635759,
+      "latency_seconds_mean": 4.726399662160402
     },
     "top_p": {
       "label": "top p",
-      "latency_per_step_ms_mean": 41.29700423858803,
-      "latency_seconds_mean": 4.977944699240034
+      "latency_per_step_ms_mean": 39.33495286718651,
+      "latency_seconds_mean": 4.729328635560669
     },
     "dola": {
       "label": "dola",
-      "latency_per_step_ms_mean": 79.12661588886367,
-      "latency_seconds_mean": 9.533601276077388
+      "latency_per_step_ms_mean": 78.6735712902095,
+      "latency_seconds_mean": 9.471975322960937
     },
     "panda_switch": {
       "label": "panda",
-      "latency_per_step_ms_mean": 180.72274006964375,
-      "latency_seconds_mean": 21.76221944702877
+      "latency_per_step_ms_mean": 173.87499825660515,
+      "latency_seconds_mean": 20.97156922248032
     },
     "fanda_frozen": {
       "label": "fanda",

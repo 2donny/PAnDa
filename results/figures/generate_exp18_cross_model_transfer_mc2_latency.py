@@ -17,7 +17,7 @@ FIGURES_DIR = ROOT / "results" / "figures"
 
 OUTPUT_SVG = FIGURES_DIR / "exp18_cross_model_transfer_mc2_latency.svg"
 OUTPUT_JSON = FIGURES_DIR / "exp18_cross_model_transfer_mc2_latency.json"
-PRIMARY_METRIC = "mc1"
+PRIMARY_METRIC = "mc2"
 
 SOURCE_SPECS = [
     {

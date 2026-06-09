@@ -1,5 +1,5 @@
 {
-  "metric_name": "mc1",
+  "metric_name": "mc2",
   "latency_field": "latency_per_forward_ms_mean",
   "decoder_order": [
     "pure_greedy",
@@ -20,22 +20,22 @@
       "decoders": {
         "pure_greedy": {
           "decoder_label": "greedy",
-          "mc1": 0.34,
-          "mc1_sem": 0.0676726816132972,
+          "mc2": 0.5314276191876766,
+          "mc2_sem": 0.06719290908856676,
           "latency_ms": 39.66951255094894,
           "latency_seconds": 4.7824521917005764
         },
         "dola": {
           "decoder_label": "dola",
-          "mc1": 0.28,
-          "mc1_sem": 0.06414269805898185,
+          "mc2": 0.527824148006008,
+          "mc2_sem": 0.06885262041743735,
           "latency_ms": 79.12661588886367,
           "latency_seconds": 9.533601276077388
         },
         "fanda": {
           "decoder_label": "fanda",
-          "mc1": 0.4,
-          "mc1_sem": 0.06998542122237653,
+          "mc2": 0.5758458460194236,
+          "mc2_sem": 0.06977991545691754,
           "latency_ms": 81.4007176706641,
           "latency_seconds": 9.763205099741754
         }
@@ -48,22 +48,22 @@
       "decoders": {
         "pure_greedy": {
           "decoder_label": "greedy",
-          "mc1": 0.26,
-          "mc1_sem": 0.06266203485560373,
+          "mc2": 0.405659276243388,
+          "mc2_sem": 0.06566159234355924,
           "latency_ms": 30.830040396319504,
           "latency_seconds": 3.6812074802998698
         },
         "dola": {
           "decoder_label": "dola",
-          "mc1": 0.22,
-          "mc1_sem": 0.059178043363451366,
+          "mc2": 0.44201401796984613,
+          "mc2_sem": 0.06844253544273575,
           "latency_ms": 63.00361706460255,
           "latency_seconds": 7.479706335720059
         },
         "fanda": {
           "decoder_label": "fanda",
-          "mc1": 0.26,
-          "mc1_sem": 0.06266203485560375,
+          "mc2": 0.4783159578678216,
+          "mc2_sem": 0.06780137147035271,
           "latency_ms": 66.08976989777621,
           "latency_seconds": 7.844217825020009
         }
@@ -76,22 +76,22 @@
       "decoders": {
         "pure_greedy": {
           "decoder_label": "greedy",
-          "mc1": 0.28,
-          "mc1_sem": 0.06414269805898185,
+          "mc2": 0.43173815838633844,
+          "mc2_sem": 0.0674577176407819,
           "latency_ms": 45.964952665808,
           "latency_seconds": 5.4493459711005565
         },
         "dola": {
           "decoder_label": "dola",
-          "mc1": 0.28,
-          "mc1_sem": 0.06414269805898185,
+          "mc2": 0.4900000000000009,
+          "mc2_sem": 0.070696245895192,
           "latency_ms": 120.03133604622776,
           "latency_seconds": 14.263482800060082
         },
         "fanda": {
           "decoder_label": "fanda",
-          "mc1": 0.3,
-          "mc1_sem": 0.0654653670707977,
+          "mc2": 0.5870335558296738,
+          "mc2_sem": 0.06967343333791534,
           "latency_ms": 122.15096636576337,
           "latency_seconds": 14.530222502560319
         }
@@ -104,22 +104,22 @@
       "decoders": {
         "pure_greedy": {
           "decoder_label": "greedy",
-          "mc1": 0.3,
-          "mc1_sem": 0.06546536707079771,
+          "mc2": 0.42769993195298783,
+          "mc2_sem": 0.06380710210680941,
           "latency_ms": 35.965459556667774,
           "latency_seconds": 4.325861037380037
         },
         "dola": {
           "decoder_label": "dola",
-          "mc1": 0.24,
-          "mc1_sem": 0.061011875725893214,
+          "mc2": 0.40386627462362634,
+          "mc2_sem": 0.06863736474310446,
           "latency_ms": 60.99331089399432,
           "latency_seconds": 7.352414491919917
         },
         "fanda": {
           "decoder_label": "fanda",
-          "mc1": 0.24,
-          "mc1_sem": 0.061011875725893214,
+          "mc2": 0.4130674764157238,
+          "mc2_sem": 0.06587002262400328,
           "latency_ms": 64.21136867677328,
           "latency_seconds": 7.7188234809201095
         }

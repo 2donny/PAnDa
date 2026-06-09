@@ -55,7 +55,7 @@ def parse_args():
     parser.add_argument(
         "--include-top-p-backoff",
         action="store_true",
-        help="Also evaluate top_p_backoff, which falls back to the full-distribution logprob when the teacher-forced gold token falls outside the nucleus.",
+        help="Also evaluate the legacy top_p_backoff alias for explicit fallback tracing alongside top_p.",
     )
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--list", action="store_true")

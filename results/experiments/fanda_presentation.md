@@ -101,10 +101,8 @@ Conclusion:
 As much as we want to keep the core contrastive decoding idea, but our motivation comes from a different tension: decoding happens token by token, while factuality is judged at the level of the full sequence. And we still want to use use the gap between token-level decoding and sequence-level factuality as our main motivation.
 
 **Attention Is All You Need**: positional encodings provide a small persistent signal available throughout the sequence.
-Source: [![](https://arxiv.org/favicon.ico)https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
 
 **Agent Skills / Claude Code**: skills package reusable knowledge and workflows that are loaded on demand to guide later actions and tool use.
-Sources: [https://code.claude.com/docs/en/skills](https://code.claude.com/docs/en/skills), [![](https://agentskills.io/favicon.ico)https://agentskills.io/home](https://agentskills.io/home)
 
 - What if we carry a small, stable piece of information across the whole generation?
 - and can that carried signal improve quality and factuality by making local token decisions more sequence-consistent?
@@ -261,14 +259,46 @@ Plain language:
 
 That is the reason to freeze `selected_layer`.
 
-## Experiment 5: Tested on full DataSet On different Model
+## Experiment 5: Cross-Model Core Transfer (`exp18`)
 
-Qwen/Qwen2.5-3B-Instruct (FANDA)
-Gemma 3 4B (FANDA)
-DeepSeek-R1-Distill-Llama-3B (FANDA)
+This presentation's `Experiment 5` corresponds to repo experiment `exp18_cross_model_transfer`.
 
-**Falcon 3 3B**
-HINT-lab/DeepSeek-R1-Distill-Qwen-1.5B-Self-Calibration (FANDA)
+Goal:
+Check whether the core `greedy` vs `dola` vs `fanda` ranking transfers across models when we keep the exact same `50` TruthfulQA questions locked.
+
+Method:
+
+- reuse the exact `50`-question subset from `exp11`
+- compare only `pure_greedy`, `dola`, and `fanda`
+- primary metric: `mc2`
+- secondary metrics: `mc1`, `mc3`
+- enabled model rows:
+  - `Gemma 3 4B`
+  - `Falcon 3 3B`
+  - `HINT self-cal Qwen 1.5B`
+- the `DeepSeek-R1-Distill-Llama-3B` row remains disabled until the exact model id is confirmed
+
+Primary transfer summary:
+
+![Exp18 cross-model transfer](../figures/exp18_cross_model_transfer_mc2_latency.svg)
+(Settings: `Qwen 2.5 3B` anchor from `exp11` plus `Gemma 3 4B`, `Falcon 3 3B`, and `HINT self-cal Qwen 1.5B` from `exp18`; same locked `50` TruthfulQA multiple-choice questions for every model; decoders = `greedy`, `dola`, and `fanda`; left panel = `mc2`; right panel = latency per forward pass.)
+
+Main reading:
+
+- `Gemma 3 4B`: `fanda` is best on all three metrics
+  - `mc1 = 0.30`, `mc2 = 0.587`, `mc3 = 0.284`
+- `Falcon 3 3B`: `fanda` is best on the primary metric `mc2`, ties `pure_greedy` on `mc1`, and is slightly below `pure_greedy` on `mc3`
+  - `mc1 = 0.26`, `mc2 = 0.478`, `mc3 = 0.228`
+- `HINT self-cal Qwen 1.5B`: `fanda` beats `dola` slightly on `mc2`, but `pure_greedy` remains strongest overall
+  - `mc1 = 0.24`, `mc2 = 0.413`, `mc3 = 0.206`
+- latency stays close to `dola` and remains much slower than `pure_greedy`, so transfer quality has to justify that extra cost
+
+Conclusion:
+
+- the core `fanda` package transfers clearly to `Gemma 3 4B`
+- it transfers partially to `Falcon 3 3B`
+- it does **not** look universal across every tested model family yet
+- so `fanda` is a strong transferable contrastive decoder, but not a guaranteed replacement for `pure_greedy`
 
 ## Slide 9: Final Hypothesis And Evidence
 
@@ -282,16 +312,18 @@ Overall evidence:
 - `Experiment 2` shows that stronger persistence improves over token-local reselection on MC-style scoring
 - `Experiment 3` shows that `frozen` stays highly competitive on full open-ended manual review
 - `Experiment 4` shows that `frozen` gets the slight edge on targeted long-generation comparisons
+- `Experiment 5` shows that cross-model transfer is real but partial: strongest on `Gemma 3 4B`, supportive on `Falcon 3 3B`, and not universal on `HINT self-cal Qwen 1.5B`
 
 Final verdict table:
 
-| Experiment         | What was compared                                                         | Winner                                                                                                                                                      | Evidence                                                                                      | What we keep                                    |
-| ------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `Experiment 1`   | filter on vs filter off                                                   | `no filter`                                                                                                                                               | strongest bars are the no-filter ones;`mc1` and `mc3` improve                             | remove the relative-top filter                  |
-| `Experiment 2`   | `update1` vs `update2` / `update4` / `frozen` on MC-style scoring | quality rank:`mc1 = frozen = update4 > update2 > update1`; `mc2 = update4 > frozen > update1 > update2`; `mc3 = frozen > update4 > update2 > update1` | `update1` is never the top-quality setting; `update4` and `frozen` dominate the ranking | do not reselect the shallow layer every token   |
-| `Experiment 3`   | full open-ended manual review                                             | `update1` overall, `frozen` second                                                                                                                      | mean manual score:`0.62` vs `0.56`                                                        | `frozen` stays competitive outside MC         |
-| `Experiment 4`   | targeted long-generation `frozen` vs `update1`                        | `frozen`                                                                                                                                                  | `4` wins vs `3`, with `1` tie                                                           | `frozen` is the stronger robustness candidate |
-| `Overall result` | full decoder package:`FanDa` vs `DoLa`                                | `FanDa`                                                                                                                                                   | wins on `mc1`, `mc2`, and `mc3`                                                         | the package works end to end                    |
+| Experiment         | What was compared                                                         | Winner                                                                                                                                                      | Evidence                                                                                                                                           | What we keep                                             |
+| ------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `Experiment 1`   | filter on vs filter off                                                   | `no filter`                                                                                                                                               | strongest bars are the no-filter ones;`mc1` and `mc3` improve                                                                                  | remove the relative-top filter                           |
+| `Experiment 2`   | `update1` vs `update2` / `update4` / `frozen` on MC-style scoring | quality rank:`mc1 = frozen = update4 > update2 > update1`; `mc2 = update4 > frozen > update1 > update2`; `mc3 = frozen > update4 > update2 > update1` | `update1` is never the top-quality setting; `update4` and `frozen` dominate the ranking                                                      | do not reselect the shallow layer every token            |
+| `Experiment 3`   | full open-ended manual review                                             | `update1` overall, `frozen` second                                                                                                                      | mean manual score:`0.62` vs `0.56`                                                                                                             | `frozen` stays competitive outside MC                  |
+| `Experiment 4`   | targeted long-generation `frozen` vs `update1`                        | `frozen`                                                                                                                                                  | `4` wins vs `3`, with `1` tie                                                                                                                | `frozen` is the stronger robustness candidate          |
+| `Experiment 5`   | locked-subset cross-model transfer:`greedy` vs `dola` vs `fanda`    | partial transfer                                                                                                                                            | `fanda` wins all three metrics on `Gemma 3 4B`, wins `mc2` on `Falcon 3 3B`, but `pure_greedy` stays best on `HINT self-cal Qwen 1.5B` | keep `fanda` as a strong option, not a universal claim |
+| `Overall result` | full decoder package:`FanDa` vs `DoLa`                                | `FanDa`                                                                                                                                                   | wins on `mc1`, `mc2`, and `mc3`                                                                                                              | the package works end to end                             |
 
 That is the backbone of the decoder we want to keep.
 
@@ -311,3 +343,12 @@ Viewed through our three decoder criteria:
 **Efficiency**
 
 **Stability**
+
+## References
+
+- Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., and Polosukhin, I. (2017). *Attention Is All You Need*. NeurIPS. https://arxiv.org/abs/1706.03762
+- Lin, S., Hilton, J., and Evans, O. (2022). *TruthfulQA: Measuring How Models Mimic Human Falsehoods*. ACL. https://arxiv.org/abs/2109.07958
+- Chuang, Y.-S., Xie, Y., Luo, H., Kim, Y., Glass, J., and He, P. (2024). *DoLa: Decoding by Contrasting Layers Improves Factuality in Large Language Models*. ICLR. https://arxiv.org/abs/2309.03883
+- Yang, A., Yang, B., Zhang, B., Hui, B., Zheng, B., Yu, B., Li, C., Liu, D., Huang, F., et al. (2025). *Qwen2.5 Technical Report*. arXiv:2412.15115. https://arxiv.org/abs/2412.15115
+- Anthropic. *Claude Code Skills Documentation*. https://code.claude.com/docs/en/skills
+- Agent Skills. *Agent Skills Home*. https://agentskills.io/home

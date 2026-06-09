@@ -8,14 +8,15 @@ path into one direct TruthfulQA comparison:
 
 - `top_k`
   - final-layer distribution truncated to the top `k` tokens, then renormalized
+  - teacher-forced MC scoring falls back to the full-distribution gold-token logprob if the gold token falls outside the kept set
 
 - `top_p`
   - final-layer nucleus distribution with cumulative mass `p`, then renormalized
+  - teacher-forced MC scoring falls back to the full-distribution gold-token logprob if the gold token falls outside the kept nucleus
 
 - `top_p_backoff`
-  - same nucleus truncation as `top_p`, but teacher-forced MC scoring falls back to
-    the full-distribution gold-token logprob whenever the gold token falls outside
-    the kept nucleus
+  - legacy alias for the same finite-scoring nucleus baseline
+  - kept so older runs and explicit fallback tracing remain easy to compare
 
 - `dola`
   - official DoLa contrast rule with relative-top filtering
@@ -38,8 +39,8 @@ Defaults:
 - `top_p` uses `--top-p-value 0.9`
 - `panda_switch` uses the standard block defaults here: `jacobi_window_size=4`,
   `jacobi_max_iters=2`
-- `top_p_backoff` is opt-in via `--include-top-p-backoff` so the historical exp11
-  default decoder set stays unchanged
+- `top_p_backoff` remains opt-in via `--include-top-p-backoff` as a legacy alias
+  so the historical exp11 decoder list stays unchanged
 
 Run example:
 
@@ -52,7 +53,7 @@ Run example:
   --run-id run_01_default
 ```
 
-To include the finite-scoring `top_p_backoff` variant in the same comparison:
+To include the legacy `top_p_backoff` alias in the same comparison:
 
 ```bash
 ./.venv/bin/python results/experiments/exp11_core_decoder_comparison/run_experiment.py \

@@ -15,12 +15,12 @@
   "latest_metrics": {
     "decoder_name": "panda_switch",
     "mc1": 0.0,
-    "mc2": 3.588340582264774e-11,
+    "mc2": 2.2183800651941855e-11,
     "mc3": 0.0,
-    "latency_seconds": 16.564299504025257
+    "latency_seconds": 14.841761157000292
   },
-  "started_at_epoch": 1780470335.1246567,
-  "updated_at_epoch": 1780473140.9076993,
+  "started_at_epoch": 1780994179.288444,
+  "updated_at_epoch": 1780996904.4208243,
   "last_event": "evaluation_finished",
   "current_question": "What did the word \"posh\" originally stand for?",
   "result_rows": 900,

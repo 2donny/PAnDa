@@ -26,39 +26,38 @@
 <line x1="108.00" y1="128.00" x2="108.00" y2="396.00" stroke="#222222" stroke-width="1.10" />
 <line x1="108.00" y1="396.00" x2="736.00" y2="396.00" stroke="#222222" stroke-width="1.10" />
 <text x="394.00" y="442.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">Higher is better</text>
-<rect x="136.67" y="304.88" width="24.00" height="91.12" fill="#0072B2" stroke="#1f1f1f" stroke-width="1.20" rx="6.00" />
+<rect x="136.67" y="304.88" width="24.00" height="91.12" fill="#0072B2" stroke="none" stroke-width="1.00" rx="6.00" />
 <text x="148.67" y="296.88" font-size="10" fill="#0072B2" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.340</text>
-<rect x="168.67" y="385.28" width="24.00" height="10.72" fill="#E69F00" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="180.67" y="377.28" font-size="10" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.040</text>
-<rect x="200.67" y="396.00" width="24.00" height="1.00" fill="#009E73" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="212.67" y="388.00" font-size="10" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.000</text>
-<rect x="232.67" y="320.96" width="24.00" height="75.04" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="244.67" y="312.96" font-size="10" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.280</text>
+<rect x="168.67" y="304.88" width="24.00" height="91.12" fill="#E69F00" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="180.67" y="296.88" font-size="10" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.340</text>
+<rect x="200.67" y="299.52" width="24.00" height="96.48" fill="#009E73" stroke="#1f1f1f" stroke-width="1.20" rx="6.00" />
+<text x="212.67" y="291.52" font-size="10" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.360</text>
+<rect x="232.67" y="326.32" width="24.00" height="69.68" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="244.67" y="318.32" font-size="10" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.260</text>
 <rect x="264.67" y="304.88" width="24.00" height="91.12" fill="#D55E00" stroke="none" stroke-width="1.00" rx="6.00" />
 <text x="276.67" y="296.88" font-size="10" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.340</text>
 <text x="212.67" y="420.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">MC1</text>
-<rect x="346.00" y="253.58" width="24.00" height="142.42" fill="#0072B2" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="358.00" y="245.58" font-size="10" fill="#0072B2" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.531</text>
-<rect x="378.00" y="336.44" width="24.00" height="59.56" fill="#E69F00" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="390.00" y="328.44" font-size="10" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.222</text>
-<line x1="410.00" y1="394.00" x2="434.00" y2="394.00" stroke="#bbbbbb" stroke-width="1.10" stroke-dasharray="3 2" />
-<text x="422.00" y="376.00" font-size="9" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">all choices</text>
-<text x="422.00" y="388.00" font-size="9" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">truncated</text>
-<rect x="442.00" y="254.54" width="24.00" height="141.46" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="454.00" y="246.54" font-size="10" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.528</text>
-<rect x="474.00" y="245.61" width="24.00" height="150.39" fill="#D55E00" stroke="#1f1f1f" stroke-width="1.20" rx="6.00" />
-<text x="486.00" y="237.61" font-size="10" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.561</text>
+<rect x="346.00" y="253.76" width="24.00" height="142.24" fill="#0072B2" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="358.00" y="245.76" font-size="10" fill="#0072B2" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.531</text>
+<rect x="378.00" y="253.78" width="24.00" height="142.22" fill="#E69F00" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="390.00" y="245.78" font-size="10" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.531</text>
+<rect x="410.00" y="253.54" width="24.00" height="142.46" fill="#009E73" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="422.00" y="245.54" font-size="10" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.532</text>
+<rect x="442.00" y="254.94" width="24.00" height="141.06" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="454.00" y="246.94" font-size="10" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.526</text>
+<rect x="474.00" y="245.27" width="24.00" height="150.73" fill="#D55E00" stroke="#1f1f1f" stroke-width="1.20" rx="6.00" />
+<text x="486.00" y="237.27" font-size="10" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.562</text>
 <text x="422.00" y="420.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">MC2</text>
 <rect x="555.33" y="313.72" width="24.00" height="82.28" fill="#0072B2" stroke="none" stroke-width="1.00" rx="6.00" />
 <text x="567.33" y="305.72" font-size="10" fill="#0072B2" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.307</text>
-<rect x="587.33" y="385.28" width="24.00" height="10.72" fill="#E69F00" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="599.33" y="377.28" font-size="10" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.040</text>
-<rect x="619.33" y="396.00" width="24.00" height="1.00" fill="#009E73" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="631.33" y="388.00" font-size="10" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.000</text>
-<rect x="651.33" y="322.84" width="24.00" height="73.16" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="6.00" />
-<text x="663.33" y="314.84" font-size="10" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.273</text>
-<rect x="683.33" y="311.94" width="24.00" height="84.06" fill="#D55E00" stroke="#1f1f1f" stroke-width="1.20" rx="6.00" />
-<text x="695.33" y="303.94" font-size="10" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.314</text>
+<rect x="587.33" y="313.72" width="24.00" height="82.28" fill="#E69F00" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="599.33" y="305.72" font-size="10" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.307</text>
+<rect x="619.33" y="311.94" width="24.00" height="84.06" fill="#009E73" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="631.33" y="303.94" font-size="10" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.314</text>
+<rect x="651.33" y="324.18" width="24.00" height="71.82" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="6.00" />
+<text x="663.33" y="316.18" font-size="10" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.268</text>
+<rect x="683.33" y="309.26" width="24.00" height="86.74" fill="#D55E00" stroke="#1f1f1f" stroke-width="1.20" rx="6.00" />
+<text x="695.33" y="301.26" font-size="10" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">0.324</text>
 <text x="631.33" y="420.00" font-size="11" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">MC3</text>
 <rect x="784.00" y="44.00" width="370.00" height="428.00" fill="#ffffff" stroke="#dddddd" stroke-width="1.00" rx="14.00" />
 <text x="969.00" y="68.00" font-size="17" fill="#222222" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="bold">Latency</text>
@@ -76,18 +75,18 @@
 <line x1="876.00" y1="388.00" x2="1124.00" y2="388.00" stroke="#222222" stroke-width="1.10" />
 <text x="1000.00" y="434.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="middle" font-weight="normal">Milliseconds</text>
 <text x="864.00" y="131.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">greedy</text>
-<rect x="876.00" y="112.00" width="49.19" height="30.00" fill="#0072B2" stroke="none" stroke-width="1.00" rx="8.00" />
-<text x="933.19" y="131.00" font-size="11" fill="#0072B2" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">39.7</text>
+<rect x="876.00" y="112.00" width="48.61" height="30.00" fill="#0072B2" stroke="none" stroke-width="1.00" rx="8.00" />
+<text x="932.61" y="131.00" font-size="11" fill="#0072B2" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">39.2</text>
 <text x="864.00" y="189.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">top k</text>
-<rect x="876.00" y="170.00" width="50.67" height="30.00" fill="#E69F00" stroke="none" stroke-width="1.00" rx="8.00" />
-<text x="934.67" y="189.00" font-size="11" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">40.9</text>
+<rect x="876.00" y="170.00" width="48.71" height="30.00" fill="#E69F00" stroke="none" stroke-width="1.00" rx="8.00" />
+<text x="932.71" y="189.00" font-size="11" fill="#E69F00" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">39.3</text>
 <text x="864.00" y="247.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">top p</text>
-<rect x="876.00" y="228.00" width="51.21" height="30.00" fill="#009E73" stroke="none" stroke-width="1.00" rx="8.00" />
-<text x="935.21" y="247.00" font-size="11" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">41.3</text>
+<rect x="876.00" y="228.00" width="48.78" height="30.00" fill="#009E73" stroke="none" stroke-width="1.00" rx="8.00" />
+<text x="932.78" y="247.00" font-size="11" fill="#009E73" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">39.3</text>
 <text x="864.00" y="305.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">dola</text>
-<rect x="876.00" y="286.00" width="98.12" height="30.00" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="8.00" />
-<text x="982.12" y="305.00" font-size="11" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">79.1</text>
+<rect x="876.00" y="286.00" width="97.56" height="30.00" fill="#CC79A7" stroke="none" stroke-width="1.00" rx="8.00" />
+<text x="981.56" y="305.00" font-size="11" fill="#CC79A7" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">78.7</text>
 <text x="864.00" y="363.00" font-size="11" fill="#444444" font-family="Times New Roman, Times, serif" text-anchor="end" font-weight="normal">panda</text>
-<rect x="876.00" y="344.00" width="224.10" height="30.00" fill="#D55E00" stroke="none" stroke-width="1.00" rx="8.00" />
-<text x="1108.10" y="363.00" font-size="11" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">180.7</text>
+<rect x="876.00" y="344.00" width="215.60" height="30.00" fill="#D55E00" stroke="none" stroke-width="1.00" rx="8.00" />
+<text x="1099.60" y="363.00" font-size="11" fill="#D55E00" font-family="Times New Roman, Times, serif" text-anchor="start" font-weight="bold">173.9</text>
 </svg>

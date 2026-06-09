@@ -523,11 +523,8 @@ class ExperimentEvaluator(Stage4Evaluator):
                 decoder_name,
             )
 
-        if decoder_name == "top_p_backoff":
-            return self._score_candidate_with_top_p_backoff(prompt, choice_text)
-
         if decoder_name in TRUNCATION_DECODER_NAMES:
-            return self._score_candidate_with_custom_step(prompt, choice_text, decoder_name)
+            return self._score_candidate_with_truncation_backoff(prompt, choice_text, decoder_name)
 
         if decoder_name in EXP4_DECODER_NAMES:
             return self._score_candidate_with_custom_step(prompt, choice_text, decoder_name)
@@ -766,7 +763,7 @@ class ExperimentEvaluator(Stage4Evaluator):
             generated_tokens=len(token_ids),
         )
 
-    def _score_candidate_with_top_p_backoff(self, prompt, choice_text):
+    def _score_candidate_with_truncation_backoff(self, prompt, choice_text, decoder_name):
         generated = self.prepare_prompt(prompt)
         total_logprob = 0.0
         token_ids = self.candidate_to_ids(choice_text)
@@ -776,8 +773,10 @@ class ExperimentEvaluator(Stage4Evaluator):
         self.synchronize_cuda()
         start_time = time.perf_counter()
         for token_id in token_ids:
-            truncated_log_probs, full_log_probs, keep_mask, trace_row = self.build_top_p_backoff_scores(
-                generated
+            truncated_log_probs, full_log_probs, keep_mask, trace_row = self.build_truncation_scores(
+                generated,
+                decoder_name,
+                return_keep_mask=True,
             )
             forward_passes += 1
             gold_token_kept = bool(keep_mask[0, token_id].item())
@@ -793,10 +792,15 @@ class ExperimentEvaluator(Stage4Evaluator):
             row["token_id"] = int(token_id)
             row["token_text"] = self.decode_token(token_id)
             row["fallback_used"] = float(not gold_token_kept)
-            row["top_p_gold_token_kept"] = float(gold_token_kept)
-            row["top_p_backoff_used"] = float(not gold_token_kept)
-            row["top_p_selected_logprob"] = selected_logprob
-            row["top_p_full_logprob"] = float(full_log_probs[0, token_id].item())
+            row["truncation_gold_token_kept"] = float(gold_token_kept)
+            row["truncation_backoff_used"] = float(not gold_token_kept)
+            row["truncation_selected_logprob"] = selected_logprob
+            row["truncation_full_logprob"] = float(full_log_probs[0, token_id].item())
+            if decoder_name in ("top_p", "top_p_backoff"):
+                row["top_p_gold_token_kept"] = float(gold_token_kept)
+                row["top_p_backoff_used"] = float(not gold_token_kept)
+                row["top_p_selected_logprob"] = selected_logprob
+                row["top_p_full_logprob"] = float(full_log_probs[0, token_id].item())
             trace.append(row)
             generated = torch.cat([generated, next_token], dim=-1)
         self.synchronize_cuda()
@@ -1427,19 +1431,30 @@ class ExperimentEvaluator(Stage4Evaluator):
             generated_tokens=len(token_ids),
         )
 
-    def build_truncation_scores(self, generated, decoder_name):
+    def build_top_p_backoff_scores(self, generated):
+        return self.build_truncation_scores(generated, "top_p_backoff", return_keep_mask=True)
+
+    def build_truncation_scores(self, generated, decoder_name, return_keep_mask=False):
         outputs = self.model(
             input_ids=generated,
             use_cache=False,
             return_dict=True,
         )
         final_logits = outputs.logits[:, -1, :].float()
-        log_probs = F.log_softmax(final_logits, dim=-1)
+        full_log_probs = F.log_softmax(final_logits, dim=-1)
 
         if decoder_name == "top_k":
-            truncated_log_probs, kept_fraction = self.apply_top_k_truncation(log_probs, self.top_k_value)
+            truncated_log_probs, kept_fraction, keep_mask = self.apply_top_k_truncation(
+                full_log_probs,
+                self.top_k_value,
+                return_keep_mask=True,
+            )
         elif decoder_name in ("top_p", "top_p_backoff"):
-            truncated_log_probs, kept_fraction = self.apply_top_p_truncation(log_probs, self.top_p_value)
+            truncated_log_probs, kept_fraction, keep_mask = self.apply_top_p_truncation(
+                full_log_probs,
+                self.top_p_value,
+                return_keep_mask=True,
+            )
         else:  # pragma: no cover - protected by dispatch
             raise ValueError(f"Unsupported truncation decoder {decoder_name!r}.")
 
@@ -1460,43 +1475,12 @@ class ExperimentEvaluator(Stage4Evaluator):
             "baseline_margin": None,
             "truncation_kept_fraction": kept_fraction,
         }
+        if return_keep_mask:
+            return truncated_log_probs, full_log_probs, keep_mask, trace_row
         return truncated_log_probs, trace_row
 
-    def build_top_p_backoff_scores(self, generated):
-        outputs = self.model(
-            input_ids=generated,
-            use_cache=False,
-            return_dict=True,
-        )
-        final_logits = outputs.logits[:, -1, :].float()
-        full_log_probs = F.log_softmax(final_logits, dim=-1)
-        truncated_log_probs, kept_fraction, keep_mask = self.apply_top_p_truncation(
-            full_log_probs,
-            self.top_p_value,
-            return_keep_mask=True,
-        )
-
-        trace_row = {
-            "step": None,
-            "selected_layer": None,
-            "divergence": None,
-            "margin": None,
-            "instability": None,
-            "alpha": None,
-            "ablation_mode": "top_p_backoff",
-            "risk_triggered": None,
-            "risk_score": None,
-            "jsd_current": None,
-            "selection_margin": None,
-            "selection_score": kept_fraction,
-            "fallback_used": 0.0,
-            "baseline_margin": None,
-            "truncation_kept_fraction": kept_fraction,
-        }
-        return truncated_log_probs, full_log_probs, keep_mask, trace_row
-
     @staticmethod
-    def apply_top_k_truncation(log_probs, k):
+    def apply_top_k_truncation(log_probs, k, return_keep_mask=False):
         vocab_size = log_probs.shape[-1]
         k = min(int(k), int(vocab_size))
         topk_values, _ = torch.topk(log_probs, k=k, dim=-1)
@@ -1505,6 +1489,8 @@ class ExperimentEvaluator(Stage4Evaluator):
         filtered = torch.where(keep_mask, log_probs, torch.full_like(log_probs, float("-inf")))
         truncated_log_probs = F.log_softmax(filtered, dim=-1)
         kept_fraction = float(keep_mask.float().mean().item())
+        if return_keep_mask:
+            return truncated_log_probs, kept_fraction, keep_mask
         return truncated_log_probs, kept_fraction
 
     @staticmethod
